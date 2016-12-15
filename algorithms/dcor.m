@@ -1,5 +1,5 @@
-function c = dcorr( X, Y )
-%DCORR computes the distance correlation between two random variables
+function c = dcor( X, Y )
+%DCOR computes the distance correlation between two random variables
 % X and Y. Rows represent the examples, and columns the variables.
 % Date: 10-03-2015
 % Author: Paolo Inglese (paolo.ingls@gmail.com)

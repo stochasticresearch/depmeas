@@ -1,5 +1,5 @@
-classdef ktauhat_s < handle
-    %ktauhat_s Definition of the "streaming" ktauhat, a more efficient
+classdef taukl_s < handle
+    %taukl_s Definition of the "streaming" ktauhat, a more efficient
     %implementation of ktauhat for computing the RSDM than the naive
     %implementation given in ktauhat.m
     %
@@ -191,7 +191,7 @@ classdef ktauhat_s < handle
     end
     
     methods
-        function obj = ktauhat_s(x, y)
+        function obj = taukl_s(x, y)
             % set immutable properties
             obj.M = length(x);
             obj.CLOSE_TO_ZERO_THRESH = 0.02;      % if we are > 2% of length in terms of combinations;

@@ -1,5 +1,5 @@
-function [ tau ] = ktauhat( X, Y, correctionFlagOpt, dataSortedFlag )
-%ktaucj - computes a rescaled version of Kendall's tau that preserves
+function [ tau ] = taukl( X, Y, correctionFlagOpt, dataSortedFlag )
+%TAUKL - computes a rescaled version of Kendall's tau that preserves
 %         the definition of Kendall's tau, but assures that in the 
 %         scenario of perfect concordance or discordance for discrete
 %         or hybrid datatypes, taucj achieves +/- 1 respectively

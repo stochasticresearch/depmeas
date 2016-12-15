@@ -53,7 +53,7 @@ xyIdx = xyIdx + 1;
 
 rsdmBias = rsdm(xContinuous, yContinuous);
 rdcBias = rdc(xContinuous,yContinuous,rdc_k,rdc_s);
-dcorrBias = dcorr(xContinuous, yContinuous);
+dcorrBias = dcor(xContinuous, yContinuous);
 corrBias = corr(xContinuous,yContinuous);
 minestatsContinuous = mine(xContinuous',yContinuous',mine_alpha,mine_c,'mic_e');
 mic_e_bias = minestatsContinuous.mic;
@@ -170,20 +170,20 @@ for ii=1:nCases
     rdcValContinuous = rdc(xContinuous,yContinuous,rdc_k,rdc_s);
     minestatsContinuous = mine(xContinuous',yContinuous',mine_alpha,mine_c,'mic_e');
     mic_e_valContinuous = minestatsContinuous.mic;
-    dcorrValContinuous = dcorr(xContinuous,yContinuous);
+    dcorrValContinuous = dcor(xContinuous,yContinuous);
     corrValContinuous = corr(xContinuous,yContinuous);
     cosValContinuous = cosdv(xContinuous,yContinuous);
-    ccorrValContinuous = cCorr(xContinuous,yContinuous);
+    ccorrValContinuous = ccor(xContinuous,yContinuous);
     
     rsdmValDiscrete = rsdm(xDiscrete, yDiscrete);
     rdcValDiscrete = rdc(xDiscrete,yDiscrete,rdc_k,rdc_s);
     minestatsDiscrete = mine(xDiscrete',yDiscrete',mine_alpha,mine_c,'mic_e');
     mic_e_valDiscrete = minestatsDiscrete.mic;
-    dcorrValDiscrete = dcorr(xDiscrete,yDiscrete);
+    dcorrValDiscrete = dcor(xDiscrete,yDiscrete);
     corrValDiscrete = corr(xDiscrete,yDiscrete);
 %     cosValDiscrete = cosdv(xDiscrete,yDiscrete);
     cosValDiscrete = 0;     % glitches b/c it is only meant for continuous
-%     ccorrValDiscrete = cCorr(xDiscrete,yDiscrete);
+%     ccorrValDiscrete = ccor(xDiscrete,yDiscrete);
     ccorrValDiscrete = 0;   % glitches b/c it is only meant for discrete
     
     barVals = [rsdmValContinuous rsdmValDiscrete; ...
@@ -232,7 +232,7 @@ for ii=1:nCases
     rdcValContinuous = rdc(xContinuous,yContinuous,rdc_k,rdc_s);
     minestatsContinuous = mine(xContinuous',yContinuous',mine_alpha,mine_c,'mic_e');
     mic_e_valContinuous = minestatsContinuous.mic;
-    dcorrValContinuous = dcorr(xContinuous,yContinuous);
+    dcorrValContinuous = dcor(xContinuous,yContinuous);
     corrValContinuous = corr(xContinuous,yContinuous);
 
     if(ii==1)
@@ -275,7 +275,7 @@ for ii=1:nCases
     rdcValContinuous = rdc(xContinuous,yContinuous,rdc_k,rdc_s);
     minestatsContinuous = mine(xContinuous',yContinuous',mine_alpha,mine_c,'mic_e');
     mic_e_valContinuous = minestatsContinuous.mic;
-    dcorrValContinuous = dcorr(xContinuous,yContinuous);
+    dcorrValContinuous = dcor(xContinuous,yContinuous);
     corrValContinuous = corr(xContinuous,yContinuous);
 
     if(ii==1)

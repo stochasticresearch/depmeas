@@ -49,7 +49,7 @@ xy{1} = [x y];
 
 rsdmBias = rsdm(x, y);
 rdcBias = rdc(x,y,rdc_k,rdc_s);
-dcorrBias = dcorr(x, y);
+dcorrBias = dcor(x, y);
 corrBias = corr(x,y);
 minestats = mine(x',y',mine_alpha,mine_c,'mic_e');
 mic_e_bias = minestats.mic;
@@ -117,7 +117,7 @@ for ii=1:nCases
     rdcVal = rdc(x,y,rdc_k,rdc_s);
     minestats = mine(x',y',mine_alpha,mine_c,'mic_e');
     mic_e_val = minestats.mic;
-    dcorrVal = dcorr(x,y);
+    dcorrVal = dcor(x,y);
     corrVal = corr(x,y);
     
     if(printBiasCorrected)
@@ -179,7 +179,7 @@ for ii=1:nCases
     rdcVal = rdc(x,y,rdc_k,rdc_s);
     minestats = mine(x',y',mine_alpha,mine_c,'mic_e');
     mic_e_val = minestats.mic;
-    dcorrVal = dcorr(x,y);
+    dcorrVal = dcor(x,y);
     corrVal = corr(x,y);
 
     if(ii==1)
@@ -222,7 +222,7 @@ for ii=1:nCases
     rdcVal = rdc(x,y,rdc_k,rdc_s);
     minestats = mine(x',y',mine_alpha,mine_c,'mic_e');
     mic_e_val = minestats.mic;
-    dcorrVal = dcorr(x,y);
+    dcorrVal = dcor(x,y);
     corrVal = corr(x,y);
 
     if(ii==1)

@@ -59,28 +59,28 @@ dep_xD_yD = zeros(1,5);
 
 tau = corr(x,y,'type','kendall');
 taub = ktaub([x y], alpha_dontCare, wantplot_dontCare);
-tau_hat = ktauhat(x, y);
+tau_hat = taukl(x, y);
 minestats = mine(x',y',mine_alpha,mine_c,'mic_e');
 rdcVal = rdc(x,y,rdc_k,rdc_s);
 dep_xC_yC(1:5) = [tau taub tau_hat minestats.mic rdcVal];
 
 tau = corr(x,yy,'type','kendall');
 taub = ktaub([x yy], alpha_dontCare, wantplot_dontCare);
-tau_hat = ktauhat(x, yy);
+tau_hat = taukl(x, yy);
 minestats = mine(x',yy',mine_alpha,mine_c,'mic_e');
 rdcVal = rdc(x,yy,rdc_k,rdc_s);
 dep_xC_yD(1:5) = [tau taub tau_hat minestats.mic rdcVal];
 
 tau = corr(xx,y,'type','kendall');
 taub = ktaub([xx y], alpha_dontCare, wantplot_dontCare);
-tau_hat = ktauhat(xx, y);
+tau_hat = taukl(xx, y);
 minestats = mine(xx',y',mine_alpha,mine_c,'mic_e');
 rdcVal = rdc(xx,y,rdc_k,rdc_s);
 dep_xD_yC(1:5) = [tau taub tau_hat minestats.mic rdcVal];
 
 tau = corr(xx,yyy,'type','kendall');
 taub = ktaub([xx yyy], alpha_dontCare, wantplot_dontCare);
-tau_hat = ktauhat(xx, yyy);
+tau_hat = taukl(xx, yyy);
 minestats = mine(xx',yyy',mine_alpha,mine_c,'mic_e');
 rdcVal = rdc(xx,yyy,rdc_k,rdc_s);
 dep_xD_yD(1:5) = [tau taub tau_hat minestats.mic rdcVal];
@@ -130,28 +130,28 @@ dep_xD_yD = zeros(1,5);
 
 tau = corr(x,y,'type','kendall');
 taub = ktaub([x y], alpha_dontCare, wantplot_dontCare);
-tau_hat = ktauhat(x, y);
+tau_hat = taukl(x, y);
 minestats = mine(x',y',mine_alpha,mine_c,'mic_e');
 rdcVal = rdc(x,y,rdc_k,rdc_s);
 dep_xC_yC(1:5) = [tau taub tau_hat minestats.mic rdcVal];
 
 tau = corr(x,yy,'type','kendall');
 taub = ktaub([x yy], alpha_dontCare, wantplot_dontCare);
-tau_hat = ktauhat(x, yy);
+tau_hat = taukl(x, yy);
 minestats = mine(x',yy',mine_alpha,mine_c,'mic_e');
 rdcVal = rdc(x,yy,rdc_k,rdc_s);
 dep_xC_yD(1:5) = [tau taub tau_hat minestats.mic rdcVal];
 
 tau = corr(xx,y,'type','kendall');
 taub = ktaub([xx y], alpha_dontCare, wantplot_dontCare);
-tau_hat = ktauhat(xx, y);
+tau_hat = taukl(xx, y);
 minestats = mine(xx',y',mine_alpha,mine_c,'mic_e');
 rdcVal = rdc(xx,y,rdc_k,rdc_s);
 dep_xD_yC(1:5) = [tau taub tau_hat minestats.mic rdcVal];
 
 tau = corr(xx,yyy,'type','kendall');
 taub = ktaub([xx yyy], alpha_dontCare, wantplot_dontCare);
-tau_hat = ktauhat(xx, yyy);
+tau_hat = taukl(xx, yyy);
 minestats = mine(xx',yyy',mine_alpha,mine_c,'mic_e');
 rdcVal = rdc(xx,yyy,rdc_k,rdc_s);
 dep_xD_yD(1:5) = [tau taub tau_hat minestats.mic rdcVal];
@@ -260,7 +260,7 @@ for copulaTypeIdx=1:length(copulaTypes)
                 
                 tau = corr(x,y,'type','kendall');
 %                 taub = ktaub([x y], alpha_dontCare, wantplot_dontCare);
-                tau_hat = ktauhat(x, y);
+                tau_hat = taukl(x, y);
                 minestats = mine(x',y',mine_alpha,mine_c,'mic_e');
                 rdcVal = rdc(x,y,rdc_k,rdc_s);
                 
@@ -291,7 +291,7 @@ correctionFactors = [1 2 3 4 5];
 numTotalConfigurations = 8; % 8 entries, 1-5 are the different correction factors, 
                                          % 6 is matlab's built in tau, 
                                          % 7 is tau-b
-                                         % 8 ktauhat_s, which should closely mimic correctionFactor=4
+                                         % 8 taukl_s, which should closely mimic correctionFactor=4
                                         
 % TODO: put monotonoic and comonotonic dependencies in here!
 dependenciesVec = {'Gaussian', 'Frank', 'Gumbel', 'Clayton'};
@@ -344,12 +344,12 @@ for dependencyIdx=1:length(dependenciesVec)
                 
                 % compute the tau
                 for correctionFactor=correctionFactors
-                    tau_hat = ktauhat(x,y,correctionFactor);
+                    tau_hat = taukl(x,y,correctionFactor);
                     tau_hat_vec(correctionFactor, simnum) = tau_hat;
                 end
                 tau_hat_vec(6,simnum) = corr(x,y,'type','kendall');
                 tau_hat_vec(7,simnum) =  ktaub([x y], 0.05, 0);
-                kso = ktauhat_s(x, y);
+                kso = taukl_s(x, y);
                 tau_hat_vec(8,simnum) = kso.consumeAll();
 
             end
@@ -419,12 +419,12 @@ for dependencyIdx=1:length(dependenciesVec_Functional)
 
                 % compute the metrics
                 for correctionFactor=correctionFactors
-                    tau_hat = ktauhat(x,y,correctionFactor);
+                    tau_hat = taukl(x,y,correctionFactor);
                     tau_hat_vec(correctionFactor, simnum) = tau_hat;
                 end
                 tau_hat_vec(6,simnum) = corr(x,y,'type','kendall');
                 tau_hat_vec(7,simnum) =  ktaub([x y], 0.05, 0);
-                kso = ktauhat_s(x, y);
+                kso = taukl_s(x, y);
                 tau_hat_vec(8,simnum) = kso.consumeAll();
             end
             
@@ -628,10 +628,10 @@ for ii=1:nsim
         x_discrete = discretizeRv(x,numDiscreteIntervals)';
         y_discrete = discretizeRv(y,numDiscreteIntervals)';
         
-        ktauhatNullDistributionResultsContinuous(ii,jj) = ktauhat(x,y);
-        ktauhatNullDistributionResultsHybrid1(ii,jj) = ktauhat(x_discrete,y);
-        ktauhatNullDistributionResultsHybrid2(ii,jj) = ktauhat(x,y_discrete);
-        ktauhatNullDistributionResultsDiscrete(ii,jj) = ktauhat(x_discrete,y_discrete);
+        ktauhatNullDistributionResultsContinuous(ii,jj) = taukl(x,y);
+        ktauhatNullDistributionResultsHybrid1(ii,jj) = taukl(x_discrete,y);
+        ktauhatNullDistributionResultsHybrid2(ii,jj) = taukl(x,y_discrete);
+        ktauhatNullDistributionResultsDiscrete(ii,jj) = taukl(x_discrete,y_discrete);
     end
 end
 

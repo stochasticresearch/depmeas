@@ -1,5 +1,5 @@
-function [metric] = cCorr( X, Y, bw, M )
-% Computes the copula-correlation between realizations of random vectors X
+function [metric] = ccor( X, Y, bw, M )
+%CCOR Computes the copula-correlation between realizations of random vectors X
 % and Y.  The copula-correlation is loosely defined as the Lp distance
 % between the copula of X and Y, and the independence copula
 % Inputs:

@@ -1,7 +1,7 @@
 function [pdcov_val, pdcor_val, cov_pval, cor_pval] = pdcov( X, Y, Z, replicates )
-%PDCORR computes the partial distance covariance between two random 
+%PDCOV computes the partial distance covariance between two random 
 % variables X and Y, given Z. Rows represent the examples, and columns 
-% the variables.  This implementation somewhat based on of dcorr.m here:
+% the variables.  This implementation somewhat based on of dcor.m here:
 % https://www.mathworks.com/matlabcentral/fileexchange/49968-dcorr--x--y--
 % and the impelmentation of pdcov.test in the "energy" package in R. 
 % Reference: https://arxiv.org/pdf/1310.2926.pdf

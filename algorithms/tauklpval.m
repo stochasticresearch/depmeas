@@ -1,5 +1,5 @@
-function [pval] = ktauhatpval(ktauhatVal, M, varargin)
-%RSDMPVAL - computes the p-value of a given ktauhat measure and the number of
+function [pval] = tauklpval(ktauhatVal, M, varargin)
+%TAUKLPVAL - computes the p-value of a given taukl measure and the number of
 %samples upon which that ktauhat measure was calculated against independence
 %hypothesis
 % Inputs:

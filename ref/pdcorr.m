@@ -1,7 +1,7 @@
 function [T0, pval] = pdcorr( X, Y, Z, replicates )
 %PDCORR computes the partial distance correlation between two random 
 % variables X and Y, given Z. Rows represent the examples, and columns 
-% the variables.  This implementation somewhat based on of dcorr.m here:
+% the variables.  This implementation somewhat based on of dcor.m here:
 %  https://www.mathworks.com/matlabcentral/fileexchange/49968-dcorr--x--y--
 % Reference: https://arxiv.org/pdf/1310.2926.pdf
 % Inputs:

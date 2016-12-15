@@ -130,7 +130,7 @@ for l=num_noise_test_min:num_noise_test_max
             
             % calculate the metrics
             rsdmNull(ii) = rsdm(x, y);
-            dcorrNull(ii) = dcorr(x, y);
+            dcorrNull(ii) = dcor(x, y);
             % compute MICe
             minestats = mine(x',y',mine_alpha,mine_c,'mic_e');
             ticeNull(ii) = minestats.tic;
@@ -141,7 +141,7 @@ for l=num_noise_test_min:num_noise_test_max
             % compute CoS
             cosNull(ii) = cosdv(x,y);
             % compute cCorr
-            ccorrNull(ii) = cCorr(x,y);
+            ccorrNull(ii) = ccor(x,y);
         end
         
         % compute the rejection cutoffs
@@ -187,7 +187,7 @@ for l=num_noise_test_min:num_noise_test_max
             
             % calculate the metrics
             rsdmAlt(ii) = rsdm(x, y);
-            dcorrAlt(ii) = dcorr(x, y);
+            dcorrAlt(ii) = dcor(x, y);
             % compute MICe
             minestats = mine(x',y',mine_alpha,mine_c,'mic_e');
             ticeAlt(ii) = minestats.tic;
@@ -198,7 +198,7 @@ for l=num_noise_test_min:num_noise_test_max
             % compute CoS
             cosAlt(ii) = cosdv(x,y);
             % compute cCorr
-            ccorrAlt(ii) = cCorr(x,y);
+            ccorrAlt(ii) = ccor(x,y);
         end
         
         % compute the power
@@ -555,7 +555,7 @@ for m=1:length(M_vec)
 
                 % calculate the metrics
                 rsdmNull(ii) = rsdm(x, y);
-                dcorrNull(ii) = dcorr(x, y);
+                dcorrNull(ii) = dcor(x, y);
                 % compute MICe
                 minestats = mine(x',y',mine_alpha,mine_c,'mic_e');
                 ticeNull(ii) = minestats.tic;
@@ -566,7 +566,7 @@ for m=1:length(M_vec)
                 % compute CoS
                 cosNull(ii) = cosdv(x,y);
                 % compute ccorr
-                ccorrNull(ii) = cCorr(x,y);
+                ccorrNull(ii) = ccor(x,y);
             end
 
             % compute the rejection cutoffs
@@ -612,7 +612,7 @@ for m=1:length(M_vec)
 
                 % calculate the metrics
                 rsdmAlt(ii) = rsdm(x, y);
-                dcorrAlt(ii) = dcorr(x, y);
+                dcorrAlt(ii) = dcor(x, y);
                 % compute MICe
                 minestats = mine(x',y',mine_alpha,mine_c,'mic_e');
                 ticeAlt(ii) = minestats.tic;
@@ -623,7 +623,7 @@ for m=1:length(M_vec)
                 % compute CoS
                 cosAlt(ii) = cosdv(x,y);
                 % compute ccorr
-                ccorrAlt(ii) = cCorr(x,y);
+                ccorrAlt(ii) = ccor(x,y);
             end
 
             % compute the power
@@ -1528,7 +1528,7 @@ for m=1:30
                 % compute CoS
                 cosNull(ii) = cosdv(x,y);
                 % compute ccorr
-                ccorrNull(ii) = cCorr(x,y);
+                ccorrNull(ii) = ccor(x,y);
             end
 
             % compute the rejection cutoffs
@@ -1575,7 +1575,7 @@ for m=1:30
                 % compute CoS
                 cosAlt(ii) = cosdv(x,y);
                 % compute ccorr
-                ccorrAlt(ii) = cCorr(x,y);
+                ccorrAlt(ii) = ccor(x,y);
             end
 
             % compute the power

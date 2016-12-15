@@ -89,10 +89,10 @@ for testNum=1:numTests
     fprintf('***** Testing DepType = %d *****\n', testNum);
     
     % test equality for for all continuous/hybrid/all discrete cases
-    kso_continuous = ktauhat_s(x, y);
-    kso_hybrid1 = ktauhat_s(x_discrete,y_hybrid1);
-    kso_hybrid2 = ktauhat_s(x,y_hybrid2);
-    kso_discrete = ktauhat_s(x_discrete,y_discrete);
+    kso_continuous = taukl_s(x, y);
+    kso_hybrid1 = taukl_s(x_discrete,y_hybrid1);
+    kso_hybrid2 = taukl_s(x,y_hybrid2);
+    kso_discrete = taukl_s(x_discrete,y_discrete);
     for ii=2:M
 %         fprintf('*******************************\n');
         x_continuous_subset = x(1:ii)';
@@ -104,10 +104,10 @@ for testNum=1:numTests
         
         
         % sort the hybrid data and the discrete data such that ktauhat and
-        % ktauhat_s *should* match-up
+        % taukl_s *should* match-up
         
         if(testContinuous)
-            tau1_c = ktauhat(x_continuous_subset, y_continuous_subset, CORRECTION_FACTOR_SETTING);
+            tau1_c = taukl(x_continuous_subset, y_continuous_subset, CORRECTION_FACTOR_SETTING);
             tau2_c = kso_continuous.consume(1);
             
             if(abs(tau1_c-tau2_c)>tol)
@@ -117,7 +117,7 @@ for testNum=1:numTests
         end
         
         if(testHybrid1)
-            tau1_h1 = ktauhat(x_discrete_subset, y_hybrid1_subset, CORRECTION_FACTOR_SETTING);
+            tau1_h1 = taukl(x_discrete_subset, y_hybrid1_subset, CORRECTION_FACTOR_SETTING);
             tau2_h1 = kso_hybrid1.consume(1);
             if(abs(tau1_h1-tau2_h1)>tol)
                 warning('Hybrid-1 Error: ii=%d', ii);
@@ -126,7 +126,7 @@ for testNum=1:numTests
         end
         
         if(testHybrid2)
-            tau1_h2 = ktauhat(x_continuous_subset, y_hybrid2_subset, CORRECTION_FACTOR_SETTING);
+            tau1_h2 = taukl(x_continuous_subset, y_hybrid2_subset, CORRECTION_FACTOR_SETTING);
             tau2_h2 = kso_hybrid2.consume(1);
             if(abs(tau1_h2-tau2_h2)>tol)
                 warning('Hybrid-2 Error: ii=%d', ii);
@@ -135,7 +135,7 @@ for testNum=1:numTests
         end
         
         if(testDiscrete)      % circular isn't correct for discrete
-            tau1_d = ktauhat(x_discrete_subset, y_discrete_subset, CORRECTION_FACTOR_SETTING);
+            tau1_d = taukl(x_discrete_subset, y_discrete_subset, CORRECTION_FACTOR_SETTING);
             tau2_d = kso_discrete.consume(1);
             if(abs(tau1_d-tau2_d)>tol)
                 warning('Discrete Error: ii=%d', ii);
@@ -147,7 +147,7 @@ for testNum=1:numTests
 %     fprintf('*******************************\n');
 end
 
-%% test ktauhat_s restart mode
+%% test taukl_s restart mode
 clear;
 clc;
 dbstop if error;
@@ -161,14 +161,14 @@ y = (x-0.5).^2;
 
 tol = 1e-3;
 
-kso = ktauhat_s(x, y);
+kso = taukl_s(x, y);
 iiBegin = 1;
 iiEnd = M/5;
 for ii=iiBegin+1:iiEnd
     x_continuous_subset = x(iiBegin:ii);
     y_continuous_subset = y(iiBegin:ii);
     
-    tau1_c = ktauhat(x_continuous_subset, y_continuous_subset);
+    tau1_c = taukl(x_continuous_subset, y_continuous_subset);
     tau2_c = kso.consume(1);
 
     if(abs(tau1_c-tau2_c)>tol)
@@ -185,7 +185,7 @@ for ii=iiBegin+1:iiEnd
     x_continuous_subset = x(iiBegin:ii);
     y_continuous_subset = y(iiBegin:ii);
     
-    tau1_c = ktauhat(x_continuous_subset, y_continuous_subset);
+    tau1_c = taukl(x_continuous_subset, y_continuous_subset);
     tau2_c = kso.consume(1);
 
     if(abs(tau1_c-tau2_c)>tol)
@@ -230,7 +230,7 @@ ALREADY_SORTED = 1;
 
 M = length(x);
 
-% sort the data so we can compare ktauhat and ktauhat_s sequentially
+% sort the data so we can compare ktauhat and taukl_s sequentially
 u = sort(x); [~,uu] = ismember(x,u);
 v = sort(y); [~,vv] = ismember(y,v);
 [u,I] = sort(uu);
@@ -241,7 +241,7 @@ v = vv(I); v = sortSubblocks(u, v);
 % subplot(1,3,2); scatter(pobs(x), pobs(y)); xlabel('pobs(x)'); ylabel('pobs(y)');
 % subplot(1,3,3); scatter(u, v); xlabel('v'); ylabel('v');
 
-kso = ktauhat_s(u, v);
+kso = taukl_s(u, v);
 
 for ii=2:M
 %     fprintf('************************************************\n');
@@ -250,7 +250,7 @@ for ii=2:M
 %     u_subset'
 %     fprintf('v_subset --->\n');
 %     v_subset'
-    tau1 = ktauhat(u_subset, v_subset, CORRECTION_FACTOR, ALREADY_SORTED);
+    tau1 = taukl(u_subset, v_subset, CORRECTION_FACTOR, ALREADY_SORTED);
     tau2 = kso.consume(1);
     fprintf('tau1=%0.02f tau2=%0.02f\n', tau1, tau2);
 %     fprintf('************************************************\n');
