@@ -1604,9 +1604,7 @@ else
 end
 
 %% CoS only parameric power curves
-%% Generate curves which show the effect of sample size for statistical for only CoS and cCorr
-% TODO: merge these results back in w/ the other power vs sample-size
-% calculations ...
+% Generate curves which show the effect of sample size for statistical for only CoS and cCorr
 
 clear;
 clc;
@@ -1757,4 +1755,159 @@ elseif(ismac)
     save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rsdmPower_CoS_M_25_1500.mat');
 else
     save('/home/kiran/ownCloud/PhD/sim_results/independence/rsdmPower_CoS_M_25_1500.mat');
+end
+
+%% RSDM only parameric power curves
+% TODO: merge these results back in w/ the other power vs sample-size
+% calculations ...
+
+clear;
+clc;
+
+% WARNING: ENSURE THAT minepy/matlab/ is in the matlab path for MIC to
+% work!
+
+rng(1234);
+dbstop if error;
+
+nsim_null = 500;   % The number of null datasets we use to estimate our rejection reject regions for an alternative with level 0.05
+nsim_alt  = 500;   % Number of alternative datasets we use to estimate our power
+
+num_noise = 30;                    % The number of different noise levels used
+noise = 3;                         % A constant to determine the amount of noise
+
+M_vec = 25:25:1500;      % number of samples
+numDepTests = 8;        % the number of different dependency tests we will conduct
+                        % TODO: add copula dependencies as well
+                        
+% Vectors holding the null "correlations" (for pearson, dcor and mic respectively) 
+% for each of the nsim null datasets at a given noise level
+rsdmNull = zeros(1,nsim_null);
+rsdmAlt = zeros(1,nsim_alt);
+
+% Arrays holding the estimated power for each of the "correlation" types, 
+% for each data type (linear, parabolic, etc...) with each noise level
+rsdmPower  = zeros(numDepTests, num_noise, length(M_vec));
+
+% We loop through the noise level and functional form; 
+% each time we estimate a null distribution based on the marginals of the data, 
+% and then use that null distribution to estimate power
+
+% We use a uniformly distributed x, because in the original paper the 
+% authors used the same
+
+% Simon & Tibshirani use xMin=0, xMax=1 for performing their analysis ...
+xMin = 0;
+xMax = 1;
+
+dispstat('','init'); % One time only initialization
+dispstat(sprintf('Begining the simulation...\n'),'keepthis','timestamp');
+num_noise_test_min = 1;
+num_noise_test_max = 30;
+for m=1:length(M_vec)
+% for m=1:30
+    M = M_vec(m);
+    for l=num_noise_test_min:num_noise_test_max
+        for typ=1:numDepTests
+            dispstat(sprintf('M=%d Noise=%d Dependency=%d',M, l, typ),'keepthis', 'timestamp');
+            % simulate data under the null w/ correct marginals
+            parfor ii=1:nsim_null
+                x = rand(M,1)*(xMax-xMin)+xMin;
+                switch(typ)
+                    case 1
+                        % linear
+                        y = x + noise*(l/num_noise)*randn(M,1); 
+                    case 2
+                        % parabolic
+                        y = 4*(x-.5).^2 + noise*(l/num_noise)*randn(M,1);
+                    case 3
+                        % cubic
+                        y = 128*(x-1/3).^3-48*(x-1/3).^3-12*(x-1/3)+10* noise*(l/num_noise)*randn(M,1);
+                    case 4
+                        % low-freq sin
+                        y = sin(4*pi*x) + 2*noise*(l/num_noise)*randn(M,1);
+                    case 5
+                        % high-freq sin
+                        y = sin(16*pi*x) + noise*(l/num_noise)*randn(M,1);
+                    case 6
+                        % fourth root
+                        y = x.^(1/4) + noise*(l/num_noise)*randn(M,1);
+                    case 7
+                        % circle
+                        y=(2*binornd(1,0.5,M,1)-1) .* (sqrt(1 - (2*x - 1).^2)) + noise/4*l/num_noise*randn(M,1);
+                    case 8
+                        % step function
+                        y = (x > 0.5) + noise*5*l/num_noise*randn(M,1);
+                    otherwise
+                        error('unknown dep type!');
+                end
+                % resimulate x so we have null scenario
+                x = rand(M,1)*(xMax-xMin)+xMin;
+
+                % calculate the metrics
+                % compute RSDM
+                rsdmNull(ii) = rsdm(x,y);
+            end
+
+            % compute the rejection cutoffs
+            rsdm_cut  = quantile(rsdmNull, 0.95);
+
+            % resimulate the data under the alternative hypothesis
+            parfor ii=1:nsim_alt
+                x = rand(M,1)*(xMax-xMin)+xMin;
+                switch(typ)
+                    case 1
+                        % linear
+                        y = x + noise*(l/num_noise)*randn(M,1); 
+                    case 2
+                        % parabolic
+                        y = 4*(x-.5).^2 + noise*(l/num_noise)*randn(M,1);
+                    case 3
+                        % cubic
+                        y = 128*(x-1/3).^3-48*(x-1/3).^3-12*(x-1/3) + 10*noise*(l/num_noise)*randn(M,1);
+                    case 4
+                        % low-freq sin
+                        y = sin(4*pi*x) + 2*noise*(l/num_noise)*randn(M,1);
+                    case 5
+                        % high-freq sin
+                        y = sin(16*pi*x) + noise*(l/num_noise)*randn(M,1);
+                    case 6
+                        % fourth root
+                        y = x.^(1/4) + noise*(l/num_noise)*randn(M,1);
+                    case 7
+                        % circle
+                        y=(2*binornd(1,0.5,M,1)-1) .* (sqrt(1 - (2*x - 1).^2)) + noise/4*l/num_noise*randn(M,1);
+                    case 8
+                        % step function
+                        y = (x > 0.5) + noise*5*l/num_noise*randn(M,1);
+                    otherwise
+                        error('unknown dep type!');
+                end
+
+                % calculate the metrics
+                % compute RSDM
+                rsdmAlt(ii) = rsdm(x,y);
+            end
+
+            % compute the power
+            rsdmPower(typ, l, m)    = sum(rsdmAlt > rsdm_cut)/nsim_alt;
+        end
+    end
+    
+    % save intermediate results just in case things crash :(
+    if(ispc)
+        save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rsdmPower_rsdm_M_25_1500.mat');
+    elseif(ismac)
+        save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rsdmPower_rsdm_M_25_1500.mat');
+    else
+        save('/home/kiran/ownCloud/PhD/sim_results/independence/rsdmPower_rsdm_M_25_1500.mat');
+    end
+end
+% save the data
+if(ispc)
+    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rsdmPower_rsdm_M_25_1500.mat');
+elseif(ismac)
+    save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rsdmPower_rsdm_M_25_1500.mat');
+else
+    save('/home/kiran/ownCloud/PhD/sim_results/independence/rsdmPower_rsdm_M_25_1500.mat');
 end
