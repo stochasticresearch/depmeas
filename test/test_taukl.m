@@ -468,7 +468,7 @@ f = figure(1);
 % plot the data
 metricsToPlot = [7 6 4];        % 7 = tau-b, 6 = tau, 4 = tau-h 8=tau-h (streaming-mode)
 % manually looking, CF4 seems to work best, plot against tau and tau-b
-legendCell = {'\tau_b', '\tau_{CJ}', '\tau_{KL}'};     % put tau-h last, it is the best performing but the bounds
+legendCell = {'\tau_b', '\tau_{N}', '\tau_{KL}'};     % put tau-h last, it is the best performing but the bounds
                                                 % are harder to see if we put it first
 cmap = [1 0 0; 0 1 0; 0 0 1];
 % cmap = jet(4);

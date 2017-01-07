@@ -1,4 +1,4 @@
-function [R] = pairrsdm( X )
+function [R, RectanglesCell] = pairrsdm( X )
 %PAIRRSDM - computes pairwise dependency metrics of a given vector
 % Inputs:
 %  X - a matrix of observations from which pairwise RSDM metrics are
@@ -26,13 +26,16 @@ function [R] = pairrsdm( X )
 
 n = size(X,2);      % the dimensionality of the dataset
 R = zeros(n,n);
+RectanglesCell = cell(n,n);
 
 for ii=1:n
     x = X(:,ii);
     parfor jj=ii+1:n
         y = X(:,jj);        
-        rsdmVal = rsdm(x,y);
+        [rsdmVal, rco] = rsdm(x,y);
         R(ii,jj) = rsdmVal;
+        
+        RectanglesCell{ii,jj} = rco;
     end
 end
 
@@ -41,5 +44,11 @@ end
 % zeros.
 R=R+R';
 R(1:n+1:n*n) = 1;   % set the diagonal to 1
+% TODO: is there an easier way to do this w/ cell arrays?
+for ii=1:n
+    for jj=ii+1:n
+        RectanglesCell{jj,ii} = RectanglesCell{ii,jj};
+    end
+end
 
 end
