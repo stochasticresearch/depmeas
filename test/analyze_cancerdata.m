@@ -43,8 +43,8 @@ end
 files = dir(fullfile(rootDir,'csv_files'));
 for ii=1:length(files)
     fname = files(ii).name;
-    [~,name,~] = fileparts(fname);
-    if(~strcmp(fname,'.') && ~strcmp(fname,'..'))
+    [~,name,ext] = fileparts(fname);
+    if(strcmpi(ext,'csv'))
         fnameWithPath = fullfile(rootDir, 'csv_files', fname);
         fprintf('Processing file=%s\n', fnameWithPath);
         % process this file
