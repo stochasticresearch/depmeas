@@ -204,6 +204,36 @@ clearvars f1name f2name outputFilename
 clearvars folder f1 f2
 save(finalOutputFile);
 
+%% Merge knn power into power_M_500
+
+clear;
+clc;
+dbstop if error;
+
+f1name = 'rsdmPower_knn_M_500.mat';
+f2name = 'power_M_500.mat';
+outputFilename = 'power_M_500.mat';
+
+if(ispc)
+    folder = 'C:\\Users\\Kiran\\ownCloud\\PhD\sim_results\\independence';
+elseif(ismac)
+    folder = '/Users/Kiran/ownCloud/PhD/sim_results/independence';
+else % assume unix
+    folder = '/home/kiran/ownCloud/PhD/sim_results/independence';
+end
+
+f1 = fullfile(folder, f1name);
+f2 = fullfile(folder, f2name);
+
+load(f1);
+clearvars -except knn1Power knn6Power knn20Power f1name f2name outputFilename folder f1 f2
+load(f2);
+
+finalOutputFile = fullfile(folder, outputFilename);
+clearvars f1name f2name outputFilename
+clearvars folder f1 f2
+save(finalOutputFile);
+
 %% Merge the ite power into power_M_500
 
 clear;
