@@ -46,6 +46,11 @@ for ii=1:length(files)
     [~,name,ext] = fileparts(fname);
     if(strcmpi(ext,'csv'))
         fnameWithPath = fullfile(rootDir, 'csv_files', fname);
+        outFile = fullfile(rootDir,'results',[name '.mat']);
+        if(exist(outFile,'file'))
+            % we have already processed the results, no need to recompute
+            continue;
+        end
         fprintf('Processing file=%s\n', fnameWithPath);
         % process this file
         data = csvread(fnameWithPath);
@@ -69,7 +74,6 @@ for ii=1:length(files)
         I = triu(monotonicityMat,1)~=0;
         monotonicityVec = monotonicityMat(I);
         [uniques, numUniques] = count_unique(monotonicityVec);
-        outFile = fullfile(rootDir,'results',[name '.mat']);
         save(outFile, 'R', 'RectanglesCell', 'monotonicityMat', 'uniques', 'numUniques');
     end
 end
