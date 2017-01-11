@@ -401,7 +401,7 @@ x = rand(M,1);
 % y = sin(4*pi*x) + noise*randn(M,1); z = cos(4*pi*x) + noise*randn(M,1);
 % y = nthroot(x, 4) + noise*randn(M,1); z = nthroot(x, 4) + noise*randn(M,1);
 % y = x + noise*randn(M,1); z = 4*(x-0.5).^2 + noise*randn(M,1);
-y = 4*(x-0.5).^2 + noise*randn(M,1); z = cos(4*pi*x) + noise*randn(M,1);
+% y = 4*(x-0.5).^2 + noise*randn(M,1); z = cos(4*pi*x) + noise*randn(M,1);
 
 rsdm1 = rsdm(x, y);
 rsdm2 = rsdm(x, z);
@@ -466,7 +466,7 @@ h7.FontSize = fontSize;
 clear;
 clc;
 
-% rng(123);
+rng(6);
 
 M = 500;
 noise = 0;
@@ -475,11 +475,11 @@ alpha = 0.05;
 % Generate data from     Y-->X<--Z
 y = rand(M,1);
 z = rand(M,1);
-% x = y + z + noise*randn(M,1);
+x = y + z + noise*randn(M,1);
 % x = (y-0.5).^2 + (z-0.5).^2 + noise*randn(M,1);
 % x = sin(4*pi*y)+cos(4*pi*z) + noise*randn(M,1);
 % x = nthroot(y,4)+nthroot(z,4) + noise*randn(M,1);
-x = y + (z-0.5).^2 + noise*randn(M,1);
+% x = y + (z-0.5).^2 + noise*randn(M,1);
 % x = (y-0.5).^2 + cos(4*pi*z) + noise*randn(M,1);
 
 rsdm1 = rsdm(x, y);

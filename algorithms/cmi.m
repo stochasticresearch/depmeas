@@ -98,7 +98,7 @@ if nargout == 2
     info.nn = nn;
 end
 
-function K = computel2matrix(X)
+efunction K = computel2matrix(X)
 % This function computes the pairwise Euclidean distances between the rows of X
 % Input:
 %   (X) is a matrix with rows as observations

@@ -23,6 +23,18 @@ function [T0, pval] = hsic(X,Y,Z,replicates,param)
 %* 
 %**************************************************************************
 
+% setup default arguments
+if(nargin<4)
+    replicates = 200;
+    param.kernel = 'gaus';
+    param.kernelSize = 'med';
+    param.reg = 'n^(-1)';
+elseif(nargin<5)
+    param.kernel = 'gaus';
+    param.kernelSize = 'med';
+    param.reg = 'n^(-1)';
+end
+
 % compute the statistic
 T0 = hsncic(X,Y,Z,param);
 
