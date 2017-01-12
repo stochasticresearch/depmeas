@@ -25,12 +25,10 @@ clear;
 clc;
 dbstop if error;
 
+parpool;
 % suppress rank-deficient warnings for regression fitting (we aren't
 % concerned with that for our current analysis)
-spmd
-    warning_id =  'MATLAB:rankDeficientMatrix';
-    warning('off',warning_id);
-end
+pctRunOnAll warning('off','MATLAB:rankDeficientMatrix');
 
 if(ispc)
     rootDir = 'C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\cancer';
@@ -44,7 +42,7 @@ files = dir(fullfile(rootDir,'csv_files'));
 for ii=1:length(files)
     fname = files(ii).name;
     [~,name,ext] = fileparts(fname);
-    if(strcmpi(ext,'csv'))
+    if(strcmpi(ext,'.csv'))
         fnameWithPath = fullfile(rootDir, 'csv_files', fname);
         outFile = fullfile(rootDir,'results',[name '.mat']);
         if(exist(outFile,'file'))
@@ -57,6 +55,9 @@ for ii=1:length(files)
         % transpose the data, b/c computational biologists like to store
         % data in row vectors instead of column vectors ... :/
         data = data';
+        if(size(data,2)>100)
+            data = data(:,1:100);
+        end
         [R, RectanglesCell] = pairrsdm( data );
         % compute the "monotonicity" of the data
         sz = size(RectanglesCell);
@@ -74,12 +75,15 @@ for ii=1:length(files)
         I = triu(monotonicityMat,1)~=0;
         monotonicityVec = monotonicityMat(I);
         [uniques, numUniques] = count_unique(monotonicityVec);
-        save(outFile, 'R', 'RectanglesCell', 'monotonicityMat', 'uniques', 'numUniques');
+        save(outFile, 'R', 'RectanglesCell', 'monotonicityMat', 'uniques', 'numUniques', 'data');
     end
 end
 
 % restore normal Matlab warning settings
-warning('on',warning_id);
+pctRunOnAll warning('on','MATLAB:rankDeficientMatrix');
+
+p = gcp;
+delete(p)
 
 %%
 % analyze the results of monotonicity

@@ -24,13 +24,6 @@ clear;
 clc;
 dbstop if error;
 
-% suppress rank-deficient warnings for regression fitting (we aren't
-% concerned with that for our current analysis)
-spmd
-    warning_id =  'MATLAB:rankDeficientMatrix';
-    warning('off',warning_id);
-end
-
 if(ispc)
     rootDir = 'C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\stocks';
 elseif(ismac)
@@ -40,9 +33,9 @@ else
 end
 
 % list all available data
-files = dir(fullfile(rootDir,'csv_files'));
-numStocksToProcess = length(files-2);   % the -2 is to exclude '.' and '..'
-stocksData = cell{numStocksToProcess,4};   
+files = dir(fullfile(rootDir,'normalized_files'));
+numStocksToProcess = length(files)-2;   % the -2 is to exclude '.' and '..'
+stocksData = cell(numStocksToProcess,4);   
                                         % {1} = stock name
                                         % {2} = raw data
                                         % {3} = first difference of closing
@@ -64,14 +57,18 @@ jj = 1;
 for ii=1:length(files)
     fname = files(ii).name;
     [~,name,ext] = fileparts(fname);
-    if(strcmpi(ext,'csv'))
-        fnameWithPath = fullfile(rootDir, 'csv_files', fname);
+    if(strcmpi(ext,'.csv'))
+        fnameWithPath = fullfile(rootDir, 'normalized_files', fname);
         fprintf('Processing file=%s\n', fnameWithPath);
         % process this file
-        data = csvread(fnameWithPath,1,0);      % the 1 indicates skip the header
+        fid = fopen(fnameWithPath);
+        header = fgetl(fid);
+        data = textscan(fid, '%*s %f %f %f %f %*[^\n]', 'delimiter', ',');
+        fclose(fid);
+        
         stocksData{jj,1} = name;
         stocksData{jj,2} = data;
-        closePrice = data(:,5);
+        closePrice = data{4};
         % compute returns data
         returnsData = closePrice(1:end-1)-closePrice(2:end);
         stocksData{jj,3} = returnsData;
@@ -85,9 +82,16 @@ for ii=1:length(files)
     end
 end
 
+% start the parallel pool if none exist
+p = gcp();
+
+% suppress rank-deficient warnings for regression fitting (we aren't
+% concerned with that for our current analysis)
+pctRunOnAll warning('off','MATLAB:rankDeficientMatrix');
+
 % now perform monotonicity analysis
 R = zeros(numStocksToProcess,numStocksToProcess);
-RectanglesCell = cell{numStocksToProcess,numStocksToProcess};
+RectanglesCell = cell(numStocksToProcess,numStocksToProcess);
 for ii=1:numStocksToProcess
     fprintf('Processing Data # %d\n', ii);
     parfor jj=ii+1:numStocksToProcess
@@ -99,7 +103,7 @@ for ii=1:numStocksToProcess
         [metric, rectangleCellOut] = rsdm(returns_i,returns_j);
         
         R(ii,jj) = metric; 
-        RectanglesCell{ii,jj} = rectangleCellout;
+        RectanglesCell{ii,jj} = rectangleCellOut;
     end
 end
 
@@ -107,7 +111,7 @@ for ii=1:numStocksToProcess
     for jj=ii+1:numStocksToProcess
         R(jj,ii) = R(ii,jj); 
         R(ii,ii) = 1;
-        RectanglesCell{jj,ii} = rectangleCellout;
+        RectanglesCell{jj,ii} = RectanglesCell{ii,jj};
     end
 end
 
@@ -127,7 +131,13 @@ I = triu(monotonicityMat,1)~=0;
 monotonicityVec = monotonicityMat(I);
 [uniques, numUniques] = count_unique(monotonicityVec);
 
-outFile = fullfile(rootDir,'results.mat');
+outFile = fullfile(rootDir,'stocks_results.mat');
 save(outFile);
+
+% restore normal Matlab warning settings
+pctRunOnAll warning('on','MATLAB:rankDeficientMatrix');
+
+p = gcp;
+delete(p)
 
 %% Plot the Monotonicity results of the above
