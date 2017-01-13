@@ -1,4 +1,4 @@
-function val = cm(X,Y,Z,varargin)
+function val = cm(X,Y,Z)
 
 % val = cm(X,Y,Z,param) computes the CM statistic between two conditional CDFs
 % Input: X, Y and Z are column vectors of length n, X is [nx1], number of columns can vary for Y and Z

@@ -1,4 +1,4 @@
-function [val info] = cmi(data,varargin)
+function [val, info] = cmi(data,varargin)
 
 % This function computes the conditional mutual information 
 % Input: 
@@ -98,7 +98,7 @@ if nargout == 2
     info.nn = nn;
 end
 
-efunction K = computel2matrix(X)
+function K = computel2matrix(X)
 % This function computes the pairwise Euclidean distances between the rows of X
 % Input:
 %   (X) is a matrix with rows as observations
