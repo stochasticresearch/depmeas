@@ -28,14 +28,11 @@ nsim = 500;
 
 gammaVec = 0:0.1:1;
 
-numDepTypes = 6;
+numDepTypes = 4;
 rsdmResultsMat = zeros(length(gammaVec), numDepTypes, nsim);        % for comparision of acceptance rates
 rscdmResultsMat = zeros(length(gammaVec), numDepTypes, nsim);
 cmaSurrResultsMat = zeros(length(gammaVec), numDepTypes, nsim);     % for comparision of aceptance rate
 cmaResultsMat = zeros(length(gammaVec), numDepTypes, nsim);
-hdResultsMat = zeros(length(gammaVec), numDepTypes, nsim);
-hsicResultsMat = zeros(length(gammaVec), numDepTypes, nsim);
-hsicPValMat = zeros(length(gammaVec), numDepTypes, nsim);
 pdcorrResultsMat = zeros(length(gammaVec), numDepTypes, nsim);
 pdcorrPValMat = zeros(length(gammaVec), numDepTypes, nsim);
 pcorrResultsMat = zeros(length(gammaVec), numDepTypes, nsim);
@@ -45,9 +42,6 @@ rsdmResultsVec = zeros(1,nsim);
 rscdmResultsVec = zeros(1,nsim);
 cmaSurrResultsVec = zeros(1,nsim);
 cmaResultsVec = zeros(1,nsim);
-hdResultsVec = zeros(1,nsim);
-hsicResultsVec = zeros(1,nsim);
-hsicPValVec = zeros(1,nsim);
 pdcorrResultsVec = zeros(1,nsim);
 pdcorrPValVec = zeros(1,nsim);
 pcorrResultsVec = zeros(1,nsim);
@@ -88,22 +82,11 @@ for gammaIdx=1:length(gammaVec)
             cmaVal = cassor(data);
             cmaSurrVal = gensurr(data);
             
-            hdVal = hd(Y,Z,X);
-
-            [hsicVal, hsicpval] = hsic(Y,Z,X);
-            [~, pdcorVal, ~, pdcor_pval] = pdcov(Y, Z, X);
-            [pcorrVal, pcorr_pval] = partialcorr(Y, Z, X);
-            
             rsdmResultsVec(ii) = rsdmVal;
             rscdmResultsVec(ii) = rscdmVal;
             
             cmaSurrResultsVec(ii) = cmaSurrVal;
             cmaResultsVec(ii) = cmaVal;
-            
-            hdResultsVec(ii) = hdVal;
-            
-            hsicResultsVec(ii) = hsicVal;
-            hsicPValVec(ii) = hsicPVal;
             
             pdcorrResultsVec(ii) = pdcorVal;
             pdcorrPValVec(ii) = pdcor_pval;
@@ -117,11 +100,6 @@ for gammaIdx=1:length(gammaVec)
         
         cmaSurrResultsMat(gammaIdx, jj, :) = cmaSurrResultsVec;
         cmaResultsMat(gammaIdx, jj, :) = cmaResultsVec;
-        
-        hdResultsMat(gammaIdx, jj, :) = hdResultsVec;
-        
-        hsicResultsMat(gammaIdx, jj, :) = hsicResultsVec;
-        hsicPValMat(gammaIdx, jj, :) = hsicPValVec;
         
         pdcorrResultsMat(gammaIdx, jj, :) = pdcorrResultsVec;
         pdcorrPValMat(gammaIdx, jj, :) = pdcorrPValVec;

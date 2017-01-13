@@ -8,5 +8,5 @@ function val = cm(X,Y,Z)
 Kxx = grammat(X,'idfs');
 Kyy = grammat(Y,'idfs');
 Kzz = grammat(Z,'idfs');
-Kyy = Kyy .* Kzz;
-val = mean(mean(Kxx .* Kyy) .* mean(Kzz) - mean(Kxx .* Kzz) .* mean(Kyy)).^2;
+Kyz = Kyy .* Kzz;
+val = mean(mean(Kxx .* Kyz) .* mean(Kzz) - mean(Kxx .* Kzz) .* mean(Kyz)).^2;
