@@ -99,18 +99,172 @@ else
     rootDir = '/home/kiran/ownCloud/PhD/sim_results/cancer';
 end
 
-files = dir(fullfile(rootDir,'results'));
-for ii=1:length(files)
-    fname = files(ii).name;
-    [~,name,~] = fileparts(fname);
-    if(~strcmp(fname,'.') && ~strcmp(fname,'..'))
-        fnameWithPath = fullfile(rootDir, 'results', fname);
-        fprintf('Processing file=%s\n', fnameWithPath);
-        load(fnameWithPath);
-        
-        % figure out what to do with the results
-        
-        % somehow, need to show the % of monotonicity vs. nonmonotonicity
-        % for each dataset, and for the cancer "genre" as a whole also!
+alpha = 0.05;       % for p-value comparison
+depThreshVec = [0.01 0.05 0.1 0.15 0.2 0.25];
+finalMonotonicityResults = cell(1,length(depThreshVec));
+
+for zz=1:length(depThreshVec)
+    depThresh = depThreshVec(zz);   % vary the percentage difference tolerated
+    
+    fprintf('Processing depThresh=%0.02f\n', depThresh);
+    
+    files = dir(fullfile(rootDir,'results'));
+    % first delete any postProcessed files we may already have
+    for ii=1:length(files)
+        fname = files(ii).name;
+        [~,name,ext] = fileparts(fname);
+        if(~isempty(strfind(name,'postProcessed')))
+            delete(fname);
+        end
+    end
+    % now post-process again with the chosen depThresh
+    files = dir(fullfile(rootDir,'results'));
+    for ii=1:length(files)
+        fname = files(ii).name;
+        [~,name,ext] = fileparts(fname);
+
+        % delete any old 'postProcessed files', since we will do the
+        % postProcessing again here
+        if(strcmpi(ext,'.mat'))
+            fnameWithPath = fullfile(rootDir, 'results', fname);
+            %fprintf('Processing file=%s\n', fnameWithPath);
+            load(fnameWithPath);
+
+            % Find all the pairwise dependencies that were flagged as
+            % nonmonotonic, and compare the value of RSDM to taukl, if they are
+            % sufficiently close, it means that we have overfit, so we can
+            % conclude that the dependency is indeed actually monotonic
+            nonMonotonicIdx = find(monotonicityMat>1); nonMonotonicIdx = nonMonotonicIdx';
+            for idx=nonMonotonicIdx
+                [iIdx,jIdx] = ind2sub(size(monotonicityMat), idx);
+                % get the RSDM value
+                rsdmVal = R(iIdx,jIdx);
+                tauklVal = abs(taukl(data(:,iIdx),data(:,jIdx)));
+                percentageDiff = abs(rsdmVal-tauklVal)/tauklVal;
+                if(percentageDiff<depThresh)
+                    % means we overfit, and we correct for that here
+                    monotonicityMat(iIdx,jIdx) = 1;
+                    monotonicityMat(jIdx,iIdx) = 1;
+                end
+            end
+            
+            numDataPoints = size(data,1);
+            validDepMat = zeros(size(monotonicityMat));
+            for jj=1:size(R,1)
+                for kk=jj+1:size(R,1)
+                    pval = rsdmpval(R(jj,kk), numDataPoints);
+                    if(pval<alpha)
+                        validDepMat(jj,kk) = 1; % we flag this as non-independent, and
+                                                % thus we will process it
+                        validDepMat(kk,jj) = 1;
+                    end
+                end
+            end
+
+            % again, count the # of unique monotonicity levels we have
+            I1 = find(triu(monotonicityMat,1)~=0);
+            I2 = find(validDepMat~=0);
+            intersectI = intersect(I1,I2);
+            monotonicityVec = monotonicityMat(intersectI);
+            [uniques, numUniques] = count_unique(monotonicityVec);
+
+            outFile = fullfile(rootDir, 'results', [name '_postProcessed.mat']);
+            save(outFile, 'depThresh', 'R', 'RectanglesCell', 'monotonicityMat', 'uniques', 'numUniques', 'data', 'validDepMat');
+        end
+    end
+
+    minNumSamples = 50;
+    numFilesAnalyzed = 0;
+    % now plot the aggregate monotonicity results
+    % now post-process again with the chosen depThresh
+    files = dir(fullfile(rootDir,'results'));
+    monotonicityResults = containers.Map('KeyType', 'int32', 'ValueType', 'int32');
+    for ii=1:length(files)
+        fname = files(ii).name;
+        [~,name,ext] = fileparts(fname);
+        if(~isempty(strfind(name,'postProcessed')) && strcmpi(ext,'.mat'))
+            fnameWithPath = fullfile(rootDir, 'results', fname);
+            %fprintf('Processing file=%s\n', fnameWithPath);
+            load(fnameWithPath);
+
+            % if we have processed > minNumSamples samples at minimum, 
+            % aggregate the results
+            if(size(data,1)>minNumSamples)
+                numFilesAnalyzed = numFilesAnalyzed + 1;
+                lenUniques = length(uniques);
+                for jj=1:lenUniques
+                    if(isKey(monotonicityResults, uniques(jj)))
+                        monotonicityResults(uniques(jj)) = monotonicityResults(uniques(jj)) + numUniques(jj);
+                    else
+                        monotonicityResults(uniques(jj)) = numUniques(jj);
+                    end
+                end
+            end
+        end
+    end
+    keys(monotonicityResults)
+    values(monotonicityResults)
+    finalMonotonicityResults{zz} = monotonicityResults;
+end
+
+% save off the results
+save(fullfile(rootDir,'results', 'finalMonotonicityResults.mat'), 'finalMonotonicityResults', 'depThreshVec');
+
+%% plot the final monotonicityResults
+
+clear;
+clc;
+
+if(ispc)
+    rootDir = 'C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\cancer';
+elseif(ismac)
+    rootDir = '/Users/Kiran/ownCloud/PhD/sim_results/cancer';
+else
+    rootDir = '/home/kiran/ownCloud/PhD/sim_results/cancer';
+end
+load(fullfile(rootDir,'results', 'finalMonotonicityResults.mat'));
+
+maxCount = 0;
+for ii=1:length(depThreshVec)
+    if(finalMonotonicityResults{ii}.Count>maxCount)
+        maxCount = finalMonotonicityResults{ii}.Count;
     end
 end
+
+barPlotVec = zeros(maxCount, length(depThreshVec));
+for ii=1:length(depThreshVec)
+    c = finalMonotonicityResults{ii};
+    for jj=1:maxCount
+        val = double(c(jj));    % potentially experiment w/ transforms, 
+                                % log is one
+                                % x/(a+x) is another one
+                                % both diminish the effect of how prevalent
+                                % monotonic dependencies are in the data,
+                                % so for now we leave it as is.
+        valToPlot = val;
+        barPlotVec(ii,jj) = valToPlot;
+    end
+    numTotalPairwiseDepsAnalyzed = sum(barPlotVec(ii,:));
+    barPlotVec(ii,:) = barPlotVec(ii,:)/sum(barPlotVec(ii,:)) * 100;
+end
+
+h = bar(depThreshVec, barPlotVec,'stacked');
+grid on;
+fontSize = 20;
+xlabel('Tolerance %', 'FontSize', fontSize, 'FontWeight', 'bold')
+ylabel('% of total dependencies', 'FontSize', fontSize, 'FontWeight', 'bold');
+a = 1:maxCount;
+legendCell = cellstr(num2str(a(:)));
+legendCell = legendCell.';
+lh = legend(legendCell, 'location', 'southeast');
+v = get(lh,'title');
+set(v,'string',{'# Monotonic', 'Regions'});
+title({sprintf('Monotonicity of %d pairwise dependencies analyzed', ...
+    numTotalPairwiseDepsAnalyzed), 'for various Gene-Expression datasets'}, ...
+    'FontSize', fontSize, 'FontWeight', 'bold');
+
+xt = get(gca, 'XTick');
+set(gca, 'XTick', depThreshVec);
+set(gca, 'YTick', 10:10:100);
+ylim([0 100])
+set(gca, 'FontSize', 28)

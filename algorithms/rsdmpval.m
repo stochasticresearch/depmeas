@@ -46,6 +46,6 @@ M_vec = 100:100:1000;
 alpha = interp1(M_vec, alphaVec, M, 'spline');
 beta = interp1(M_vec, betaVec, M, 'spline');
 
-pval = 1-betacdf(rsdmVal, k, alpha, beta);
+pval = 1-betacdf(rsdmVal, alpha, beta);
 
 end
