@@ -209,9 +209,11 @@ pdcov_pval_mse = mean(pdcov_pval_mse_vec,2);
 pdcor_mse = mean(pdcor_mse_vec,2);
 pdcor_pval_mse = mean(pdcor_pval_mse_vec,2);
 
-fprintf(fID, '>>>>>>>>>>>>>>>>>>>>>>>> RESULTS <<<<<<<<<<<<<<<<<<<<<'\n');
+fprintf(fID, '>>>>>>>>>>>>>>>>>>>>>>>> RESULTS <<<<<<<<<<<<<<<<<<<<<\n');
 fprintf(fID, 'pdcov_mse=%0.03f\n', pdcov_mse);
 fprintf(fID, 'pdcov_pval_mse=%0.03f\n', pdcov_pval_mse);
 fprintf(fID, 'pdcor_mse=%0.03f\n', pdcor_mse);
 fprintf(fID, 'pdcor_pval_mse=%0.03f\n', pdcor_pval_mse);
-fprintf(fID, '>>>>>>>>>>>>>>>>>>>>>>>>*********<<<<<<<<<<<<<<<<<<<<<'\n');
+fprintf(fID, '>>>>>>>>>>>>>>>>>>>>>>>>*********<<<<<<<<<<<<<<<<<<<<<\n');
+
+fclose(fID);
