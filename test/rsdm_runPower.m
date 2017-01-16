@@ -923,6 +923,8 @@ rng(1234);
 
 nsim = 1000;
 M_vec = 100:100:1000;
+initLen = length(M_vec);
+M_vec = [M_vec 1500:500:10000];
 
 xMin = 0; xMax = 1;
 yMin = 0; yMax = 1;
@@ -957,42 +959,43 @@ for ii=1:nsim
 end
 
 % plot distribution of RSDM under the null distribution 
-legendCell = cell(1,length(M_vec));
+M_vec_toPlot = M_vec(1:initLen);
+legendCell = cell(1,length(M_vec_toPlot));
 subplot(2,2,1);
-for ii=1:length(M_vec)
+for ii=1:length(M_vec_toPlot)
     [f,xi] = ksdensity(rsdmNullDistributionResultsContinuous(:,ii));
     plot(xi,f); hold on;
-    legendCell{ii} = sprintf('M=%d',M_vec(ii));
+    legendCell{ii} = sprintf('M=%d',M_vec_toPlot(ii));
 end
 grid on;
 legend(legendCell);
 title('Distribution of RSDM_{approx}, X-C,Y-C');
 
 subplot(2,2,2);
-for ii=1:length(M_vec)
+for ii=1:length(M_vec_toPlot)
     [f,xi] = ksdensity(rsdmNullDistributionResultsHybrid1(:,ii));
     plot(xi,f); hold on;
-    legendCell{ii} = sprintf('M=%d',M_vec(ii));
+    legendCell{ii} = sprintf('M=%d',M_vec_toPlot(ii));
 end
 grid on;
 legend(legendCell);
 title('Distribution of RSDM_{approx}, X-D,Y-C');
 
 subplot(2,2,3);
-for ii=1:length(M_vec)
+for ii=1:length(M_vec_toPlot)
     [f,xi] = ksdensity(rsdmNullDistributionResultsHybrid2(:,ii));
     plot(xi,f); hold on;
-    legendCell{ii} = sprintf('M=%d',M_vec(ii));
+    legendCell{ii} = sprintf('M=%d',M_vec_toPlot(ii));
 end
 grid on;
 legend(legendCell);
 title('Distribution of RSDM_{approx}, X-C,Y-D');
 
 subplot(2,2,4);
-for ii=1:length(M_vec)
+for ii=1:length(M_vec_toPlot)
     [f,xi] = ksdensity(rsdmNullDistributionResultsDiscrete(:,ii));
     plot(xi,f); hold on;
-    legendCell{ii} = sprintf('M=%d',M_vec(ii));
+    legendCell{ii} = sprintf('M=%d',M_vec_toPlot(ii));
 end
 grid on;
 legend(legendCell);
@@ -1380,6 +1383,12 @@ for ii=1:length(M_vec)
     alphaVecDiscrete(ii) = pdDiscrete.a; betaVecDiscrete(ii) = pdDiscrete.b;
 end
 
+% NOTE: Print out the vectors alphaVecContinuous, betaVecContinuous,
+%                             alphaVecHybrid1,    betaVecHybrid1,
+%                             alphaVecHybrid2,    betaVecHybrid2,
+%                             alphaVecDiscrete,   betaVecDiscrete
+% in order to fill in the values for rsdmpval function
+
 fontSize = 20;
 
 % do the Q-Q plot
@@ -1398,8 +1407,8 @@ title({'(b)', 'M = 1000'}, 'FontSize', fontSize);
 h2.FontSize = fontSize;
 
 h3 = subplot(2,2,3); 
-p3 = plot(M_vec, alphaVecContinuous, M_vec, alphaVecHybrid1, ...
-          M_vec, alphaVecHybrid2, M_vec, alphaVecDiscrete);   
+p3 = plot(M_vec_toPlot, alphaVecContinuous(1:initLen), M_vec_toPlot, alphaVecHybrid1(1:initLen), ...
+          M_vec_toPlot, alphaVecHybrid2(1:initLen), M_vec_toPlot, alphaVecDiscrete(1:initLen));   
 grid on; xlabel('M', 'FontSize', fontSize); 
 ylabel('\alpha', 'FontSize', fontSize);
 title('(c)', 'FontSize', fontSize);
@@ -1410,8 +1419,8 @@ p3(3).LineWidth = 3; p3(3).Marker = '*'; p3(3).MarkerSize = 16;
 p3(4).LineWidth = 3; p3(4).Marker = 'x'; p3(4).MarkerSize = 16;
 
 h4 = subplot(2,2,4); 
-p4 = plot(M_vec, betaVecContinuous, M_vec, betaVecHybrid1, ...
-          M_vec, betaVecHybrid2, M_vec, betaVecDiscrete);
+p4 = plot(M_vec_toPlot, betaVecContinuous(1:initLen), M_vec_toPlot, betaVecHybrid1(1:initLen), ...
+          M_vec_toPlot, betaVecHybrid2(1:initLen), M_vec_toPlot, betaVecDiscrete(1:initLen));
 grid on; xlabel('M', 'FontSize', fontSize); 
 ylabel('\beta', 'FontSize', fontSize);
 title('(d)', 'FontSize', fontSize);

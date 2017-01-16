@@ -141,7 +141,7 @@ for zz=1:length(depThreshVec)
                 rsdmVal = R(iIdx,jIdx);
                 tauklVal = abs(taukl(data(:,iIdx),data(:,jIdx)));
                 percentageDiff = abs(rsdmVal-tauklVal)/tauklVal;
-                if(percentageDiff<depThresh)
+                if(percentageDiff<=depThresh)
                     % means we overfit, and we correct for that here
                     monotonicityMat(iIdx,jIdx) = 1;
                     monotonicityMat(jIdx,iIdx) = 1;
@@ -248,7 +248,10 @@ for ii=1:length(depThreshVec)
     barPlotVec(ii,:) = barPlotVec(ii,:)/sum(barPlotVec(ii,:)) * 100;
 end
 
-h = bar(depThreshVec, barPlotVec,'stacked');
+barX = depThreshVec*100;
+h = bar(barX, barPlotVec,'stacked');
+hold on
+plot(xlim,[95 95], 'r--', 'LineWidth', 4)
 grid on;
 fontSize = 20;
 xlabel('Tolerance %', 'FontSize', fontSize, 'FontWeight', 'bold')
@@ -264,7 +267,7 @@ title({sprintf('Monotonicity of %d pairwise dependencies analyzed', ...
     'FontSize', fontSize, 'FontWeight', 'bold');
 
 xt = get(gca, 'XTick');
-set(gca, 'XTick', depThreshVec);
-set(gca, 'YTick', 10:10:100);
+set(gca, 'XTick', barX);
+set(gca, 'YTick', [20 40 60 80 95]);
 ylim([0 100])
 set(gca, 'FontSize', 28)

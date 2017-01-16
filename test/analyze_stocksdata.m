@@ -131,13 +131,150 @@ I = triu(monotonicityMat,1)~=0;
 monotonicityVec = monotonicityMat(I);
 [uniques, numUniques] = count_unique(monotonicityVec);
 
-outFile = fullfile(rootDir,'stocks_results.mat');
-save(outFile);
-
 % restore normal Matlab warning settings
 pctRunOnAll warning('on','MATLAB:rankDeficientMatrix');
 
-p = gcp;
+p = gcp('nocreate');
 delete(p)
 
+outFile = fullfile(rootDir,'stocks_results.mat');
+save(outFile);
+
 %% Plot the Monotonicity results of the above
+clear;
+clc;
+dbstop if error;
+
+if(ispc)
+    rootDir = 'C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\stocks';
+elseif(ismac)
+    rootDir = '/Users/Kiran/ownCloud/PhD/sim_results/stocks';
+else
+    rootDir = '/home/kiran/ownCloud/PhD/sim_results/stocks';
+end
+load(fullfile(rootDir,'stocks_results.mat'));
+
+numStocksProcessed = size(monotonicityMat,1);
+alpha = 0.05;       % significance level for Dickey-Fuller tests
+% we only aggregate results for where the Dickey-Fuller confirms that the
+% data is indeed stationary
+validIdxs = zeros(1,numStocksProcessed);
+for ii=1:numStocksProcessed
+    adfTestResults = stocksData{ii,4};
+    if(adfTestResults.pval < alpha)
+        validIdxs(ii) = 1;
+    end
+end
+
+depThreshVec = [0.01 0.05 0.1 0.15 0.2 0.25];
+finalMonotonicityResults = cell(1,length(depThreshVec));
+
+for zz=1:length(depThreshVec)
+    depThresh = depThreshVec(zz);
+    fprintf('Processing depThresh=%0.02f\n', depThresh);
+    monotonicityResults = containers.Map('KeyType', 'int32', 'ValueType', 'int32');
+    for ii=1:numStocksProcessed
+        for jj=ii+1:numStocksProcessed
+            if(validIdxs(ii) && validIdxs(jj))
+                % means both stocks returns data are stationary
+
+                % make sure that this pairwise computation is not independent
+                rsdmVal = R(ii,jj);
+                returns_i = stocksData{ii,3};
+                returns_j = stocksData{jj,3};
+                numSampsToProc = min(length(returns_i),length(returns_j));
+                tauklVal = abs(taukl(returns_i(1:numSampsToProc),returns_j(1:numSampsToProc)));
+                percentageDiff = abs(rsdmVal-tauklVal)/tauklVal;
+                if(percentageDiff<=depThresh)
+                    monotonicityMat(ii,jj) = 1;
+                    monotonicityMat(jj,ii) = 1;
+                end
+                numMonotonicRegions = monotonicityMat(ii,jj);
+
+                numSampsProcessed = min(length(returns_i),length(returns_j));
+                pval = rsdmpval(rsdmVal, numSampsProcessed);
+                if(pval<alpha)
+
+                    if(isKey(monotonicityResults,numMonotonicRegions))
+                        monotonicityResults(numMonotonicRegions) = monotonicityResults(numMonotonicRegions) + 1;
+                    else
+                        monotonicityResults(numMonotonicRegions) = 1;
+                    end
+                end
+            end
+        end
+    end
+    keys(monotonicityResults)
+    values(monotonicityResults)
+    finalMonotonicityResults{zz} = monotonicityResults;
+end
+
+% save off the results
+save(fullfile(rootDir, 'finalMonotonicityResults.mat'), 'finalMonotonicityResults', 'depThreshVec');
+
+%% plot the final monotonicityResults
+
+clear;
+clc;
+
+if(ispc)
+    rootDir = 'C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\stocks';
+elseif(ismac)
+    rootDir = '/Users/Kiran/ownCloud/PhD/sim_results/stocks';
+else
+    rootDir = '/home/kiran/ownCloud/PhD/sim_results/stocks';
+end
+load(fullfile(rootDir,'finalMonotonicityResults.mat'));
+
+
+maxCount = 0;
+for ii=1:length(depThreshVec)
+    if(finalMonotonicityResults{ii}.Count>maxCount)
+        maxCount = finalMonotonicityResults{ii}.Count;
+    end
+end
+
+barPlotVec = zeros(maxCount, length(depThreshVec));
+for ii=1:length(depThreshVec)
+    c = finalMonotonicityResults{ii};
+    for jj=1:maxCount
+        if(isKey(c,jj))
+            val = double(c(jj));    % potentially experiment w/ transforms, 
+                                    % log is one
+                                    % x/(a+x) is another one
+                                    % both diminish the effect of how prevalent
+                                    % monotonic dependencies are in the data,
+                                    % so for now we leave it as is.
+        else
+            val = 0;
+        end
+        valToPlot = val;
+        barPlotVec(ii,jj) = valToPlot;
+    end
+    numTotalPairwiseDepsAnalyzed = sum(barPlotVec(ii,:));
+    barPlotVec(ii,:) = barPlotVec(ii,:)/sum(barPlotVec(ii,:)) * 100;
+end
+
+barX = depThreshVec*100;
+h = bar(barX, barPlotVec,'stacked');
+hold on
+plot(xlim,[95 95], 'r--', 'LineWidth', 4)
+grid on;
+fontSize = 20;
+xlabel('Tolerance %', 'FontSize', fontSize, 'FontWeight', 'bold')
+ylabel('% of total dependencies', 'FontSize', fontSize, 'FontWeight', 'bold');
+a = 1:maxCount;
+legendCell = cellstr(num2str(a(:)));
+legendCell = legendCell.';
+lh = legend(legendCell, 'location', 'southeast');
+v = get(lh,'title');
+set(v,'string',{'# Monotonic', 'Regions'});
+title({sprintf('Monotonicity of %d pairwise dependencies analyzed', ...
+    numTotalPairwiseDepsAnalyzed), 'for returns of Major Stock indices'}, ...
+    'FontSize', fontSize, 'FontWeight', 'bold');
+
+xt = get(gca, 'XTick');
+set(gca, 'XTick', barX);
+set(gca, 'YTick', [20 40 60 80 95]);
+ylim([0 100])
+set(gca, 'FontSize', 28)
