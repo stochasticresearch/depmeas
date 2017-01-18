@@ -138,7 +138,10 @@ adfTestType = 0;    % 0 : No deterministic terms
 lags = 0;
 pairwiseAnalysis = cell(1,length(pairwiseTimeAlignedData));
 
+dispstat('','init'); % One time only initialization
+dispstat(sprintf('Begining the analysis...'),'keepthis','timestamp');
 for ii=1:length(pairwiseTimeAlignedData)
+    dispstat(sprintf('%0.02f %% complete!',(ii/length(pairwiseTimeAlignedData))*100),'timestamp');
     res.R = zeros(1,45);        % 45 = nchoosek(10,2).  We have 10 different data records
                             % for each buoy, of which we can do a pairwise
                             % analysis on each at a time
@@ -286,6 +289,10 @@ for ii=1:length(pairwiseTimeAlignedData)
                 dataY = pairwiseTimeAlignedData{ii}.seaSurfaceTempJ;
         end
         
+        % we like column vectors
+        dataX = dataX(:);
+        dataY = dataY(:);
+        
         % get the largest subset of dataX and dataY that is not 
         % missing data, as noted by -999.0 records
         invalidX = find(dataX==-999.0);
@@ -318,7 +325,7 @@ for ii=1:length(pairwiseTimeAlignedData)
             dataY = dataY(maxStartIdx:maxEndIdx);
             [metric, rectangleCellOut] = rsdm(dataX,dataY);
             tauklval = taukl(dataX,dataY);
-            pval = rsdmpval(metric, numSampsToProc);
+            pval = rsdmpval(metric, length(dataX));
             if(pval<alpha)
                 res.R(jj) = metric;
                 res.RectanglesCell{jj} = rectangleCellOut;
@@ -361,7 +368,7 @@ for zz=1:length(depThreshVec)
     fprintf('Processing depThresh=%0.02f\n', depThresh);
     monotonicityResults = containers.Map('KeyType', 'int32', 'ValueType', 'int32');
     for ii=1:length(pairwiseAnalysis)
-        res = pairwiseAnalysis.res{ii};
+        res = pairwiseAnalysis{ii};
         for jj=1:45
             if(res.validVec(jj))
                 % count the monotonicity after ensuring we didn't overfit
@@ -371,7 +378,7 @@ for zz=1:length(depThreshVec)
                 if(percentageDiff<=depThresh)
                     numMonotonicRegions = 1;
                 else
-                    numMonotonicRegions = size(RectanglesCell{jj},2);
+                    numMonotonicRegions = size(res.RectanglesCell{jj},2);
                 end
                 % store into the map
                 if(isKey(monotonicityResults,numMonotonicRegions))

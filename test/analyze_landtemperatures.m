@@ -48,6 +48,7 @@ lags = 0;
 validCountriesVec = zeros(1,numCountries);
 for ii=1:numCountries
     countryIData = eval(countries{ii});
+    countryIData = countryIData(:);
     % find the last occurance of -999.0, which was inserted if no data was
     % found for a certain date by the raw-data processor
     I = find(countryIData==-999.0, 1, 'last' );
@@ -66,11 +67,17 @@ R = zeros(numCountries);
 RectanglesCell = cell(numCountries);
 tauklMat = zeros(numCountries);
 validMat = zeros(numCountries);
+dispstat('','init'); % One time only initialization
+dispstat(sprintf('Begining the analysis...'),'keepthis','timestamp');
 for ii=1:numCountries
     for jj=ii+1:numCountries  % we can't do parfor here b/c of eval :(
+        percentageComplete = jj/numCountries*100;
+        dispstat(sprintf('Processing %s --> %0.02f %%',countries{ii},percentageComplete),'timestamp');
         if(validCountriesVec(ii) && validCountriesVec(jj))
             countryIData = eval(countries{ii});
             countryJData = eval(countries{jj});
+            countryIData = countryIData(:);
+            countryJData = countryJData(:);
             Ii = find(countryIData==-999.0, 1, 'last' );
             if(~isempty(Ii))
                 countryIData = countryIData(Ii:end);
@@ -82,7 +89,7 @@ for ii=1:numCountries
             numSampsToProc = min(length(countryIData),length(countryJData));
             countryIData = countryIData(end-numSampsToProc+1:end);
             countryJData = countryJData(end-numSampsToProc+1:end);
-            [metric, rectangleCellOut] = rsdm(returns_i,returns_j);
+            [metric, rectangleCellOut] = rsdm(countryIData,countryJData);
             pval = rsdmpval(metric, numSampsToProc);
             if(pval<alpha)
                 R(ii,jj) = metric; R(jj,ii) = metric;
@@ -93,6 +100,7 @@ for ii=1:numCountries
             end
         end
     end
+    dispstat(sprintf('%s complete!',countries{ii}),'keepthis', 'timestamp');
 end
 
 % save the data for post-processing
