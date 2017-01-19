@@ -55,11 +55,11 @@ for ii=1:numSites
     
     iDataChunkIdxs = find(diff(siteIDates)~=1);
     
-    for jj=ii+1
+    for jj=ii+1:numSites
         siteJ = siteNumsUnique(jj);
         siteJ_idx = find(pollutionData.data(:,1)==siteJ);
         siteJDates = pollutionData.data(siteJ_idx,2);
-        siteJ_NO2  = pollutionData.data(siteI_idx,3);
+        siteJ_NO2  = pollutionData.data(siteJ_idx,3);
         siteJ_O3   = pollutionData.data(siteJ_idx,3);
         siteJ_SO2  = pollutionData.data(siteJ_idx,3);
         siteJ_CO   = pollutionData.data(siteJ_idx,3);
@@ -68,10 +68,10 @@ for ii=1:numSites
         for kk=1:length(iDataChunkIdxs)
             numSampsInChunk = iDataChunkIdxs(kk)-prevIdx+1;
             if(numSampsInChunk>minSamps)
-                validIDateCodes = buoyIData.datecode(prevIdx+1:iDataChunkIdxs(kk));
+                validIDateCodes = siteIDates(prevIdx+1:iDataChunkIdxs(kk));
                 % now try to find corresponding dates that are contiguous
                 % in j
-                matchVec = ismember(validIDateCodes, siteJDates);
+                matchVec = ismember(validIDateCodes, siteJDates); matchVec=matchVec';
                 % find series of ones that > min # of samples ... this is a
                 % valid chunk to process
                 is=find(diff([0 matchVec])==1);
@@ -81,8 +81,8 @@ for ii=1:numSites
                     if(lgt(ll)>minSamps)
                         idxLoI = is(ll);
                         idxHiI = ie(ll);
-                        idxLoJ = find(siteJDates.datecode==validIDateCodes(idxLoI));
-                        idxHiJ = find(siteJDates.datecode==validIDateCodes(idxHiI));
+                        idxLoJ = find(siteJDates==validIDateCodes(idxLoI));
+                        idxHiJ = find(siteJDates==validIDateCodes(idxHiI));
                         
                         % perform a cross-check of the datecode alignment
                         % and process the data if it passes the cross-check
@@ -110,8 +110,8 @@ for ii=1:numSites
                     end
                 end
             end
+            prevIdx = iDataChunkIdxs(kk)+1;
         end
-        prevIdx = iDataChunkIdxs(kk)+1;
     end
 end
 
@@ -134,7 +134,7 @@ elseif(ismac)
 else
     rootDir = '/home/kiran/ownCloud/PhD/sim_results/climate';
 end
-fname = fullfile(rootDir,'normalized_files', 'elnino_pairwise.mat');
+fname = fullfile(rootDir,'normalized_files', 'pollution_pairwise.mat');
 minSamps = 100;
 load(fname);
 
@@ -265,8 +265,8 @@ for ii=1:length(pairwiseTimeAlignedData)
                 res.R(jj) = metric;
                 res.RectanglesCell{jj} = rectangleCellOut;
                 res.tauklVec(jj) = tauklval;
-                res.startDates(jj) = datesX(maxStartIdx);
-                res.stopDates(jj) = datesX(maxEndIdx);
+                res.startDates(jj) = pairwiseTimeAlignedData{ii}.datecode(1);
+                res.stopDates(jj) = pairwiseTimeAlignedData{ii}.datecode(end);
                 res.validVec(jj) = 1;
             end
         end
