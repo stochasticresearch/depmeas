@@ -138,6 +138,8 @@ adfTestType = 0;    % 0 : No deterministic terms
 lags = 0;
 pairwiseAnalysis = cell(1,length(pairwiseTimeAlignedData));
 
+warning('off','MATLAB:rankDeficientMatrix')
+
 dispstat('','init'); % One time only initialization
 dispstat(sprintf('Begining the analysis...'),'keepthis','timestamp');
 for ii=1:length(pairwiseTimeAlignedData)
@@ -323,16 +325,23 @@ for ii=1:length(pairwiseTimeAlignedData)
         if(maxRun>minSamps)
             dataX = dataX(maxStartIdx:maxEndIdx);
             dataY = dataY(maxStartIdx:maxEndIdx);
-            [metric, rectangleCellOut] = rsdm(dataX,dataY);
-            tauklval = taukl(dataX,dataY);
-            pval = rsdmpval(metric, length(dataX));
-            if(pval<alpha)
-                res.R(jj) = metric;
-                res.RectanglesCell{jj} = rectangleCellOut;
-                res.tauklVec(jj) = tauklval;
-                res.startDates(jj) = datesX(maxStartIdx);
-                res.stopDates(jj) = datesX(maxEndIdx);
-                res.validVec(jj) = 1;
+            
+            % check stationarity of the data!
+            [~,pvalX] = augdf(dataX,adfTestType,lags);
+            [~,pvalY] = augdf(dataY,adfTestType,lags);
+
+            if(pvalX<alpha && pvalY<alpha)
+                [metric, rectangleCellOut] = rsdm(dataX,dataY);
+                tauklval = taukl(dataX,dataY);
+                pval = rsdmpval(metric, length(dataX));
+                if(pval<alpha)
+                    res.R(jj) = metric;
+                    res.RectanglesCell{jj} = rectangleCellOut;
+                    res.tauklVec(jj) = tauklval;
+                    res.startDates(jj) = datesX(maxStartIdx);
+                    res.stopDates(jj) = datesX(maxEndIdx);
+                    res.validVec(jj) = 1;
+                end
             end
         end
     end
@@ -342,9 +351,8 @@ end
 fname = fullfile(rootDir,'results', 'elnino.mat');
 save(fname, 'pairwiseAnalysis');
 
+warning('on','MATLAB:rankDeficientMatrix')
 %% Plot the monotonicity results
-
-
 clear;
 clc;
 dbstop if error;

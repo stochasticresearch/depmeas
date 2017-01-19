@@ -32,6 +32,8 @@ else
 end
 fname = fullfile(rootDir,'normalized_files', 'landTemperatures.mat');
 
+warning('off','MATLAB:rankDeficientMatrix')
+
 countries = who('-file', fname);
 numCountries = length(countries);
 load(fname);        % load the data
@@ -106,6 +108,8 @@ end
 % save the data for post-processing
 fname = fullfile(rootDir,'results', 'landTemperaturesResults.mat');
 save(fname, 'R', 'RectanglesCell', 'validMat', 'tauklMat');
+
+warning('on','MATLAB:rankDeficientMatrix')
 %% Post-Process & plot the monotonicity results
 
 clear;
