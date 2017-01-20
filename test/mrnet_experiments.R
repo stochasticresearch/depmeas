@@ -42,8 +42,10 @@ MI <- function(data){
 comp <- netbenchmark(datasources.names="all", 
                      methods=c("Spearman","Kendall","MI"),verbose=FALSE,
                      seed = 123) 
+# save the results
+save(list = ls(all.names = TRUE), file = "/home/kiran/ownCloud/PhD/sim_results/mrnet_all.RData", envir = .GlobalEnv)
 aupr <- comp[[1]][,-(1:2)]
 #make the name look prety 
 library("tools") 
 colnames(aupr) <- sapply(colnames(aupr),file_path_sans_ext) 
-boxplot(aupr, main="Syntren300", ylab=expression('AUPR'[20]))
+boxplot(aupr, main="All Data", ylab=expression('AUPR'[20]))
