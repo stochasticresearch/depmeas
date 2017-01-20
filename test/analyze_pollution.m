@@ -303,7 +303,7 @@ for zz=1:length(depThreshVec)
     monotonicityResults = containers.Map('KeyType', 'int32', 'ValueType', 'int32');
     for ii=1:length(pairwiseAnalysis)
         res = pairwiseAnalysis{ii};
-        for jj=1:45
+        for jj=1:28
             if(res.validVec(jj))
                 % count the monotonicity after ensuring we didn't overfit
                 rsdmVal = res.R(jj);
