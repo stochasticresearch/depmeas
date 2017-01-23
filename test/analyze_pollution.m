@@ -328,7 +328,24 @@ for zz=1:length(depThreshVec)
     finalMonotonicityResults{zz} = monotonicityResults;
 end
 
-% now plot the results :D
+save(fullfile(rootDir,'results', 'pollution_finalMonotonicityResults.mat'), 'finalMonotonicityResults', 'depThreshVec');
+
+%% % now plot the results :D
+
+clear;
+clc;
+dbstop if error;
+
+if(ispc)
+    rootDir = 'C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\climate';
+elseif(ismac)
+    rootDir = '/Users/Kiran/ownCloud/PhD/sim_results/climate';
+else
+    rootDir = '/home/kiran/ownCloud/PhD/sim_results/climate';
+end
+fname = fullfile(rootDir,'results', 'pollution_finalMonotonicityResults.mat');
+load(fname);
+
 maxCount = 0;
 for ii=1:length(depThreshVec)
     if(finalMonotonicityResults{ii}.Count>maxCount)
