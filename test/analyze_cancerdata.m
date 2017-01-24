@@ -167,9 +167,10 @@ for zz=1:length(depThreshVec)
             intersectI = intersect(I1,I2);
             monotonicityVec = monotonicityMat(intersectI);
             [uniques, numUniques] = count_unique(monotonicityVec);
+            numDepsAnalyzed = length(intersectI);
 
             outFile = fullfile(rootDir, 'results', [name '_postProcessed.mat']);
-            save(outFile, 'depThresh', 'R', 'RectanglesCell', 'monotonicityMat', 'uniques', 'numUniques', 'data', 'validDepMat');
+            save(outFile, 'depThresh', 'R', 'RectanglesCell', 'monotonicityMat', 'uniques', 'numUniques', 'data', 'validDepMat', 'numDepsAnalyzed');
         end
     end
 
@@ -179,6 +180,7 @@ for zz=1:length(depThreshVec)
     % now post-process again with the chosen depThresh
     files = dir(fullfile(rootDir,'results'));
     monotonicityResults = containers.Map('KeyType', 'int32', 'ValueType', 'int32');
+    numTotalDepsAnalyzed = 0;
     for ii=1:length(files)
         fname = files(ii).name;
         [~,name,ext] = fileparts(fname);
@@ -191,6 +193,7 @@ for zz=1:length(depThreshVec)
             % aggregate the results
             if(size(data,1)>minNumSamples)
                 numFilesAnalyzed = numFilesAnalyzed + 1;
+                numTotalDepsAnalyzed = numTotalDepsAnalyzed + numDepsAnalyzed;
                 lenUniques = length(uniques);
                 for jj=1:lenUniques
                     if(isKey(monotonicityResults, uniques(jj)))
@@ -202,13 +205,14 @@ for zz=1:length(depThreshVec)
             end
         end
     end
+    numTotalDepsAnalyzed
     keys(monotonicityResults)
     values(monotonicityResults)
     finalMonotonicityResults{zz} = monotonicityResults;
 end
 
 % save off the results
-save(fullfile(rootDir,'results', 'finalMonotonicityResults.mat'), 'finalMonotonicityResults', 'depThreshVec');
+save(fullfile(rootDir,'results', 'finalMonotonicityResults.mat'), 'finalMonotonicityResults', 'depThreshVec', 'numTotalDepsAnalyzed');
 
 %% plot the final monotonicityResults
 
