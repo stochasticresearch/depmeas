@@ -40,7 +40,7 @@ MI <- function(data){
 
 
 comp <- netbenchmark(datasources.names="all", 
-                     methods=c("Spearman","Kendall","MI"),verbose=FALSE,
+                     methods=c("Kendall","MI"),verbose=FALSE,
                      seed = 123) 
 # save the results
 save(list = ls(all.names = TRUE), file = "/home/kiran/ownCloud/PhD/sim_results/mrnet_all.RData", envir = .GlobalEnv)

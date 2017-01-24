@@ -25,7 +25,7 @@ clc;
 dbstop if error;
 
 depThresh = 0.01;
-fontSize = 20;
+fontSize = 36;
 
 %>>>>>>>>>>>>>>>>>>>>>>>> PROCESS CANCER DATA <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 if(ispc)
@@ -53,7 +53,6 @@ p1 = pie(cancerMonotonicityResults, explode);
 p1(2).FontSize = fontSize;
 p1(4).FontSize = fontSize;
 p1(6).String = '';
-title('Cancer Gene Expression Data', 'FontSize', fontSize, 'FontWeight', 'bold');
 fprintf('Num cancer Dependencies Analyzed = %d\n', sum(cancerMonotonicityResults));
 
 
@@ -76,10 +75,9 @@ explode = zeros(1,length(stocksMonotonicityResults)); explode(2) = 1;
 %subplot(1,3,2);
 figure;
 p2 = pie(stocksMonotonicityResults, explode);
-p2(2).FontSize = 20;
-p2(4).FontSize = 20;
+p2(2).FontSize = fontSize;
+p2(4).FontSize = fontSize;
 p2(6).String = '';
-title('Major Indices Returns Data', 'FontSize', fontSize, 'FontWeight', 'bold');
 fprintf('Num Stocks Dependencies Analyzed = %d\n', sum(stocksMonotonicityResults));
 
 %>>>>>>>>>>>>>>>>>>>>>>>> PROCESS CLIMATE DATA <<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -116,8 +114,7 @@ climateResults = elninoMonotonicityResults + landtemperaturesMonotonicityResults
 explode = zeros(1,length(climateResults)); explode(2) = 1;
 figure;
 p3 = pie(climateResults, explode);
-p3(2).FontSize = 20;
-p3(4).FontSize = 20;
+p3(2).FontSize = fontSize;
+p3(4).FontSize = fontSize;
 p3(6).String = '';
-title('Climate Data', 'FontSize', fontSize, 'FontWeight', 'bold');
 fprintf('Num Climate Dependencies Analyzed = %d\n', sum(climateResults));
