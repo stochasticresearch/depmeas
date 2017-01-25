@@ -27,7 +27,7 @@ rng(21);
 M = 500;
 nsim = 500;
 
-gammaVec = 0:0.1:1;
+gammaVec = 0:0.01:1;
 
 numDepTypes = 6;
 rsdmResultsMat = zeros(length(gammaVec), numDepTypes, nsim);        % for comparision of acceptance rates
@@ -114,10 +114,16 @@ for gammaIdx=1:length(gammaVec)
         pcorrResultsMat(gammaIdx, jj, :) = pcorrResultsVec;
         pcorrPValMat(gammaIdx, jj, :) = pcorrPValVec;
     end
-end
+    % save the results in case the computer crashes :(
+    if(ispc)
+        save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rscdm_CD_gamma_1_25.mat');
+    elseif(ismac)
+        save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rscdm_CD_gamma_1_25.mat');
+    elseif(isunix)
+        save('/home/kiran/ownCloud/PhD/sim_results/independence/rscdm_CD_gamma_1_25.mat');
+    end
 
-% TODO: calculate acceptace rates for RSDM/RSCDM based on calculating the
-% test statistic ...
+end
 
 % To understand the acceptance for CMA, look at demo.m in the cmi folder to
 % see how to use the "surrogate" versus the actual test statistic to see if
@@ -125,12 +131,15 @@ end
 
 % save the results
 if(ispc)
-    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rscdm_CD.mat');
+    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rscdm_CD_gamma_1_25.mat');
 elseif(ismac)
-    save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rscdm_CD.mat');
+    save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rscdm_CD_gamma_1_25.mat');
 elseif(isunix)
-    save('/home/kiran/ownCloud/PhD/sim_results/independence/rscdm_CD.mat');
+    save('/home/kiran/ownCloud/PhD/sim_results/independence/rscdm_CD_gamma_1_25.mat');
 end
+
+% TODO: calculate acceptace rates for RSDM/RSCDM based on calculating the
+% test statistic ...
 
 % plot the dependence metric results versus gamma for each dep type
 figure;
@@ -227,7 +236,7 @@ rng(22);
 M = 500;
 nsim = 500;
 
-gammaVec = 0:0.1:1;
+gammaVec = 0:0.01:1;
 
 numDepTypes = 6;
 rsdmResultsMat = zeros(length(gammaVec), numDepTypes, nsim);        % for comparision of acceptance rates
@@ -320,15 +329,23 @@ for gammaIdx=1:length(gammaVec)
         pcorrPValMat(gammaIdx, jj, :) = pcorrPValVec;
         
     end
+    % save the results in case the computer crashes
+    if(ispc)
+        save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rscdm_CI_gamma_1_25.mat');
+    elseif(ismac)
+        save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rscdm_CI_gamma_1_25.mat');
+    elseif(isunix)
+        save('/home/kiran/ownCloud/PhD/sim_results/independence/rscdm_CI_gamma_1_25.mat');
+    end
 end
 
 % save the results
 if(ispc)
-    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rscdm_CI.mat');
+    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rscdm_CI_gamma_1_25.mat');
 elseif(ismac)
-    save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rscdm_CI.mat');
+    save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rscdm_CI_gamma_1_25.mat');
 elseif(isunix)
-    save('/home/kiran/ownCloud/PhD/sim_results/independence/rscdm_CI.mat');
+    save('/home/kiran/ownCloud/PhD/sim_results/independence/rscdm_CI_gamma_1_25.mat');
 end
 
 % plot the dependence metric results versus gamma for each dep type

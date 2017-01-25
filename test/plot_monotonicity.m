@@ -24,7 +24,7 @@ clear;
 clc;
 dbstop if error;
 
-depThresh = 0.01;
+depThresh = 0.05;
 fontSize = 36;
 
 %>>>>>>>>>>>>>>>>>>>>>>>> PROCESS CANCER DATA <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
