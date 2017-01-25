@@ -239,24 +239,15 @@ barPlotVec = zeros(maxCount, length(depThreshVec));
 for ii=1:length(depThreshVec)
     c = finalMonotonicityResults{ii};
     for jj=1:maxCount
-<<<<<<< HEAD
         if(~isempty(find(cell2mat(c.keys())==jj)))
-=======
-        if(isempty(find(jj==cell2mat(c.keys()))))
-            val = 0;
-        else
->>>>>>> 5322e5a18fa3b8b531fe58cb8d054d2cfa42611b
             val = double(c(jj));    % potentially experiment w/ transforms, 
                                 % log is one
                                 % x/(a+x) is another one
                                 % both diminish the effect of how prevalent
                                 % monotonic dependencies are in the data,
                                 % so for now we leave it as is.
-<<<<<<< HEAD
         else
             val = 0;
-=======
->>>>>>> 5322e5a18fa3b8b531fe58cb8d054d2cfa42611b
         end
         valToPlot = val;
         barPlotVec(ii,jj) = valToPlot;
