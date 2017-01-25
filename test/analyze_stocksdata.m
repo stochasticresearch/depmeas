@@ -173,6 +173,7 @@ for zz=1:length(depThreshVec)
     depThresh = depThreshVec(zz);
     fprintf('Processing depThresh=%0.02f\n', depThresh);
     monotonicityResults = containers.Map('KeyType', 'int32', 'ValueType', 'int32');
+    numTotalDepsAnalyzed = 0;
     for ii=1:numStocksProcessed
         for jj=ii+1:numStocksProcessed
             if(validIdxs(ii) && validIdxs(jj))
@@ -200,10 +201,12 @@ for zz=1:length(depThreshVec)
                     else
                         monotonicityResults(numMonotonicRegions) = 1;
                     end
+                    numTotalDepsAnalyzed = numTotalDepsAnalyzed + 1;
                 end
             end
         end
     end
+    numTotalDepsAnalyzed
     keys(monotonicityResults)
     values(monotonicityResults)
     finalMonotonicityResults{zz} = monotonicityResults;

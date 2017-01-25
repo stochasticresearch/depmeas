@@ -164,7 +164,7 @@ for zz=1:length(depThreshVec)
     finalMonotonicityResults{zz} = monotonicityResults;
 end
 
-save(fullfile(rootDir,'results', 'landTemperatures_finalMonotonicityResults.mat'), 'finalMonotonicityResults', 'depThreshVec');
+save(fullfile(rootDir,'results', 'landTemperatures_finalMonotonicityResults.mat'), 'numCountries', 'finalMonotonicityResults', 'depThreshVec');
 
 %% 
 % now plot the results :D
