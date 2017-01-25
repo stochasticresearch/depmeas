@@ -170,7 +170,7 @@ for zz=1:length(depThreshVec)
             numDepsAnalyzed = length(intersectI);
 
             outFile = fullfile(rootDir, 'results', [name '_postProcessed.mat']);
-            save(outFile, 'depThresh', 'R', 'RectanglesCell', 'monotonicityMat', 'uniques', 'numUniques', 'data', 'validDepMat', 'numDepsAnalyzed');
+            save(outFile, 'depThresh', 'R', 'RectanglesCell', 'monotonicityVec', 'uniques', 'numUniques', 'data', 'validDepMat', 'numDepsAnalyzed');
         end
     end
 
@@ -239,12 +239,16 @@ barPlotVec = zeros(maxCount, length(depThreshVec));
 for ii=1:length(depThreshVec)
     c = finalMonotonicityResults{ii};
     for jj=1:maxCount
-        val = double(c(jj));    % potentially experiment w/ transforms, 
+        if(~isempty(find(cell2mat(c.keys())==jj)))
+            val = double(c(jj));    % potentially experiment w/ transforms, 
                                 % log is one
                                 % x/(a+x) is another one
                                 % both diminish the effect of how prevalent
                                 % monotonic dependencies are in the data,
                                 % so for now we leave it as is.
+        else
+            val = 0;
+        end
         valToPlot = val;
         barPlotVec(ii,jj) = valToPlot;
     end

@@ -45,7 +45,7 @@ cancerMonotonicityResults = double(cell2mat(finalMonotonicityResults{resultsIdx}
 % condense the 5 categories into 3 for plot uniformity ...
 cancerMonotonicityResults = [cancerMonotonicityResults(1) ...
                              cancerMonotonicityResults(2) ...
-                             sum(cancerMonotonicityResults(3:5))];
+                             sum(cancerMonotonicityResults(3:end))];
 explode = zeros(1,length(cancerMonotonicityResults)); explode(2) = 1;
 %subplot(1,3,1);
 figure;
@@ -94,7 +94,11 @@ resultsIdx = find(depThresh==depThreshVec);
 if(isempty(resultsIdx))
     error('Invalid depThresh chosen!');
 end
+maxLen = 5;
 elninoMonotonicityResults = double(cell2mat(finalMonotonicityResults{resultsIdx}.values()));
+elninoMonotonicityResults = [elninoMonotonicityResults(1) ...
+                             elninoMonotonicityResults(2) ...
+                             sum(elninoMonotonicityResults(3:end))];
 % now get land temperatures
 load(fullfile(rootDir,'landTemperatures_finalMonotonicityResults.mat'));
 resultsIdx = find(depThresh==depThreshVec);
@@ -102,6 +106,9 @@ if(isempty(resultsIdx))
     error('Invalid depThresh chosen!');
 end
 landtemperaturesMonotonicityResults = double(cell2mat(finalMonotonicityResults{resultsIdx}.values()));
+landtemperaturesMonotonicityResults = [landtemperaturesMonotonicityResults(1) ...
+                             landtemperaturesMonotonicityResults(2) ...
+                             sum(landtemperaturesMonotonicityResults(3:end))];
 % now get pollution
 load(fullfile(rootDir,'pollution_finalMonotonicityResults.mat'));
 resultsIdx = find(depThresh==depThreshVec);
@@ -109,6 +116,9 @@ if(isempty(resultsIdx))
     error('Invalid depThresh chosen!');
 end
 pollutionMonotonicityResults = double(cell2mat(finalMonotonicityResults{resultsIdx}.values()));
+pollutionMonotonicityResults = [pollutionMonotonicityResults(1) ...
+                             pollutionMonotonicityResults(2) ...
+                             sum(pollutionMonotonicityResults(3:end))];
 % aggregate into climate results
 climateResults = elninoMonotonicityResults + landtemperaturesMonotonicityResults + pollutionMonotonicityResults;
 explode = zeros(1,length(climateResults)); explode(2) = 1;
