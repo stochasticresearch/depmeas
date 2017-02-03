@@ -1921,7 +1921,7 @@ else
     save('/home/kiran/ownCloud/PhD/sim_results/independence/rsdmPower_rsdm_M_25_1500.mat');
 end
 
-%% Generate power curves for only KNN-MI
+%% Generate power curves for only KNN-MI, ITE estimators, the Shannon AP & vME
 
 clear;
 clc;
@@ -1938,7 +1938,7 @@ nsim_alt  = 500;   % Number of alternative datasets we use to estimate our power
 num_noise = 30;                    % The number of different noise levels used
 noise = 3;                         % A constant to determine the amount of noise
 
-M_vec = 500;        % for now, only do 500 samps, I don't think we'll show the other plot anyway
+M_vec = 100;        % for now, only do 500 samps, I don't think we'll show the other plot anyway
 numDepTests = 8;        % the number of different dependency tests we will conduct
                         % TODO: add copula dependencies as well
                         
@@ -1947,16 +1947,27 @@ numDepTests = 8;        % the number of different dependency tests we will condu
 knn1Null = zeros(1,nsim_null);
 knn6Null = zeros(1,nsim_null);
 knn20Null = zeros(1,nsim_null);
+shapNull = zeros(1,nsim_null);
+shvmeNull = zeros(1,nsim_null);
 
 knn1Alt = zeros(1,nsim_alt);
 knn6Alt = zeros(1,nsim_alt);
 knn20Alt = zeros(1,nsim_alt);
+shapAlt = zeros(1,nsim_alt);
+shvmeAlt = zeros(1,nsim_alt);
 
 % Arrays holding the estimated power for each of the "correlation" types, 
 % for each data type (linear, parabolic, etc...) with each noise level
 knn1Power  = zeros(numDepTests, num_noise, length(M_vec));
 knn6Power  = zeros(numDepTests, num_noise, length(M_vec));
 knn20Power = zeros(numDepTests, num_noise, length(M_vec));
+shapPower  = zeros(numDepTests, num_noise, length(M_vec));
+shvmePower  = zeros(numDepTests, num_noise, length(M_vec));
+
+% initialize the ite estimators
+ds = [1;1]; mult = 1;
+iSHAP = IShannon_AP_initialization(mult);
+iSHvME = IShannon_vME_initialization(mult);
 
 % We loop through the noise level and functional form; 
 % each time we estimate a null distribution based on the marginals of the data, 
@@ -2016,12 +2027,16 @@ for m=1:length(M_vec)
                 knn1Null(ii) = KraskovMI(x, y, 1);
                 knn6Null(ii) = KraskovMI(x, y, 6);
                 knn20Null(ii) = KraskovMI(x, y, 20);
+                shapNull(ii) = IShannon_AP_estimation([x y]',ds,iSHAP);
+                shvmeNull(ii) = IShannon_vME_estimation([x y]',ds,iSHvME);
             end
 
             % compute the rejection cutoffs
             knn1_cut  = quantile(knn1Null, 0.95);
             knn6_cut = quantile(knn6Null, 0.95);
             knn20_cut = quantile(knn20Null, 0.95);
+            shap_cut  = quantile(shapNull, 0.95);
+            shvme_cut = quantile(shvmeNull, 0.95);
 
             % resimulate the data under the alternative hypothesis
             parfor ii=1:nsim_alt
@@ -2059,31 +2074,35 @@ for m=1:length(M_vec)
                 knn1Alt(ii) = KraskovMI(x, y, 1);
                 knn6Alt(ii) = KraskovMI(x, y, 6);
                 knn20Alt(ii) = KraskovMI(x, y, 20);
+                shapAlt(ii) = IShannon_AP_estimation([x y]',ds,iSHAP);
+                shvmeAlt(ii) = IShannon_vME_estimation([x y]',ds,iSHvME);
             end
 
             % compute the power
             knn1Power(typ, l, m)    = sum(knn1Alt > knn1_cut)/nsim_alt;
             knn6Power(typ, l, m)  = sum(knn6Alt > knn6_cut)/nsim_alt;
             knn20Power(typ, l, m)   = sum(knn20Alt > knn20_cut)/nsim_alt;
+            shapPower(typ, l, m)    = sum(shapAlt > shap_cut)/nsim_alt;
+            shvmePower(typ, l, m)  = sum(shvmeAlt > shvme_cut)/nsim_alt;
         end
     end
     
     % save intermediate results just in case things crash :(
     if(ispc)
-        save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rsdmPower_knn_M_500.mat');
+        save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rsdmPower_MI_M_100.mat');
     elseif(ismac)
-        save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rsdmPower_knn_M_500.mat');
+        save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rsdmPower_MI_M_100.mat');
     else
-        save('/home/kiran/ownCloud/PhD/sim_results/independence/rsdmPower_knn_M_500.mat');
+        save('/home/kiran/ownCloud/PhD/sim_results/independence/rsdmPower_MI_M_100.mat');
     end
 end
 % save the data
 if(ispc)
-    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rsdmPower_knn_M_500.mat');
+    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rsdmPower_MI_M_100.mat');
 elseif(ismac)
-    save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rsdmPower_knn_M_500.mat');
+    save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rsdmPower_MI_M_100.mat');
 else
-    save('/home/kiran/ownCloud/PhD/sim_results/independence/rsdmPower_knn_M_500.mat');
+    save('/home/kiran/ownCloud/PhD/sim_results/independence/rsdmPower_MI_M_100.mat');
 end
 
 %% Generate power curves for only ITE estimators, the Shannon AP & vME
