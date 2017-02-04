@@ -128,3 +128,5 @@ p3(2).FontSize = fontSize;
 p3(4).FontSize = fontSize;
 p3(6).String = '';
 fprintf('Num Climate Dependencies Analyzed = %d\n', sum(climateResults));
+h = legend({'1','>=2'});
+set(h,'FontSize',fontSize);
