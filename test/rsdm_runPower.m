@@ -242,6 +242,7 @@ hh1 = plot(noiseVec, rsdmPower(1,num_noise_test_min:num_noise_test_max), 'o-.', 
      noiseVec, ccorrPower(1,num_noise_test_min:num_noise_test_max), 'p-.'); 
 axis([min(noiseVec) max(noiseVec) 0 1]);
 xlabel('Noise Level', 'FontSize', 20); ylabel('Power', 'FontSize', 20); grid on;
+title('(a)', 'FontSize', 20);
 h1.FontSize = 20; 
 loc_inset = [h1.Position(1)+inset_bufX h1.Position(2)+inset_bufY inset_width inset_height];
 ax1 = axes('Position',loc_inset);
@@ -267,6 +268,7 @@ hh2 = plot(noiseVec, rsdmPower(2,num_noise_test_min:num_noise_test_max), 'o-.', 
      noiseVec, ccorrPower(2,num_noise_test_min:num_noise_test_max), 'p-.'); 
 axis([min(noiseVec) max(noiseVec) 0 1]);
 xlabel('Noise Level', 'FontSize', 20); ylabel('Power', 'FontSize', 20); grid on;
+title('(b)', 'FontSize', 20);
 h2.FontSize = 20; 
 loc_inset = [h2.Position(1)+inset_bufX h2.Position(2)+inset_bufY inset_width inset_height];
 ax2 = axes('Position',loc_inset);
@@ -292,6 +294,7 @@ hh3 = plot(noiseVec, rsdmPower(3,num_noise_test_min:num_noise_test_max), 'o-.', 
      noiseVec, ccorrPower(3,num_noise_test_min:num_noise_test_max), 'p-.');   
 axis([min(noiseVec) max(noiseVec) 0 1]);
 xlabel('Noise Level', 'FontSize', 20); ylabel('Power', 'FontSize', 20); grid on;
+title('(c)', 'FontSize', 20);
 h3.FontSize = 20; 
 loc_inset = [h3.Position(1)+inset_bufX h3.Position(2)+inset_bufY inset_width inset_height];
 ax3 = axes('Position',loc_inset);
@@ -317,6 +320,7 @@ hh4 = plot(noiseVec, rsdmPower(4,num_noise_test_min:num_noise_test_max), 'o-.', 
      noiseVec, ccorrPower(4,num_noise_test_min:num_noise_test_max), 'p-.'); 
 axis([min(noiseVec) max(noiseVec) 0 1]);
 xlabel('Noise Level', 'FontSize', 20); ylabel('Power', 'FontSize', 20); grid on;
+title('(d)', 'FontSize', 20);
 h4.FontSize = 20; 
 loc_inset = [h4.Position(1)+inset_bufX h4.Position(2)+inset_bufY inset_width inset_height];
 ax4 = axes('Position',loc_inset);
@@ -342,7 +346,8 @@ hh5 = plot(noiseVec, rsdmPower(5,num_noise_test_min:num_noise_test_max), 'o-.', 
      noiseVec, cosPower(5,num_noise_test_min:num_noise_test_max), 's-.', ...
      noiseVec, ccorrPower(5,num_noise_test_min:num_noise_test_max), 'p-.'); 
 axis([min(noiseVec) max(noiseVec) 0 1]);
-xlabel('Noise Level'); ylabel('Power'); grid on;
+xlabel('Noise Level'); ylabel('Power', 'FontSize', 20); grid on;
+title('(e)', 'FontSize', 20);
 h5.FontSize = 20; 
 loc_inset = [h5.Position(1)+inset_bufX h5.Position(2)+inset_bufY inset_width inset_height];
 ax5 = axes('Position',loc_inset);
@@ -367,7 +372,8 @@ hh6 = plot(noiseVec, rsdmPower(6,num_noise_test_min:num_noise_test_max), 'o-.', 
      noiseVec, cosPower(6,num_noise_test_min:num_noise_test_max), 's-.', ...
      noiseVec, ccorrPower(6,num_noise_test_min:num_noise_test_max), 'p-.'); 
 axis([min(noiseVec) max(noiseVec) 0 1]);
-xlabel('Noise Level'); ylabel('Power'); grid on;
+xlabel('Noise Level'); ylabel('Power', 'FontSize', 20); grid on;
+title('(f)', 'FontSize', 20);
 h6.FontSize = 20; 
 loc_inset = [h6.Position(1)+inset_bufX h6.Position(2)+inset_bufY inset_width inset_height];
 ax6 = axes('Position',loc_inset);
@@ -392,7 +398,8 @@ hh7 = plot(noiseVec, rsdmPower(7,num_noise_test_min:num_noise_test_max), 'o-.', 
      noiseVec, cosPower(7,num_noise_test_min:num_noise_test_max), 's-.', ...
      noiseVec, ccorrPower(7,num_noise_test_min:num_noise_test_max), 'p-.'); 
 axis([min(noiseVec) max(noiseVec) 0 1]);
-xlabel('Noise Level'); ylabel('Power'); grid on;
+xlabel('Noise Level'); ylabel('Power', 'FontSize', 20); grid on;
+title('(g)', 'FontSize', 20);
 h7.FontSize = 20; 
 loc_inset = [h7.Position(1)+inset_bufX h7.Position(2)+inset_bufY inset_width inset_height];
 ax7 = axes('Position',loc_inset);
@@ -420,9 +427,10 @@ hh8 = plot(noiseVec, rsdmPower(8,num_noise_test_min:num_noise_test_max), 'o-.', 
      noiseVec, ccorrPower(8,num_noise_test_min:num_noise_test_max), 'p-.'); 
 axis([min(noiseVec) max(noiseVec) 0 1]);
 h8.FontSize = 20; 
-legend('RSDM', 'dCor', 'TIC_e', 'RDC', 'CoS', 'cCor');  % manually move this using the mouse to a
+legend('RSDM', 'dCor', 'TIC_e', 'RDC', 'CoS', 'Ccor');  % manually move this using the mouse to a
                                                         % good location
-xlabel('Noise Level'); ylabel('Power'); grid on;
+xlabel('Noise Level'); ylabel('Power', 'FontSize', 20); grid on;
+title('(h)', 'FontSize', 20);
 loc_inset = [h8.Position(1)+inset_bufX h8.Position(2)+inset_bufY inset_width inset_height];
 ax8 = axes('Position',loc_inset);
 tmp1 = linspace(0,1,M_inlet);
@@ -718,6 +726,7 @@ hh1 = plot(noiseVec, squeeze(sampleSizeAnalysisVec(1,rsdmIdx,num_noise_test_min:
      noiseVec, squeeze(sampleSizeAnalysisVec(1,ccorrIdx,num_noise_test_min:num_noise_test_max)), 'p-.'); 
 % axis([min(noiseVec) max(noiseVec) 0 1]);
 xlabel('Noise Level', 'FontSize', 20); ylabel('$$M_{min}$$', 'FontSize', 20, 'Interpreter', 'Latex'); grid on;
+title('(a)', 'FontSize', 20);
 h1.FontSize = 20; 
 loc_inset = [h1.Position(1)+inset_bufX h1.Position(2)+inset_bufY inset_width inset_height];
 ax1 = axes('Position',loc_inset);
@@ -743,6 +752,7 @@ hh2 = plot(noiseVec, squeeze(sampleSizeAnalysisVec(2,rsdmIdx,num_noise_test_min:
      noiseVec, squeeze(sampleSizeAnalysisVec(2,ccorrIdx,num_noise_test_min:num_noise_test_max)), 'p-.'); 
 % axis([min(noiseVec) max(noiseVec) 0 1]);
 xlabel('Noise Level', 'FontSize', 20); ylabel('$$M_{min}$$', 'FontSize', 20, 'Interpreter', 'Latex'); grid on;
+title('(b)', 'FontSize', 20);
 h2.FontSize = 20; 
 loc_inset = [h2.Position(1)+inset_bufX h2.Position(2)+inset_bufY inset_width inset_height];
 ax1 = axes('Position',loc_inset);
@@ -768,6 +778,7 @@ hh3 = plot(noiseVec, squeeze(sampleSizeAnalysisVec(3,rsdmIdx,num_noise_test_min:
      noiseVec, squeeze(sampleSizeAnalysisVec(3,ccorrIdx,num_noise_test_min:num_noise_test_max)), 'p-.'); 
 % axis([min(noiseVec) max(noiseVec) 0 1]);
 xlabel('Noise Level', 'FontSize', 20); ylabel('$$M_{min}$$', 'FontSize', 20, 'Interpreter', 'Latex'); grid on;
+title('(c)', 'FontSize', 20);
 h3.FontSize = 20; 
 loc_inset = [h3.Position(1)+inset_bufX h3.Position(2)+inset_bufY inset_width inset_height];
 ax1 = axes('Position',loc_inset);
@@ -793,6 +804,7 @@ hh4 = plot(noiseVec, squeeze(sampleSizeAnalysisVec(4,rsdmIdx,num_noise_test_min:
      noiseVec, squeeze(sampleSizeAnalysisVec(4,ccorrIdx,num_noise_test_min:num_noise_test_max)), 'p-.'); 
 % axis([min(noiseVec) max(noiseVec) 0 1]);
 xlabel('Noise Level', 'FontSize', 20); ylabel('$$M_{min}$$', 'FontSize', 20, 'Interpreter', 'Latex'); grid on;
+title('(d)', 'FontSize', 20);
 h4.FontSize = 20; 
 loc_inset = [h4.Position(1)+inset_bufX h4.Position(2)+inset_bufY inset_width inset_height];
 ax1 = axes('Position',loc_inset);
@@ -819,6 +831,7 @@ hh5 = plot(noiseVec, squeeze(sampleSizeAnalysisVec(5,rsdmIdx,num_noise_test_min:
      noiseVec, squeeze(sampleSizeAnalysisVec(5,ccorrIdx,num_noise_test_min:num_noise_test_max)), 'p-.'); 
 % axis([min(noiseVec) max(noiseVec) 0 1]);
 xlabel('Noise Level', 'FontSize', 20); ylabel('$$M_{min}$$', 'FontSize', 20, 'Interpreter', 'Latex'); grid on;
+title('(e)', 'FontSize', 20);
 h5.FontSize = 20; 
 loc_inset = [h5.Position(1)+inset_bufX h5.Position(2)+inset_bufY inset_width inset_height];
 ax1 = axes('Position',loc_inset);
@@ -844,6 +857,7 @@ hh6 = plot(noiseVec, squeeze(sampleSizeAnalysisVec(6,rsdmIdx,num_noise_test_min:
      noiseVec, squeeze(sampleSizeAnalysisVec(6,ccorrIdx,num_noise_test_min:num_noise_test_max)), 'p-.'); 
 % axis([min(noiseVec) max(noiseVec) 0 1]);
 xlabel('Noise Level', 'FontSize', 20); ylabel('$$M_{min}$$', 'FontSize', 20, 'Interpreter', 'Latex'); grid on;
+title('(f)', 'FontSize', 20);
 h6.FontSize = 20; 
 loc_inset = [h6.Position(1)+inset_bufX h6.Position(2)+inset_bufY inset_width inset_height];
 ax1 = axes('Position',loc_inset);
@@ -869,6 +883,7 @@ hh7 = plot(noiseVec, squeeze(sampleSizeAnalysisVec(7,rsdmIdx,num_noise_test_min:
      noiseVec, squeeze(sampleSizeAnalysisVec(7,ccorrIdx,num_noise_test_min:num_noise_test_max)), 'p-.'); 
 % axis([min(noiseVec) max(noiseVec) 0 1]);
 xlabel('Noise Level', 'FontSize', 20); ylabel('$$M_{min}$$', 'FontSize', 20, 'Interpreter', 'Latex'); grid on;
+title('(g)', 'FontSize', 20);
 h7.FontSize = 20; 
 loc_inset = [h7.Position(1)+inset_bufX h7.Position(2)+inset_bufY inset_width inset_height];
 ax1 = axes('Position',loc_inset);
@@ -894,10 +909,11 @@ hh8 = plot(noiseVec, squeeze(sampleSizeAnalysisVec(8,rsdmIdx,num_noise_test_min:
      noiseVec, squeeze(sampleSizeAnalysisVec(8,rdcIdx,num_noise_test_min:num_noise_test_max)), 'v-.', ...
      noiseVec, squeeze(sampleSizeAnalysisVec(8,cosIdx,num_noise_test_min:num_noise_test_max)), 's-.', ...
      noiseVec, squeeze(sampleSizeAnalysisVec(8,ccorrIdx,num_noise_test_min:num_noise_test_max)), 'p-.'); 
-legend('RSDM', 'dCor', 'TIC_e', 'RDC', 'CoS', 'cCor');  % manually move this using the mouse to a
+legend('RSDM', 'dCor', 'TIC_e', 'RDC', 'CoS', 'Ccor');  % manually move this using the mouse to a
                                                   % good location
 % axis([min(noiseVec) max(noiseVec) 0 1]);
 xlabel('Noise Level', 'FontSize', 20); ylabel('$$M_{min}$$', 'FontSize', 20, 'Interpreter', 'Latex'); grid on;
+title('(h)', 'FontSize', 20);
 h8.FontSize = 20; 
 loc_inset = [h8.Position(1)+inset_bufX h8.Position(2)+inset_bufY inset_width inset_height];
 ax1 = axes('Position',loc_inset);
