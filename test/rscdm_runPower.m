@@ -24,10 +24,12 @@ dbstop if error;
 
 rng(21);
 
+significance_thresh = 0.05;
+
 M = 500;
 nsim = 500;
 
-gammaVec = 0:0.01:1;
+gammaVec = 0:0.1:1;
 
 numDepTypes = 6;
 rsdmResultsMat = zeros(length(gammaVec), numDepTypes, nsim);        % for comparision of acceptance rates
@@ -116,11 +118,11 @@ for gammaIdx=1:length(gammaVec)
     end
     % save the results in case the computer crashes :(
     if(ispc)
-        save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rscdm_CD_gamma_1_25.mat');
+        save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rscdm_CD.mat');
     elseif(ismac)
-        save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rscdm_CD_gamma_1_25.mat');
+        save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rscdm_CD.mat');
     elseif(isunix)
-        save('/home/kiran/ownCloud/PhD/sim_results/independence/rscdm_CD_gamma_1_25.mat');
+        save('/home/kiran/ownCloud/PhD/sim_results/independence/rscdm_CD.mat');
     end
 
 end
@@ -131,15 +133,18 @@ end
 
 % save the results
 if(ispc)
-    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rscdm_CD_gamma_1_25.mat');
+    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rscdm_CD.mat');
 elseif(ismac)
-    save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rscdm_CD_gamma_1_25.mat');
+    save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rscdm_CD.mat');
 elseif(isunix)
-    save('/home/kiran/ownCloud/PhD/sim_results/independence/rscdm_CD_gamma_1_25.mat');
+    save('/home/kiran/ownCloud/PhD/sim_results/independence/rscdm_CD.mat');
 end
 
-% TODO: calculate acceptace rates for RSDM/RSCDM based on calculating the
-% test statistic ...
+% compute acceptance rates
+pdcorr_acceptance = pdcorrPValMat<significance_thresh;
+pcorr_acceptance = pcorrPValMat<significance_thresh;
+rscdm_acceptance = rscdmResultsMat>rsdmResultsMat;
+cma_acceptance = cmaResultsMat>cmaSurrResultsMat;
 
 % plot the dependence metric results versus gamma for each dep type
 figure;
@@ -147,79 +152,115 @@ figure;
 h1 = subplot(3,2,1);
 depIdx = 1;
 meanRscdmRes = mean(squeeze(rscdmResultsMat(:,depIdx,:)),2);
+meanRscdmAcceptanceRate = mean(squeeze(rscdm_acceptance(:,depIdx,:)),2);
 meanPdcorrRes = mean(squeeze(pdcorrResultsMat(:,depIdx,:)),2);
+meanPdcorrAcceptanceRate = mean(squeeze(pdcorr_acceptance(:,depIdx,:)),2);
 meanPcorrRes = mean(squeeze(pcorrResultsMat(:,depIdx,:)),2);
+meanPcorrAcceptanceRate = mean(squeeze(pcorr_acceptance(:,depIdx,:)),2);
 meanCmaRes = mean(squeeze(cmaResultsMat(:,depIdx,:)),2);
-plot(gammaVec, meanRscdmRes, 'o-.', ...
-     gammaVec, meanPdcorrRes, 'x-.', ...
-     gammaVec, meanPcorrRes, 'd-.', ...
-     gammaVec, meanCmaRes, '+-.');
-xlabel('\gamma', 'FontSize', 20); ylabel('\mu[DEP({X,Y}|Z)]', 'FontSize', 20); grid on;
+meanCmaAcceptanceRate = mean(squeeze(cma_acceptance(:,depIdx,:)),2);
+plot(gammaVec, meanRscdmAcceptanceRate, 'o-.', ...
+     gammaVec, meanPdcorrAcceptanceRate, 'x-.', ...
+     gammaVec, meanPcorrAcceptanceRate, 'd-.', ...
+     gammaVec, meanCmaAcceptanceRate, '+-.');
+xlabel('\gamma', 'FontSize', 20); ylabel('Acceptance Rate', 'FontSize', 20);
+title('(a)', 'FontSize', 20);
+grid on;
 h1.FontSize = 20; 
 
 h2 = subplot(3,2,2);
 depIdx = 2;
 meanRscdmRes = mean(squeeze(rscdmResultsMat(:,depIdx,:)),2);
+meanRscdmAcceptanceRate = mean(squeeze(rscdm_acceptance(:,depIdx,:)),2);
 meanPdcorrRes = mean(squeeze(pdcorrResultsMat(:,depIdx,:)),2);
+meanPdcorrAcceptanceRate = mean(squeeze(pdcorr_acceptance(:,depIdx,:)),2);
 meanPcorrRes = mean(squeeze(pcorrResultsMat(:,depIdx,:)),2);
+meanPcorrAcceptanceRate = mean(squeeze(pcorr_acceptance(:,depIdx,:)),2);
 meanCmaRes = mean(squeeze(cmaResultsMat(:,depIdx,:)),2);
-plot(gammaVec, meanRscdmRes, 'o-.', ...
-     gammaVec, meanPdcorrRes, 'x-.', ...
-     gammaVec, meanPcorrRes, 'd-.', ...
-     gammaVec, meanCmaRes, '+-.');
-xlabel('\gamma', 'FontSize', 20); ylabel('\mu[DEP({X,Y}|Z)]', 'FontSize', 20); grid on;
+meanCmaAcceptanceRate = mean(squeeze(cma_acceptance(:,depIdx,:)),2);
+plot(gammaVec, meanRscdmAcceptanceRate, 'o-.', ...
+     gammaVec, meanPdcorrAcceptanceRate, 'x-.', ...
+     gammaVec, meanPcorrAcceptanceRate, 'd-.', ...
+     gammaVec, meanCmaAcceptanceRate, '+-.');
+xlabel('\gamma', 'FontSize', 20); ylabel('Acceptance Rate', 'FontSize', 20);
+title('(b)', 'FontSize', 20);
+grid on;
 h2.FontSize = 20;
 
 h3 = subplot(3,2,3);
 depIdx = 3;
 meanRscdmRes = mean(squeeze(rscdmResultsMat(:,depIdx,:)),2);
+meanRscdmAcceptanceRate = mean(squeeze(rscdm_acceptance(:,depIdx,:)),2);
 meanPdcorrRes = mean(squeeze(pdcorrResultsMat(:,depIdx,:)),2);
+meanPdcorrAcceptanceRate = mean(squeeze(pdcorr_acceptance(:,depIdx,:)),2);
 meanPcorrRes = mean(squeeze(pcorrResultsMat(:,depIdx,:)),2);
+meanPcorrAcceptanceRate = mean(squeeze(pcorr_acceptance(:,depIdx,:)),2);
 meanCmaRes = mean(squeeze(cmaResultsMat(:,depIdx,:)),2);
-plot(gammaVec, meanRscdmRes, 'o-.', ...
-     gammaVec, meanPdcorrRes, 'x-.', ...
-     gammaVec, meanPcorrRes, 'd-.', ...
-     gammaVec, meanCmaRes, '+-.');
-xlabel('\gamma', 'FontSize', 20); ylabel('\mu[DEP({X,Y}|Z)]', 'FontSize', 20); grid on;
+meanCmaAcceptanceRate = mean(squeeze(cma_acceptance(:,depIdx,:)),2);
+plot(gammaVec, meanRscdmAcceptanceRate, 'o-.', ...
+     gammaVec, meanPdcorrAcceptanceRate, 'x-.', ...
+     gammaVec, meanPcorrAcceptanceRate, 'd-.', ...
+     gammaVec, meanCmaAcceptanceRate, '+-.');
+xlabel('\gamma', 'FontSize', 20); ylabel('Acceptance Rate', 'FontSize', 20); 
+title('(c)', 'FontSize', 20);
+grid on;
 h3.FontSize = 20;
 
 h4 = subplot(3,2,4);
 depIdx = 4;
 meanRscdmRes = mean(squeeze(rscdmResultsMat(:,depIdx,:)),2);
+meanRscdmAcceptanceRate = mean(squeeze(rscdm_acceptance(:,depIdx,:)),2);
 meanPdcorrRes = mean(squeeze(pdcorrResultsMat(:,depIdx,:)),2);
+meanPdcorrAcceptanceRate = mean(squeeze(pdcorr_acceptance(:,depIdx,:)),2);
 meanPcorrRes = mean(squeeze(pcorrResultsMat(:,depIdx,:)),2);
+meanPcorrAcceptanceRate = mean(squeeze(pcorr_acceptance(:,depIdx,:)),2);
 meanCmaRes = mean(squeeze(cmaResultsMat(:,depIdx,:)),2);
-plot(gammaVec, meanRscdmRes, 'o-.', ...
-     gammaVec, meanPdcorrRes, 'x-.', ...
-     gammaVec, meanPcorrRes, 'd-.', ...
-     gammaVec, meanCmaRes, '+-.');
-xlabel('\gamma', 'FontSize', 20); ylabel('\mu[DEP({X,Y}|Z)]', 'FontSize', 20); grid on;
+meanCmaAcceptanceRate = mean(squeeze(cma_acceptance(:,depIdx,:)),2);
+plot(gammaVec, meanRscdmAcceptanceRate, 'o-.', ...
+     gammaVec, meanPdcorrAcceptanceRate, 'x-.', ...
+     gammaVec, meanPcorrAcceptanceRate, 'd-.', ...
+     gammaVec, meanCmaAcceptanceRate, '+-.');
+xlabel('\gamma', 'FontSize', 20); ylabel('Acceptance Rate', 'FontSize', 20); 
+title('(d)', 'FontSize', 20);
+grid on;
 h4.FontSize = 20;
 
 h5 = subplot(3,2,5);
 depIdx = 5;
 meanRscdmRes = mean(squeeze(rscdmResultsMat(:,depIdx,:)),2);
+meanRscdmAcceptanceRate = mean(squeeze(rscdm_acceptance(:,depIdx,:)),2);
 meanPdcorrRes = mean(squeeze(pdcorrResultsMat(:,depIdx,:)),2);
+meanPdcorrAcceptanceRate = mean(squeeze(pdcorr_acceptance(:,depIdx,:)),2);
 meanPcorrRes = mean(squeeze(pcorrResultsMat(:,depIdx,:)),2);
+meanPcorrAcceptanceRate = mean(squeeze(pcorr_acceptance(:,depIdx,:)),2);
 meanCmaRes = mean(squeeze(cmaResultsMat(:,depIdx,:)),2);
-plot(gammaVec, meanRscdmRes, 'o-.', ...
-     gammaVec, meanPdcorrRes, 'x-.', ...
-     gammaVec, meanPcorrRes, 'd-.', ...
-     gammaVec, meanCmaRes, '+-.');
-xlabel('\gamma', 'FontSize', 20); ylabel('\mu[DEP({X,Y}|Z)]', 'FontSize', 20); grid on;
+meanCmaAcceptanceRate = mean(squeeze(cma_acceptance(:,depIdx,:)),2);
+plot(gammaVec, meanRscdmAcceptanceRate, 'o-.', ...
+     gammaVec, meanPdcorrAcceptanceRate, 'x-.', ...
+     gammaVec, meanPcorrAcceptanceRate, 'd-.', ...
+     gammaVec, meanCmaAcceptanceRate, '+-.');
+xlabel('\gamma', 'FontSize', 20); ylabel('Acceptance Rate', 'FontSize', 20);
+title('(e)', 'FontSize', 20);
+grid on;
 h5.FontSize = 20; 
 
 h6 = subplot(3,2,6);
 depIdx = 6;
 meanRscdmRes = mean(squeeze(rscdmResultsMat(:,depIdx,:)),2);
+meanRscdmAcceptanceRate = mean(squeeze(rscdm_acceptance(:,depIdx,:)),2);
 meanPdcorrRes = mean(squeeze(pdcorrResultsMat(:,depIdx,:)),2);
+meanPdcorrAcceptanceRate = mean(squeeze(pdcorr_acceptance(:,depIdx,:)),2);
 meanPcorrRes = mean(squeeze(pcorrResultsMat(:,depIdx,:)),2);
+meanPcorrAcceptanceRate = mean(squeeze(pcorr_acceptance(:,depIdx,:)),2);
 meanCmaRes = mean(squeeze(cmaResultsMat(:,depIdx,:)),2);
-plot(gammaVec, meanRscdmRes, 'o-.', ...
-     gammaVec, meanPdcorrRes, 'x-.', ...
-     gammaVec, meanPcorrRes, 'd-.', ...
-     gammaVec, meanCmaRes, '+-.');
-xlabel('\gamma', 'FontSize', 20); ylabel('\mu[DEP({X,Y}|Z)]', 'FontSize', 20); grid on;
+meanCmaAcceptanceRate = mean(squeeze(cma_acceptance(:,depIdx,:)),2);
+plot(gammaVec, meanRscdmAcceptanceRate, 'o-.', ...
+     gammaVec, meanPdcorrAcceptanceRate, 'x-.', ...
+     gammaVec, meanPcorrAcceptanceRate, 'd-.', ...
+     gammaVec, meanCmaAcceptanceRate, '+-.');
+xlabel('\gamma', 'FontSize', 20); ylabel('Acceptance Rate', 'FontSize', 20);
+title('(f)', 'FontSize', 20);
+grid on;
 h6.FontSize = 20; 
 
 legend('RSCDM', 'PDCORR', 'PCORR', 'CMA');  % manually move this using the mouse to a
@@ -236,7 +277,8 @@ rng(22);
 M = 500;
 nsim = 500;
 
-gammaVec = 0:0.01:1;
+significance_thresh = 0.05;
+gammaVec = 0:0.1:1;
 
 numDepTypes = 6;
 rsdmResultsMat = zeros(length(gammaVec), numDepTypes, nsim);        % for comparision of acceptance rates
@@ -331,102 +373,143 @@ for gammaIdx=1:length(gammaVec)
     end
     % save the results in case the computer crashes
     if(ispc)
-        save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rscdm_CI_gamma_1_25.mat');
+        save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rscdm_CI.mat');
     elseif(ismac)
-        save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rscdm_CI_gamma_1_25.mat');
+        save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rscdm_CI.mat');
     elseif(isunix)
-        save('/home/kiran/ownCloud/PhD/sim_results/independence/rscdm_CI_gamma_1_25.mat');
+        save('/home/kiran/ownCloud/PhD/sim_results/independence/rscdm_CI.mat');
     end
 end
 
 % save the results
 if(ispc)
-    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rscdm_CI_gamma_1_25.mat');
+    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rscdm_CI.mat');
 elseif(ismac)
-    save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rscdm_CI_gamma_1_25.mat');
+    save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rscdm_CI.mat');
 elseif(isunix)
-    save('/home/kiran/ownCloud/PhD/sim_results/independence/rscdm_CI_gamma_1_25.mat');
+    save('/home/kiran/ownCloud/PhD/sim_results/independence/rscdm_CI.mat');
 end
 
-% plot the dependence metric results versus gamma for each dep type
+% compute acceptance rates
+pdcorr_acceptance = pdcorrPValMat<significance_thresh;
+pcorr_acceptance = pcorrPValMat<significance_thresh;
+rscdm_acceptance = rscdmResultsMat>rsdmResultsMat;
+cma_acceptance = cmaResultsMat>cmaSurrResultsMat;
+
 figure;
 
 h1 = subplot(3,2,1);
 depIdx = 1;
 meanRscdmRes = mean(squeeze(rscdmResultsMat(:,depIdx,:)),2);
+meanRscdmAcceptanceRate = mean(squeeze(rscdm_acceptance(:,depIdx,:)),2);
 meanPdcorrRes = mean(squeeze(pdcorrResultsMat(:,depIdx,:)),2);
+meanPdcorrAcceptanceRate = mean(squeeze(pdcorr_acceptance(:,depIdx,:)),2);
 meanPcorrRes = mean(squeeze(pcorrResultsMat(:,depIdx,:)),2);
+meanPcorrAcceptanceRate = mean(squeeze(pcorr_acceptance(:,depIdx,:)),2);
 meanCmaRes = mean(squeeze(cmaResultsMat(:,depIdx,:)),2);
-plot(gammaVec, meanRscdmRes, 'o-.', ...
-     gammaVec, meanPdcorrRes, 'x-.', ...
-     gammaVec, meanPcorrRes, 'd-.', ...
-     gammaVec, meanCmaRes, '+-.');
-xlabel('\gamma', 'FontSize', 20); ylabel('\mu[DEP({X,Y}|Z)]', 'FontSize', 20); grid on;
+meanCmaAcceptanceRate = mean(squeeze(cma_acceptance(:,depIdx,:)),2);
+plot(gammaVec, 1-meanRscdmAcceptanceRate, 'o-.', ...
+     gammaVec, 1-meanPdcorrAcceptanceRate, 'x-.', ...
+     gammaVec, 1-meanPcorrAcceptanceRate, 'd-.', ...
+     gammaVec, 1-meanCmaAcceptanceRate, '+-.');
+xlabel('\gamma', 'FontSize', 20); ylabel('1-Acceptance Rate', 'FontSize', 20);
+title('(a)', 'FontSize', 20);
+grid on;
 h1.FontSize = 20; 
 
 h2 = subplot(3,2,2);
 depIdx = 2;
 meanRscdmRes = mean(squeeze(rscdmResultsMat(:,depIdx,:)),2);
+meanRscdmAcceptanceRate = mean(squeeze(rscdm_acceptance(:,depIdx,:)),2);
 meanPdcorrRes = mean(squeeze(pdcorrResultsMat(:,depIdx,:)),2);
+meanPdcorrAcceptanceRate = mean(squeeze(pdcorr_acceptance(:,depIdx,:)),2);
 meanPcorrRes = mean(squeeze(pcorrResultsMat(:,depIdx,:)),2);
+meanPcorrAcceptanceRate = mean(squeeze(pcorr_acceptance(:,depIdx,:)),2);
 meanCmaRes = mean(squeeze(cmaResultsMat(:,depIdx,:)),2);
-plot(gammaVec, meanRscdmRes, 'o-.', ...
-     gammaVec, meanPdcorrRes, 'x-.', ...
-     gammaVec, meanPcorrRes, 'd-.', ...
-     gammaVec, meanCmaRes, '+-.');
-xlabel('\gamma', 'FontSize', 20); ylabel('\mu[DEP({X,Y}|Z)]', 'FontSize', 20); grid on;
+meanCmaAcceptanceRate = mean(squeeze(cma_acceptance(:,depIdx,:)),2);
+plot(gammaVec, 1-meanRscdmAcceptanceRate, 'o-.', ...
+     gammaVec, 1-meanPdcorrAcceptanceRate, 'x-.', ...
+     gammaVec, 1-meanPcorrAcceptanceRate, 'd-.', ...
+     gammaVec, 1-meanCmaAcceptanceRate, '+-.');
+xlabel('\gamma', 'FontSize', 20); ylabel('1-Acceptance Rate', 'FontSize', 20);
+title('(b)', 'FontSize', 20);
+grid on;
 h2.FontSize = 20;
 
 h3 = subplot(3,2,3);
 depIdx = 3;
 meanRscdmRes = mean(squeeze(rscdmResultsMat(:,depIdx,:)),2);
+meanRscdmAcceptanceRate = mean(squeeze(rscdm_acceptance(:,depIdx,:)),2);
 meanPdcorrRes = mean(squeeze(pdcorrResultsMat(:,depIdx,:)),2);
+meanPdcorrAcceptanceRate = mean(squeeze(pdcorr_acceptance(:,depIdx,:)),2);
 meanPcorrRes = mean(squeeze(pcorrResultsMat(:,depIdx,:)),2);
+meanPcorrAcceptanceRate = mean(squeeze(pcorr_acceptance(:,depIdx,:)),2);
 meanCmaRes = mean(squeeze(cmaResultsMat(:,depIdx,:)),2);
-plot(gammaVec, meanRscdmRes, 'o-.', ...
-     gammaVec, meanPdcorrRes, 'x-.', ...
-     gammaVec, meanPcorrRes, 'd-.', ...
-     gammaVec, meanCmaRes, '+-.');
-xlabel('\gamma', 'FontSize', 20); ylabel('\mu[DEP({X,Y}|Z)]', 'FontSize', 20); grid on;
+meanCmaAcceptanceRate = mean(squeeze(cma_acceptance(:,depIdx,:)),2);
+plot(gammaVec, 1-meanRscdmAcceptanceRate, 'o-.', ...
+     gammaVec, 1-meanPdcorrAcceptanceRate, 'x-.', ...
+     gammaVec, 1-meanPcorrAcceptanceRate, 'd-.', ...
+     gammaVec, 1-meanCmaAcceptanceRate, '+-.');
+xlabel('\gamma', 'FontSize', 20); ylabel('1-Acceptance Rate', 'FontSize', 20); 
+title('(c)', 'FontSize', 20);
+grid on;
 h3.FontSize = 20;
 
 h4 = subplot(3,2,4);
 depIdx = 4;
 meanRscdmRes = mean(squeeze(rscdmResultsMat(:,depIdx,:)),2);
+meanRscdmAcceptanceRate = mean(squeeze(rscdm_acceptance(:,depIdx,:)),2);
 meanPdcorrRes = mean(squeeze(pdcorrResultsMat(:,depIdx,:)),2);
+meanPdcorrAcceptanceRate = mean(squeeze(pdcorr_acceptance(:,depIdx,:)),2);
 meanPcorrRes = mean(squeeze(pcorrResultsMat(:,depIdx,:)),2);
+meanPcorrAcceptanceRate = mean(squeeze(pcorr_acceptance(:,depIdx,:)),2);
 meanCmaRes = mean(squeeze(cmaResultsMat(:,depIdx,:)),2);
-plot(gammaVec, meanRscdmRes, 'o-.', ...
-     gammaVec, meanPdcorrRes, 'x-.', ...
-     gammaVec, meanPcorrRes, 'd-.', ...
-     gammaVec, meanCmaRes, '+-.');
-xlabel('\gamma', 'FontSize', 20); ylabel('\mu[DEP({X,Y}|Z)]', 'FontSize', 20); grid on;
+meanCmaAcceptanceRate = mean(squeeze(cma_acceptance(:,depIdx,:)),2);
+plot(gammaVec, 1-meanRscdmAcceptanceRate, 'o-.', ...
+     gammaVec, 1-meanPdcorrAcceptanceRate, 'x-.', ...
+     gammaVec, 1-meanPcorrAcceptanceRate, 'd-.', ...
+     gammaVec, 1-meanCmaAcceptanceRate, '+-.');
+xlabel('\gamma', 'FontSize', 20); ylabel('1-Acceptance Rate', 'FontSize', 20); 
+title('(d)', 'FontSize', 20);
+grid on;
 h4.FontSize = 20;
 
 h5 = subplot(3,2,5);
 depIdx = 5;
 meanRscdmRes = mean(squeeze(rscdmResultsMat(:,depIdx,:)),2);
+meanRscdmAcceptanceRate = mean(squeeze(rscdm_acceptance(:,depIdx,:)),2);
 meanPdcorrRes = mean(squeeze(pdcorrResultsMat(:,depIdx,:)),2);
+meanPdcorrAcceptanceRate = mean(squeeze(pdcorr_acceptance(:,depIdx,:)),2);
 meanPcorrRes = mean(squeeze(pcorrResultsMat(:,depIdx,:)),2);
+meanPcorrAcceptanceRate = mean(squeeze(pcorr_acceptance(:,depIdx,:)),2);
 meanCmaRes = mean(squeeze(cmaResultsMat(:,depIdx,:)),2);
-plot(gammaVec, meanRscdmRes, 'o-.', ...
-     gammaVec, meanPdcorrRes, 'x-.', ...
-     gammaVec, meanPcorrRes, 'd-.', ...
-     gammaVec, meanCmaRes, '+-.');
-xlabel('\gamma', 'FontSize', 20); ylabel('\mu[DEP({X,Y}|Z)]', 'FontSize', 20); grid on;
+meanCmaAcceptanceRate = mean(squeeze(cma_acceptance(:,depIdx,:)),2);
+plot(gammaVec, 1-meanRscdmAcceptanceRate, 'o-.', ...
+     gammaVec, 1-meanPdcorrAcceptanceRate, 'x-.', ...
+     gammaVec, 1-meanPcorrAcceptanceRate, 'd-.', ...
+     gammaVec, 1-meanCmaAcceptanceRate, '+-.');
+xlabel('\gamma', 'FontSize', 20); ylabel('1-Acceptance Rate', 'FontSize', 20);
+title('(e)', 'FontSize', 20);
+grid on;
 h5.FontSize = 20; 
 
 h6 = subplot(3,2,6);
 depIdx = 6;
 meanRscdmRes = mean(squeeze(rscdmResultsMat(:,depIdx,:)),2);
+meanRscdmAcceptanceRate = mean(squeeze(rscdm_acceptance(:,depIdx,:)),2);
 meanPdcorrRes = mean(squeeze(pdcorrResultsMat(:,depIdx,:)),2);
+meanPdcorrAcceptanceRate = mean(squeeze(pdcorr_acceptance(:,depIdx,:)),2);
 meanPcorrRes = mean(squeeze(pcorrResultsMat(:,depIdx,:)),2);
+meanPcorrAcceptanceRate = mean(squeeze(pcorr_acceptance(:,depIdx,:)),2);
 meanCmaRes = mean(squeeze(cmaResultsMat(:,depIdx,:)),2);
-plot(gammaVec, meanRscdmRes, 'o-.', ...
-     gammaVec, meanPdcorrRes, 'x-.', ...
-     gammaVec, meanPcorrRes, 'd-.', ...
-     gammaVec, meanCmaRes, '+-.');
-xlabel('\gamma', 'FontSize', 20); ylabel('\mu[DEP({X,Y}|Z)]', 'FontSize', 20); grid on;
+meanCmaAcceptanceRate = mean(squeeze(cma_acceptance(:,depIdx,:)),2);
+plot(gammaVec, 1-meanRscdmAcceptanceRate, 'o-.', ...
+     gammaVec, 1-meanPdcorrAcceptanceRate, 'x-.', ...
+     gammaVec, 1-meanPcorrAcceptanceRate, 'd-.', ...
+     gammaVec, 1-meanCmaAcceptanceRate, '+-.');
+xlabel('\gamma', 'FontSize', 20); ylabel('1-Acceptance Rate', 'FontSize', 20);
+title('(f)', 'FontSize', 20);
+grid on;
 h6.FontSize = 20; 
 
 legend('RSCDM', 'PDCORR', 'PCORR', 'CMA');  % manually move this using the mouse to a

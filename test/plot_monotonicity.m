@@ -47,12 +47,13 @@ cancerMonotonicityResults = [cancerMonotonicityResults(1) ...
                              cancerMonotonicityResults(2) ...
                              sum(cancerMonotonicityResults(3:end))];
 explode = zeros(1,length(cancerMonotonicityResults)); explode(2) = 1;
-%subplot(1,3,1);
-figure;
+subplot(1,3,1);
+% figure;
 p1 = pie(cancerMonotonicityResults, explode);
 p1(2).FontSize = fontSize;
 p1(4).FontSize = fontSize;
 p1(6).String = '';
+title('(a)', 'FontSize', fontSize)
 fprintf('Num cancer Dependencies Analyzed = %d\n', sum(cancerMonotonicityResults));
 
 
@@ -72,12 +73,13 @@ end
 
 stocksMonotonicityResults = double(cell2mat(finalMonotonicityResults{resultsIdx}.values()));
 explode = zeros(1,length(stocksMonotonicityResults)); explode(2) = 1;
-%subplot(1,3,2);
-figure;
+subplot(1,3,2);
+% figure;
 p2 = pie(stocksMonotonicityResults, explode);
 p2(2).FontSize = fontSize;
 p2(4).FontSize = fontSize;
 p2(6).String = '';
+title('(b)', 'FontSize', fontSize)
 fprintf('Num Stocks Dependencies Analyzed = %d\n', sum(stocksMonotonicityResults));
 
 %>>>>>>>>>>>>>>>>>>>>>>>> PROCESS CLIMATE DATA <<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -122,9 +124,11 @@ pollutionMonotonicityResults = [pollutionMonotonicityResults(1) ...
 % aggregate into climate results
 climateResults = elninoMonotonicityResults + landtemperaturesMonotonicityResults + pollutionMonotonicityResults;
 explode = zeros(1,length(climateResults)); explode(2) = 1;
-figure;
+% figure;
+subplot(1,3,3);
 p3 = pie(climateResults, explode);
 p3(2).FontSize = fontSize;
 p3(4).FontSize = fontSize;
 p3(6).String = '';
+title('(c)', 'FontSize', fontSize)
 fprintf('Num Climate Dependencies Analyzed = %d\n', sum(climateResults));
