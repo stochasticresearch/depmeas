@@ -242,6 +242,7 @@ hh1 = plot(noiseVec, rsdmPower(1,num_noise_test_min:num_noise_test_max), 'o-.', 
      noiseVec, ccorrPower(1,num_noise_test_min:num_noise_test_max), 'p-.'); 
 axis([min(noiseVec) max(noiseVec) 0 1]);
 xlabel('Noise Level', 'FontSize', 20); ylabel('Power', 'FontSize', 20); grid on;
+title('(a)', 'FontSize', 20);
 h1.FontSize = 20; 
 loc_inset = [h1.Position(1)+inset_bufX h1.Position(2)+inset_bufY inset_width inset_height];
 ax1 = axes('Position',loc_inset);
@@ -267,6 +268,7 @@ hh2 = plot(noiseVec, rsdmPower(2,num_noise_test_min:num_noise_test_max), 'o-.', 
      noiseVec, ccorrPower(2,num_noise_test_min:num_noise_test_max), 'p-.'); 
 axis([min(noiseVec) max(noiseVec) 0 1]);
 xlabel('Noise Level', 'FontSize', 20); ylabel('Power', 'FontSize', 20); grid on;
+title('(b)', 'FontSize', 20);
 h2.FontSize = 20; 
 loc_inset = [h2.Position(1)+inset_bufX h2.Position(2)+inset_bufY inset_width inset_height];
 ax2 = axes('Position',loc_inset);
@@ -292,6 +294,7 @@ hh3 = plot(noiseVec, rsdmPower(3,num_noise_test_min:num_noise_test_max), 'o-.', 
      noiseVec, ccorrPower(3,num_noise_test_min:num_noise_test_max), 'p-.');   
 axis([min(noiseVec) max(noiseVec) 0 1]);
 xlabel('Noise Level', 'FontSize', 20); ylabel('Power', 'FontSize', 20); grid on;
+title('(c)', 'FontSize', 20);
 h3.FontSize = 20; 
 loc_inset = [h3.Position(1)+inset_bufX h3.Position(2)+inset_bufY inset_width inset_height];
 ax3 = axes('Position',loc_inset);
@@ -317,6 +320,7 @@ hh4 = plot(noiseVec, rsdmPower(4,num_noise_test_min:num_noise_test_max), 'o-.', 
      noiseVec, ccorrPower(4,num_noise_test_min:num_noise_test_max), 'p-.'); 
 axis([min(noiseVec) max(noiseVec) 0 1]);
 xlabel('Noise Level', 'FontSize', 20); ylabel('Power', 'FontSize', 20); grid on;
+title('(d)', 'FontSize', 20);
 h4.FontSize = 20; 
 loc_inset = [h4.Position(1)+inset_bufX h4.Position(2)+inset_bufY inset_width inset_height];
 ax4 = axes('Position',loc_inset);
@@ -342,7 +346,8 @@ hh5 = plot(noiseVec, rsdmPower(5,num_noise_test_min:num_noise_test_max), 'o-.', 
      noiseVec, cosPower(5,num_noise_test_min:num_noise_test_max), 's-.', ...
      noiseVec, ccorrPower(5,num_noise_test_min:num_noise_test_max), 'p-.'); 
 axis([min(noiseVec) max(noiseVec) 0 1]);
-xlabel('Noise Level'); ylabel('Power'); grid on;
+xlabel('Noise Level'); ylabel('Power', 'FontSize', 20); grid on;
+title('(e)', 'FontSize', 20);
 h5.FontSize = 20; 
 loc_inset = [h5.Position(1)+inset_bufX h5.Position(2)+inset_bufY inset_width inset_height];
 ax5 = axes('Position',loc_inset);
@@ -367,7 +372,8 @@ hh6 = plot(noiseVec, rsdmPower(6,num_noise_test_min:num_noise_test_max), 'o-.', 
      noiseVec, cosPower(6,num_noise_test_min:num_noise_test_max), 's-.', ...
      noiseVec, ccorrPower(6,num_noise_test_min:num_noise_test_max), 'p-.'); 
 axis([min(noiseVec) max(noiseVec) 0 1]);
-xlabel('Noise Level'); ylabel('Power'); grid on;
+xlabel('Noise Level'); ylabel('Power', 'FontSize', 20); grid on;
+title('(f)', 'FontSize', 20);
 h6.FontSize = 20; 
 loc_inset = [h6.Position(1)+inset_bufX h6.Position(2)+inset_bufY inset_width inset_height];
 ax6 = axes('Position',loc_inset);
@@ -392,7 +398,8 @@ hh7 = plot(noiseVec, rsdmPower(7,num_noise_test_min:num_noise_test_max), 'o-.', 
      noiseVec, cosPower(7,num_noise_test_min:num_noise_test_max), 's-.', ...
      noiseVec, ccorrPower(7,num_noise_test_min:num_noise_test_max), 'p-.'); 
 axis([min(noiseVec) max(noiseVec) 0 1]);
-xlabel('Noise Level'); ylabel('Power'); grid on;
+xlabel('Noise Level'); ylabel('Power', 'FontSize', 20); grid on;
+title('(g)', 'FontSize', 20);
 h7.FontSize = 20; 
 loc_inset = [h7.Position(1)+inset_bufX h7.Position(2)+inset_bufY inset_width inset_height];
 ax7 = axes('Position',loc_inset);
@@ -420,9 +427,10 @@ hh8 = plot(noiseVec, rsdmPower(8,num_noise_test_min:num_noise_test_max), 'o-.', 
      noiseVec, ccorrPower(8,num_noise_test_min:num_noise_test_max), 'p-.'); 
 axis([min(noiseVec) max(noiseVec) 0 1]);
 h8.FontSize = 20; 
-legend('RSDM', 'dCor', 'TIC_e', 'RDC', 'CoS', 'cCor');  % manually move this using the mouse to a
+legend('RSDM', 'dCor', 'TIC_e', 'RDC', 'CoS', 'Ccor');  % manually move this using the mouse to a
                                                         % good location
-xlabel('Noise Level'); ylabel('Power'); grid on;
+xlabel('Noise Level'); ylabel('Power', 'FontSize', 20); grid on;
+title('(h)', 'FontSize', 20);
 loc_inset = [h8.Position(1)+inset_bufX h8.Position(2)+inset_bufY inset_width inset_height];
 ax8 = axes('Position',loc_inset);
 tmp1 = linspace(0,1,M_inlet);
@@ -718,6 +726,7 @@ hh1 = plot(noiseVec, squeeze(sampleSizeAnalysisVec(1,rsdmIdx,num_noise_test_min:
      noiseVec, squeeze(sampleSizeAnalysisVec(1,ccorrIdx,num_noise_test_min:num_noise_test_max)), 'p-.'); 
 % axis([min(noiseVec) max(noiseVec) 0 1]);
 xlabel('Noise Level', 'FontSize', 20); ylabel('$$M_{min}$$', 'FontSize', 20, 'Interpreter', 'Latex'); grid on;
+title('(a)', 'FontSize', 20);
 h1.FontSize = 20; 
 loc_inset = [h1.Position(1)+inset_bufX h1.Position(2)+inset_bufY inset_width inset_height];
 ax1 = axes('Position',loc_inset);
@@ -743,6 +752,7 @@ hh2 = plot(noiseVec, squeeze(sampleSizeAnalysisVec(2,rsdmIdx,num_noise_test_min:
      noiseVec, squeeze(sampleSizeAnalysisVec(2,ccorrIdx,num_noise_test_min:num_noise_test_max)), 'p-.'); 
 % axis([min(noiseVec) max(noiseVec) 0 1]);
 xlabel('Noise Level', 'FontSize', 20); ylabel('$$M_{min}$$', 'FontSize', 20, 'Interpreter', 'Latex'); grid on;
+title('(b)', 'FontSize', 20);
 h2.FontSize = 20; 
 loc_inset = [h2.Position(1)+inset_bufX h2.Position(2)+inset_bufY inset_width inset_height];
 ax1 = axes('Position',loc_inset);
@@ -768,6 +778,7 @@ hh3 = plot(noiseVec, squeeze(sampleSizeAnalysisVec(3,rsdmIdx,num_noise_test_min:
      noiseVec, squeeze(sampleSizeAnalysisVec(3,ccorrIdx,num_noise_test_min:num_noise_test_max)), 'p-.'); 
 % axis([min(noiseVec) max(noiseVec) 0 1]);
 xlabel('Noise Level', 'FontSize', 20); ylabel('$$M_{min}$$', 'FontSize', 20, 'Interpreter', 'Latex'); grid on;
+title('(c)', 'FontSize', 20);
 h3.FontSize = 20; 
 loc_inset = [h3.Position(1)+inset_bufX h3.Position(2)+inset_bufY inset_width inset_height];
 ax1 = axes('Position',loc_inset);
@@ -793,6 +804,7 @@ hh4 = plot(noiseVec, squeeze(sampleSizeAnalysisVec(4,rsdmIdx,num_noise_test_min:
      noiseVec, squeeze(sampleSizeAnalysisVec(4,ccorrIdx,num_noise_test_min:num_noise_test_max)), 'p-.'); 
 % axis([min(noiseVec) max(noiseVec) 0 1]);
 xlabel('Noise Level', 'FontSize', 20); ylabel('$$M_{min}$$', 'FontSize', 20, 'Interpreter', 'Latex'); grid on;
+title('(d)', 'FontSize', 20);
 h4.FontSize = 20; 
 loc_inset = [h4.Position(1)+inset_bufX h4.Position(2)+inset_bufY inset_width inset_height];
 ax1 = axes('Position',loc_inset);
@@ -819,6 +831,7 @@ hh5 = plot(noiseVec, squeeze(sampleSizeAnalysisVec(5,rsdmIdx,num_noise_test_min:
      noiseVec, squeeze(sampleSizeAnalysisVec(5,ccorrIdx,num_noise_test_min:num_noise_test_max)), 'p-.'); 
 % axis([min(noiseVec) max(noiseVec) 0 1]);
 xlabel('Noise Level', 'FontSize', 20); ylabel('$$M_{min}$$', 'FontSize', 20, 'Interpreter', 'Latex'); grid on;
+title('(e)', 'FontSize', 20);
 h5.FontSize = 20; 
 loc_inset = [h5.Position(1)+inset_bufX h5.Position(2)+inset_bufY inset_width inset_height];
 ax1 = axes('Position',loc_inset);
@@ -844,6 +857,7 @@ hh6 = plot(noiseVec, squeeze(sampleSizeAnalysisVec(6,rsdmIdx,num_noise_test_min:
      noiseVec, squeeze(sampleSizeAnalysisVec(6,ccorrIdx,num_noise_test_min:num_noise_test_max)), 'p-.'); 
 % axis([min(noiseVec) max(noiseVec) 0 1]);
 xlabel('Noise Level', 'FontSize', 20); ylabel('$$M_{min}$$', 'FontSize', 20, 'Interpreter', 'Latex'); grid on;
+title('(f)', 'FontSize', 20);
 h6.FontSize = 20; 
 loc_inset = [h6.Position(1)+inset_bufX h6.Position(2)+inset_bufY inset_width inset_height];
 ax1 = axes('Position',loc_inset);
@@ -869,6 +883,7 @@ hh7 = plot(noiseVec, squeeze(sampleSizeAnalysisVec(7,rsdmIdx,num_noise_test_min:
      noiseVec, squeeze(sampleSizeAnalysisVec(7,ccorrIdx,num_noise_test_min:num_noise_test_max)), 'p-.'); 
 % axis([min(noiseVec) max(noiseVec) 0 1]);
 xlabel('Noise Level', 'FontSize', 20); ylabel('$$M_{min}$$', 'FontSize', 20, 'Interpreter', 'Latex'); grid on;
+title('(g)', 'FontSize', 20);
 h7.FontSize = 20; 
 loc_inset = [h7.Position(1)+inset_bufX h7.Position(2)+inset_bufY inset_width inset_height];
 ax1 = axes('Position',loc_inset);
@@ -894,10 +909,11 @@ hh8 = plot(noiseVec, squeeze(sampleSizeAnalysisVec(8,rsdmIdx,num_noise_test_min:
      noiseVec, squeeze(sampleSizeAnalysisVec(8,rdcIdx,num_noise_test_min:num_noise_test_max)), 'v-.', ...
      noiseVec, squeeze(sampleSizeAnalysisVec(8,cosIdx,num_noise_test_min:num_noise_test_max)), 's-.', ...
      noiseVec, squeeze(sampleSizeAnalysisVec(8,ccorrIdx,num_noise_test_min:num_noise_test_max)), 'p-.'); 
-legend('RSDM', 'dCor', 'TIC_e', 'RDC', 'CoS', 'cCor');  % manually move this using the mouse to a
+legend('RSDM', 'dCor', 'TIC_e', 'RDC', 'CoS', 'Ccor');  % manually move this using the mouse to a
                                                   % good location
 % axis([min(noiseVec) max(noiseVec) 0 1]);
 xlabel('Noise Level', 'FontSize', 20); ylabel('$$M_{min}$$', 'FontSize', 20, 'Interpreter', 'Latex'); grid on;
+title('(h)', 'FontSize', 20);
 h8.FontSize = 20; 
 loc_inset = [h8.Position(1)+inset_bufX h8.Position(2)+inset_bufY inset_width inset_height];
 ax1 = axes('Position',loc_inset);
@@ -1921,7 +1937,7 @@ else
     save('/home/kiran/ownCloud/PhD/sim_results/independence/rsdmPower_rsdm_M_25_1500.mat');
 end
 
-%% Generate power curves for only KNN-MI
+%% Generate power curves for only KNN-MI, ITE estimators, the Shannon AP & vME
 
 clear;
 clc;
@@ -1938,7 +1954,7 @@ nsim_alt  = 500;   % Number of alternative datasets we use to estimate our power
 num_noise = 30;                    % The number of different noise levels used
 noise = 3;                         % A constant to determine the amount of noise
 
-M_vec = 500;        % for now, only do 500 samps, I don't think we'll show the other plot anyway
+M_vec = 100;        % for now, only do 500 samps, I don't think we'll show the other plot anyway
 numDepTests = 8;        % the number of different dependency tests we will conduct
                         % TODO: add copula dependencies as well
                         
@@ -1947,177 +1963,20 @@ numDepTests = 8;        % the number of different dependency tests we will condu
 knn1Null = zeros(1,nsim_null);
 knn6Null = zeros(1,nsim_null);
 knn20Null = zeros(1,nsim_null);
+shapNull = zeros(1,nsim_null);
+shvmeNull = zeros(1,nsim_null);
 
 knn1Alt = zeros(1,nsim_alt);
 knn6Alt = zeros(1,nsim_alt);
 knn20Alt = zeros(1,nsim_alt);
+shapAlt = zeros(1,nsim_alt);
+shvmeAlt = zeros(1,nsim_alt);
 
 % Arrays holding the estimated power for each of the "correlation" types, 
 % for each data type (linear, parabolic, etc...) with each noise level
 knn1Power  = zeros(numDepTests, num_noise, length(M_vec));
 knn6Power  = zeros(numDepTests, num_noise, length(M_vec));
 knn20Power = zeros(numDepTests, num_noise, length(M_vec));
-
-% We loop through the noise level and functional form; 
-% each time we estimate a null distribution based on the marginals of the data, 
-% and then use that null distribution to estimate power
-
-% We use a uniformly distributed x, because in the original paper the 
-% authors used the same
-
-% Simon & Tibshirani use xMin=0, xMax=1 for performing their analysis ...
-xMin = 0;
-xMax = 1;
-
-dispstat('','init'); % One time only initialization
-dispstat(sprintf('Begining the simulation...\n'),'keepthis','timestamp');
-num_noise_test_min = 1;
-num_noise_test_max = 30;
-for m=1:length(M_vec)
-    M = M_vec(m);
-    for l=num_noise_test_min:num_noise_test_max
-        for typ=1:numDepTests
-            dispstat(sprintf('M=%d Noise=%d Dependency=%d',M, l, typ),'keepthis', 'timestamp');
-            % simulate data under the null w/ correct marginals
-            parfor ii=1:nsim_null
-                x = rand(M,1)*(xMax-xMin)+xMin;
-                switch(typ)
-                    case 1
-                        % linear
-                        y = x + noise*(l/num_noise)*randn(M,1); 
-                    case 2
-                        % parabolic
-                        y = 4*(x-.5).^2 + noise*(l/num_noise)*randn(M,1);
-                    case 3
-                        % cubic
-                        y = 128*(x-1/3).^3-48*(x-1/3).^3-12*(x-1/3)+10* noise*(l/num_noise)*randn(M,1);
-                    case 4
-                        % low-freq sin
-                        y = sin(4*pi*x) + 2*noise*(l/num_noise)*randn(M,1);
-                    case 5
-                        % high-freq sin
-                        y = sin(16*pi*x) + noise*(l/num_noise)*randn(M,1);
-                    case 6
-                        % fourth root
-                        y = x.^(1/4) + noise*(l/num_noise)*randn(M,1);
-                    case 7
-                        % circle
-                        y=(2*binornd(1,0.5,M,1)-1) .* (sqrt(1 - (2*x - 1).^2)) + noise/4*l/num_noise*randn(M,1);
-                    case 8
-                        % step function
-                        y = (x > 0.5) + noise*5*l/num_noise*randn(M,1);
-                    otherwise
-                        error('unknown dep type!');
-                end
-                % resimulate x so we have null scenario
-                x = rand(M,1)*(xMax-xMin)+xMin;
-
-                % calculate the metrics
-                knn1Null(ii) = KraskovMI(x, y, 1);
-                knn6Null(ii) = KraskovMI(x, y, 6);
-                knn20Null(ii) = KraskovMI(x, y, 20);
-            end
-
-            % compute the rejection cutoffs
-            knn1_cut  = quantile(knn1Null, 0.95);
-            knn6_cut = quantile(knn6Null, 0.95);
-            knn20_cut = quantile(knn20Null, 0.95);
-
-            % resimulate the data under the alternative hypothesis
-            parfor ii=1:nsim_alt
-                x = rand(M,1)*(xMax-xMin)+xMin;
-                switch(typ)
-                    case 1
-                        % linear
-                        y = x + noise*(l/num_noise)*randn(M,1); 
-                    case 2
-                        % parabolic
-                        y = 4*(x-.5).^2 + noise*(l/num_noise)*randn(M,1);
-                    case 3
-                        % cubic
-                        y = 128*(x-1/3).^3-48*(x-1/3).^3-12*(x-1/3) + 10*noise*(l/num_noise)*randn(M,1);
-                    case 4
-                        % low-freq sin
-                        y = sin(4*pi*x) + 2*noise*(l/num_noise)*randn(M,1);
-                    case 5
-                        % high-freq sin
-                        y = sin(16*pi*x) + noise*(l/num_noise)*randn(M,1);
-                    case 6
-                        % fourth root
-                        y = x.^(1/4) + noise*(l/num_noise)*randn(M,1);
-                    case 7
-                        % circle
-                        y=(2*binornd(1,0.5,M,1)-1) .* (sqrt(1 - (2*x - 1).^2)) + noise/4*l/num_noise*randn(M,1);
-                    case 8
-                        % step function
-                        y = (x > 0.5) + noise*5*l/num_noise*randn(M,1);
-                    otherwise
-                        error('unknown dep type!');
-                end
-
-                % calculate the metrics
-                knn1Alt(ii) = KraskovMI(x, y, 1);
-                knn6Alt(ii) = KraskovMI(x, y, 6);
-                knn20Alt(ii) = KraskovMI(x, y, 20);
-            end
-
-            % compute the power
-            knn1Power(typ, l, m)    = sum(knn1Alt > knn1_cut)/nsim_alt;
-            knn6Power(typ, l, m)  = sum(knn6Alt > knn6_cut)/nsim_alt;
-            knn20Power(typ, l, m)   = sum(knn20Alt > knn20_cut)/nsim_alt;
-        end
-    end
-    
-    % save intermediate results just in case things crash :(
-    if(ispc)
-        save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rsdmPower_knn_M_500.mat');
-    elseif(ismac)
-        save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rsdmPower_knn_M_500.mat');
-    else
-        save('/home/kiran/ownCloud/PhD/sim_results/independence/rsdmPower_knn_M_500.mat');
-    end
-end
-% save the data
-if(ispc)
-    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rsdmPower_knn_M_500.mat');
-elseif(ismac)
-    save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rsdmPower_knn_M_500.mat');
-else
-    save('/home/kiran/ownCloud/PhD/sim_results/independence/rsdmPower_knn_M_500.mat');
-end
-
-%% Generate power curves for only ITE estimators, the Shannon AP & vME
-
-clear;
-clc;
-
-% WARNING: ENSURE THAT minepy/matlab/ is in the matlab path for MIC to
-% work!  Likewise, make sure that ITE is in your path for the ITE
-% estimators to work!
-
-rng(1234);
-dbstop if error;
-
-nsim_null = 500;   % The number of null datasets we use to estimate our rejection reject regions for an alternative with level 0.05
-nsim_alt  = 500;   % Number of alternative datasets we use to estimate our power
-
-num_noise = 30;                    % The number of different noise levels used
-noise = 3;                         % A constant to determine the amount of noise
-
-M_vec = 500;        % for now, only do 500 samps, I don't think we'll show the other plot anyway
-numDepTests = 8;        % the number of different dependency tests we will conduct
-                        % TODO: add copula dependencies as well
-                        
-% Vectors holding the null "correlations" (for pearson, dcor and mic respectively) 
-% for each of the nsim null datasets at a given noise level
-shapNull = zeros(1,nsim_null);
-shvmeNull = zeros(1,nsim_null);
-
-shapAlt = zeros(1,nsim_alt);
-shvmeAlt = zeros(1,nsim_alt);
-
-% Arrays holding the estimated power for each of the "correlation" types, 
-% for each data type (linear, parabolic, etc...) with each noise level
 shapPower  = zeros(numDepTests, num_noise, length(M_vec));
 shvmePower  = zeros(numDepTests, num_noise, length(M_vec));
 
@@ -2181,11 +2040,17 @@ for m=1:length(M_vec)
                 x = rand(M,1)*(xMax-xMin)+xMin;
 
                 % calculate the metrics
+                knn1Null(ii) = KraskovMI(x, y, 1);
+                knn6Null(ii) = KraskovMI(x, y, 6);
+                knn20Null(ii) = KraskovMI(x, y, 20);
                 shapNull(ii) = IShannon_AP_estimation([x y]',ds,iSHAP);
                 shvmeNull(ii) = IShannon_vME_estimation([x y]',ds,iSHvME);
             end
 
             % compute the rejection cutoffs
+            knn1_cut  = quantile(knn1Null, 0.95);
+            knn6_cut = quantile(knn6Null, 0.95);
+            knn20_cut = quantile(knn20Null, 0.95);
             shap_cut  = quantile(shapNull, 0.95);
             shvme_cut = quantile(shvmeNull, 0.95);
 
@@ -2222,11 +2087,17 @@ for m=1:length(M_vec)
                 end
 
                 % calculate the metrics
+                knn1Alt(ii) = KraskovMI(x, y, 1);
+                knn6Alt(ii) = KraskovMI(x, y, 6);
+                knn20Alt(ii) = KraskovMI(x, y, 20);
                 shapAlt(ii) = IShannon_AP_estimation([x y]',ds,iSHAP);
                 shvmeAlt(ii) = IShannon_vME_estimation([x y]',ds,iSHvME);
             end
 
             % compute the power
+            knn1Power(typ, l, m)    = sum(knn1Alt > knn1_cut)/nsim_alt;
+            knn6Power(typ, l, m)  = sum(knn6Alt > knn6_cut)/nsim_alt;
+            knn20Power(typ, l, m)   = sum(knn20Alt > knn20_cut)/nsim_alt;
             shapPower(typ, l, m)    = sum(shapAlt > shap_cut)/nsim_alt;
             shvmePower(typ, l, m)  = sum(shvmeAlt > shvme_cut)/nsim_alt;
         end
@@ -2234,25 +2105,25 @@ for m=1:length(M_vec)
     
     % save intermediate results just in case things crash :(
     if(ispc)
-        save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rsdmPower_ite_M_500.mat');
+        save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rsdmPower_MI_M_100.mat');
     elseif(ismac)
-        save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rsdmPower_ite_M_500.mat');
+        save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rsdmPower_MI_M_100.mat');
     else
-        save('/home/kiran/ownCloud/PhD/sim_results/independence/rsdmPower_ite_M_500.mat');
+        save('/home/kiran/ownCloud/PhD/sim_results/independence/rsdmPower_MI_M_100.mat');
     end
 end
 % save the data
 if(ispc)
-    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rsdmPower_ite_M_500.mat');
+    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rsdmPower_MI_M_100.mat');
 elseif(ismac)
-    save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rsdmPower_ite_M_500.mat');
+    save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rsdmPower_MI_M_100.mat');
 else
-    save('/home/kiran/ownCloud/PhD/sim_results/independence/rsdmPower_ite_M_500.mat');
+    save('/home/kiran/ownCloud/PhD/sim_results/independence/rsdmPower_MI_M_100.mat');
 end
 
 %% Plot RSDM vs KNN-1,KNN-6,KNN-20,Shannon Adaptive Partitioning, vonMises Expansion
 
-M = 500;
+M = 100;
 
 % save the data
 if(ispc)

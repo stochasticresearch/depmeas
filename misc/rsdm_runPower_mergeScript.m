@@ -545,3 +545,46 @@ ax8.Box = 'on'; ax8.XTick = []; ax8.YTick = [];
 ax8.XLim = [min(tmp1) max(tmp1)];
 hh8(1).LineWidth = 1.5; 
 hh8(2).LineWidth = 1.5; 
+
+%% Merge the ite power's @ M=100 & RSDM @ M=100
+
+clear;
+clc;
+dbstop if error;
+
+f1name = 'rsdmPower_MI_M_100.mat';
+f2name = 'power_all.mat';
+
+if(ispc)
+    folder = 'C:\\Users\\Kiran\\ownCloud\\PhD\sim_results\\independence';
+elseif(ismac)
+    folder = '/Users/Kiran/ownCloud/PhD/sim_results/independence';
+else % assume unix
+    folder = '/home/kiran/ownCloud/PhD/sim_results/independence';
+end
+
+f1 = fullfile(folder, f1name);
+f2 = fullfile(folder, f2name);
+
+load(f2);
+rsdmPower = squeeze(rsdmPower(:,:,4));  %  grab RSDM M=100 data
+clearvars -except rsdmPower f1
+
+load(f1);
+clearvars -except rsdmPower knn1Power knn6Power knn20Power shapPower shvmePower
+
+M = 100;
+num_noise_test_min = 1;
+num_noise_test_max = 30;
+
+outputFilename = 'power_M_100.mat';
+if(ispc)
+    folder = 'C:\\Users\\Kiran\\ownCloud\\PhD\sim_results\\independence';
+elseif(ismac)
+    folder = '/Users/Kiran/ownCloud/PhD/sim_results/independence';
+else % assume unix
+    folder = '/home/kiran/ownCloud/PhD/sim_results/independence';
+end
+
+finalOutputFile = fullfile(folder, outputFilename);
+save(finalOutputFile);
