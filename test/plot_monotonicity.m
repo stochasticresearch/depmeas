@@ -53,7 +53,6 @@ p1 = pie(cancerMonotonicityResults, explode);
 p1(2).FontSize = fontSize;
 p1(4).FontSize = fontSize;
 p1(6).String = '';
-title('(a)', 'FontSize', fontSize)
 fprintf('Num cancer Dependencies Analyzed = %d\n', sum(cancerMonotonicityResults));
 
 
@@ -79,7 +78,6 @@ p2 = pie(stocksMonotonicityResults, explode);
 p2(2).FontSize = fontSize;
 p2(4).FontSize = fontSize;
 p2(6).String = '';
-title('(b)', 'FontSize', fontSize)
 fprintf('Num Stocks Dependencies Analyzed = %d\n', sum(stocksMonotonicityResults));
 
 %>>>>>>>>>>>>>>>>>>>>>>>> PROCESS CLIMATE DATA <<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -130,11 +128,4 @@ p3 = pie(climateResults, explode);
 p3(2).FontSize = fontSize;
 p3(4).FontSize = fontSize;
 p3(6).String = '';
-<<<<<<< HEAD
-title('(c)', 'FontSize', fontSize)
 fprintf('Num Climate Dependencies Analyzed = %d\n', sum(climateResults));
-=======
-fprintf('Num Climate Dependencies Analyzed = %d\n', sum(climateResults));
-h = legend({'1','>=2'});
-set(h,'FontSize',fontSize);
->>>>>>> be8b8f3f135222759194082101f842615ca1870d

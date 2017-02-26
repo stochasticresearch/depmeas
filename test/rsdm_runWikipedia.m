@@ -196,7 +196,7 @@ for ii=1:nCases
     b = bar(barVals);
     b(1).BarWidth = 1;
     ylim([0 1])
-    Labels = {'RSDM', 'RDC', 'MIC_e', 'dCor', 'CoS', 'cCor'};
+    Labels = {'CIM', 'RDC', 'MIC_e', 'dCor', 'CoS', 'cCor'};
     set(gca, 'XTick', 1:6, 'XTickLabel', Labels, 'FontSize', 20);
     rotateXLabels( gca(), 80 )
    

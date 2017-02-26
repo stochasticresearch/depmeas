@@ -26,7 +26,7 @@ tauResMatrix = zeros(numDepTypes, length(noisePowerVec));
 
 for noisePowerIdx=1:length(noisePowerVec)
     noisePower = noisePowerVec(noisePowerIdx);
-    x = rand(M,1)*3+2;
+    x = rand(M,1)*10+2;
     noise = randn(M,1)*noisePower;
     
     y1 = x + noise;
@@ -40,3 +40,26 @@ for noisePowerIdx=1:length(noisePowerVec)
 end
 
 plot(noisePowerVec, tauResMatrix);
+
+%% Generate Figure 5
+clear;
+clc;
+
+M = 1000;
+x = rand(M,1)*8+2;
+y1 = x;
+y2 = exp(x);
+noise = randn(M,1)*2;
+
+u = pobs(x);
+v1 = pobs(y1+noise);
+v2 = pobs(y2+noise);
+
+subplot(2,2,1);
+scatter(x,y1); grid on; xlabel({'x', '(a)'}, 'FontSize', 20); ylabel('y', 'FontSize', 20);
+subplot(2,2,2);
+scatter(u,v1); grid on; xlabel({'u', '(b)'}, 'FontSize', 20); ylabel('v', 'FontSize', 20);
+subplot(2,2,3);
+scatter(x,y2); grid on; xlabel({'x', '(c)'}, 'FontSize', 20); ylabel('y', 'FontSize', 20);
+subplot(2,2,4);
+scatter(u,v2); grid on; xlabel({'u', '(d)'}, 'FontSize', 20); ylabel('v', 'FontSize', 20);

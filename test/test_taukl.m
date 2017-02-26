@@ -284,7 +284,8 @@ clc;
 rng(123);
 
 nsim = 300;
-M = 500;
+% M = 500;
+M_vec = 100:100:1000;
 numDiscreteIntervals = 4;
 
 correctionFactors = [1 2 3 4 5];
@@ -304,78 +305,81 @@ pdConfigurations = {'', '', ...
     {'Gaussian', 'Uniform', 'ThickTailed'}, ...
     {[0.25 0.25 0.25 0.25], [0.5 0.3 0.1 0.1], [0.1 0.1 0.3 0.5]} };
 
-resultsXYCopula_bias = zeros( [size(subDependenciesVec) numTotalConfigurations ]);
-resultsXYCopula_var = zeros( [size(subDependenciesVec) numTotalConfigurations ]);
-resultsYXCopula_bias = zeros( [size(subDependenciesVec) numTotalConfigurations ]);
-resultsYXCopula_var = zeros( [size(subDependenciesVec) numTotalConfigurations ]);
+resultsXYCopula_bias = zeros( [length(M_vec) size(subDependenciesVec) numTotalConfigurations ]);
+resultsXYCopula_var = zeros(  [length(M_vec)  size(subDependenciesVec) numTotalConfigurations ]);
+resultsYXCopula_bias = zeros( [length(M_vec) size(subDependenciesVec) numTotalConfigurations ]);
+resultsYXCopula_var = zeros(  [length(M_vec)  size(subDependenciesVec) numTotalConfigurations ]);
 
-for dependencyIdx=1:length(dependenciesVec)
-    dependency = dependenciesVec{dependencyIdx};
-    subDependencies = subDependenciesVec(dependencyIdx,:);
-    for subDependencyIdx=1:length(subDependencies)
-        subDependency = subDependencies(subDependencyIdx);
-        tauTrue = copulastat(dependency, subDependency);
-        % TODO: add more kinds of distributions for pd1 and pd2...
-        pd1 = makedist('Normal');
-        pd2 = makedist('Multinomial','Probabilities',[0.25 0.25 0.25 0.25]);
-        
-        for xyOrientation=xyOrientationVec
-            
-            tau_hat_vec = zeros(numTotalConfigurations, nsim);
-            for simnum=1:nsim
-            
-                % generate the data according to the configuration
-                rho = subDependency;
-                U = copularnd(dependency, subDependency, M);
-                
-                X = zeros(size(U));
-                if(xyOrientation==1)
-                    for ii=1:M
-                        X(ii,1) = pd1.icdf(U(ii,1));
-                        X(ii,2) = pd2.icdf(U(ii,2));
+for mIdx=1:length(M_vec)
+    M = M_vec(mIdx);
+    for dependencyIdx=1:length(dependenciesVec)
+        dependency = dependenciesVec{dependencyIdx};
+        subDependencies = subDependenciesVec(dependencyIdx,:);
+        for subDependencyIdx=1:length(subDependencies)
+            subDependency = subDependencies(subDependencyIdx);
+            tauTrue = copulastat(dependency, subDependency);
+            % TODO: add more kinds of distributions for pd1 and pd2...
+            pd1 = makedist('Normal');
+            pd2 = makedist('Multinomial','Probabilities',[0.25 0.25 0.25 0.25]);
+
+            for xyOrientation=xyOrientationVec
+
+                tau_hat_vec = zeros(numTotalConfigurations, nsim);
+                for simnum=1:nsim
+
+                    % generate the data according to the configuration
+                    rho = subDependency;
+                    U = copularnd(dependency, subDependency, M);
+
+                    X = zeros(size(U));
+                    if(xyOrientation==1)
+                        for ii=1:M
+                            X(ii,1) = pd1.icdf(U(ii,1));
+                            X(ii,2) = pd2.icdf(U(ii,2));
+                        end
+                    else
+                        for ii=1:M
+                            X(ii,2) = pd1.icdf(U(ii,2));
+                            X(ii,1) = pd2.icdf(U(ii,1));
+                        end
                     end
+                    x = X(:,1); y = X(:,2);
+
+                    % compute the tau
+                    for correctionFactor=correctionFactors
+                        tau_hat = taukl(x,y,correctionFactor);
+                        tau_hat_vec(correctionFactor, simnum) = tau_hat;
+                    end
+                    tau_hat_vec(6,simnum) = corr(x,y,'type','kendall');
+                    tau_hat_vec(7,simnum) =  ktaub([x y], 0.05, 0);
+                    kso = taukl_s(x, y);
+                    tau_hat_vec(8,simnum) = kso.consumeAll();
+
+                end
+
+                % compute standardized bias and variance
+                tau_hat_bias = mean(tau_hat_vec,2)-tauTrue;
+                tau_hat_var  = var(tau_hat_vec-tauTrue,0,2);    % w = 0
+
+                % print the result
+                fprintf('%s -- %0.02f -- %d\n', ...
+                        dependency, subDependency, xyOrientation);
+                fprintf('\t Bias >> [%0.02f %0.02f %0.02f %0.02f %0.02f %0.02f %0.02f %0.02f]\n', ...
+                    tau_hat_bias(1), tau_hat_bias(2), tau_hat_bias(3), tau_hat_bias(4), ...
+                    tau_hat_bias(5), tau_hat_bias(6), tau_hat_bias(7), tau_hat_bias(8));
+                fprintf('\t Var  >> [%0.02f %0.02f %0.02f %0.02f %0.02f %0.02f %0.02f %0.02f]\n', ...
+                    tau_hat_var(1), tau_hat_var(2), tau_hat_var(3), tau_hat_var(4), ...
+                    tau_hat_var(5), tau_hat_var(6), tau_hat_var(7), tau_hat_var(8));
+
+                if(xyOrientation)
+                    resultsXYCopula_bias(mIdx, dependencyIdx, subDependencyIdx, 1:numTotalConfigurations) = tau_hat_bias;
+                    resultsXYCopula_var(mIdx, dependencyIdx, subDependencyIdx, 1:numTotalConfigurations) = tau_hat_var;
                 else
-                    for ii=1:M
-                        X(ii,2) = pd1.icdf(U(ii,2));
-                        X(ii,1) = pd2.icdf(U(ii,1));
-                    end
+                    resultsYXCopula_bias(mIdx, dependencyIdx, subDependencyIdx, 1:numTotalConfigurations) = tau_hat_bias;
+                    resultsYXCopula_var(mIdx, dependencyIdx, subDependencyIdx, 1:numTotalConfigurations) = tau_hat_var;
                 end
-                x = X(:,1); y = X(:,2);
-                
-                % compute the tau
-                for correctionFactor=correctionFactors
-                    tau_hat = taukl(x,y,correctionFactor);
-                    tau_hat_vec(correctionFactor, simnum) = tau_hat;
-                end
-                tau_hat_vec(6,simnum) = corr(x,y,'type','kendall');
-                tau_hat_vec(7,simnum) =  ktaub([x y], 0.05, 0);
-                kso = taukl_s(x, y);
-                tau_hat_vec(8,simnum) = kso.consumeAll();
 
             end
-            
-            % compute standardized bias and variance
-            tau_hat_bias = mean(tau_hat_vec,2)-tauTrue;
-            tau_hat_var  = var(tau_hat_vec-tauTrue,0,2);    % w = 0
-            
-            % print the result
-            fprintf('%s -- %0.02f -- %d\n', ...
-                    dependency, subDependency, xyOrientation);
-            fprintf('\t Bias >> [%0.02f %0.02f %0.02f %0.02f %0.02f %0.02f %0.02f %0.02f]\n', ...
-                tau_hat_bias(1), tau_hat_bias(2), tau_hat_bias(3), tau_hat_bias(4), ...
-                tau_hat_bias(5), tau_hat_bias(6), tau_hat_bias(7), tau_hat_bias(8));
-            fprintf('\t Var  >> [%0.02f %0.02f %0.02f %0.02f %0.02f %0.02f %0.02f %0.02f]\n', ...
-                tau_hat_var(1), tau_hat_var(2), tau_hat_var(3), tau_hat_var(4), ...
-                tau_hat_var(5), tau_hat_var(6), tau_hat_var(7), tau_hat_var(8));
-            
-            if(xyOrientation)
-                resultsXYCopula_bias(dependencyIdx, subDependencyIdx, 1:numTotalConfigurations) = tau_hat_bias;
-                resultsXYCopula_var(dependencyIdx, subDependencyIdx, 1:numTotalConfigurations) = tau_hat_var;
-            else
-                resultsYXCopula_bias(dependencyIdx, subDependencyIdx, 1:numTotalConfigurations) = tau_hat_bias;
-                resultsYXCopula_var(dependencyIdx, subDependencyIdx, 1:numTotalConfigurations) = tau_hat_var;
-            end
-            
         end
     end
 end
@@ -383,63 +387,66 @@ end
 dependenciesVec_Functional = {'Monotonic', 'Comonotonic'};
 subDependenciesVec_Functional = {'Linear', 'Quadratic', 'Exponential'};
 
-resultsXYFunctional_bias = zeros( [size(subDependenciesVec_Functional) numTotalConfigurations ]);
-resultsXYFunctional_var = zeros( [size(subDependenciesVec_Functional) numTotalConfigurations ]);
-resultsYXFunctional_bias = zeros( [size(subDependenciesVec_Functional) numTotalConfigurations ]);
-resultsYXFunctional_var = zeros( [size(subDependenciesVec_Functional) numTotalConfigurations ]);
+resultsXYFunctional_bias = zeros( [length(M_vec) size(subDependenciesVec_Functional) numTotalConfigurations ]);
+resultsXYFunctional_var = zeros(  [length(M_vec) size(subDependenciesVec_Functional) numTotalConfigurations ]);
+resultsYXFunctional_bias = zeros( [length(M_vec) size(subDependenciesVec_Functional) numTotalConfigurations ]);
+resultsYXFunctional_var = zeros(  [length(M_vec) size(subDependenciesVec_Functional) numTotalConfigurations ]);
 
-for dependencyIdx=1:length(dependenciesVec_Functional)
-    dependency = dependenciesVec_Functional{dependencyIdx};
-    for subDependencyIdx=1:length(subDependenciesVec_Functional)
-        subDependency = subDependenciesVec_Functional{subDependencyIdx};
-        
-        if(strcmpi(dependency, 'Monotonic'))
-            tauTrue = 1;
-        else
-            tauTrue = -1;
-        end
-        
-        for xyOrientation=xyOrientationVec
-            tau_hat_vec = zeros(numTotalConfigurations, nsim);
-            for simnum=1:nsim
-                x = rand(M,1);
-                if(strcmpi(subDependency, 'Linear'))
-                    y = tauTrue*x;
-                elseif(strcmpi(subDependency, 'Quadratic'))
-                    y = tauTrue*x.^2;
-                elseif(strcmpi(subDependency, 'Exponential'))
-                    y = tauTrue*exp(x);
+for mIdx=1:length(M_vec)
+    M = M_vec(mIdx);
+    for dependencyIdx=1:length(dependenciesVec_Functional)
+        dependency = dependenciesVec_Functional{dependencyIdx};
+        for subDependencyIdx=1:length(subDependenciesVec_Functional)
+            subDependency = subDependenciesVec_Functional{subDependencyIdx};
+
+            if(strcmpi(dependency, 'Monotonic'))
+                tauTrue = 1;
+            else
+                tauTrue = -1;
+            end
+
+            for xyOrientation=xyOrientationVec
+                tau_hat_vec = zeros(numTotalConfigurations, nsim);
+                for simnum=1:nsim
+                    x = rand(M,1);
+                    if(strcmpi(subDependency, 'Linear'))
+                        y = tauTrue*x;
+                    elseif(strcmpi(subDependency, 'Quadratic'))
+                        y = tauTrue*x.^2;
+                    elseif(strcmpi(subDependency, 'Exponential'))
+                        y = tauTrue*exp(x);
+                    end
+
+                    if(xyOrientation==1)
+                        x = discretizeRv(x, numDiscreteIntervals)';
+                    else
+                        y = discretizeRv(y, numDiscreteIntervals)';
+                    end
+
+                    % compute the metrics
+                    for correctionFactor=correctionFactors
+                        tau_hat = taukl(x,y,correctionFactor);
+                        tau_hat_vec(correctionFactor, simnum) = tau_hat;
+                    end
+                    tau_hat_vec(6,simnum) = corr(x,y,'type','kendall');
+                    tau_hat_vec(7,simnum) =  ktaub([x y], 0.05, 0);
+                    kso = taukl_s(x, y);
+                    tau_hat_vec(8,simnum) = kso.consumeAll();
                 end
+
+                tau_hat_bias = mean(tau_hat_vec,2)-tauTrue;
+                tau_hat_var  = var(tau_hat_vec-tauTrue,0,2);    % w = 0
 
                 if(xyOrientation==1)
-                    x = discretizeRv(x, numDiscreteIntervals)';
+                    resultsXYFunctional_bias(mIdx, dependencyIdx, subDependencyIdx, 1:numTotalConfigurations) = tau_hat_bias;
+                    resultsXYFunctional_var(mIdx, dependencyIdx, subDependencyIdx, 1:numTotalConfigurations) = tau_hat_var;
                 else
-                    y = discretizeRv(y, numDiscreteIntervals)';
+                    resultsYXFunctional_bias(mIdx, dependencyIdx, subDependencyIdx, 1:numTotalConfigurations) = tau_hat_bias;
+                    resultsYXFunctional_var(mIdx, dependencyIdx, subDependencyIdx, 1:numTotalConfigurations) = tau_hat_var;
                 end
 
-                % compute the metrics
-                for correctionFactor=correctionFactors
-                    tau_hat = taukl(x,y,correctionFactor);
-                    tau_hat_vec(correctionFactor, simnum) = tau_hat;
-                end
-                tau_hat_vec(6,simnum) = corr(x,y,'type','kendall');
-                tau_hat_vec(7,simnum) =  ktaub([x y], 0.05, 0);
-                kso = taukl_s(x, y);
-                tau_hat_vec(8,simnum) = kso.consumeAll();
+                fprintf('%s -- %s -- %d\n', dependency, subDependency, xyOrientation);
             end
-            
-            tau_hat_bias = mean(tau_hat_vec,2)-tauTrue;
-            tau_hat_var  = var(tau_hat_vec-tauTrue,0,2);    % w = 0
-            
-            if(xyOrientation==1)
-                resultsXYFunctional_bias(dependencyIdx, subDependencyIdx, 1:numTotalConfigurations) = tau_hat_bias;
-                resultsXYFunctional_var(dependencyIdx, subDependencyIdx, 1:numTotalConfigurations) = tau_hat_var;
-            else
-                resultsYXFunctional_bias(dependencyIdx, subDependencyIdx, 1:numTotalConfigurations) = tau_hat_bias;
-                resultsYXFunctional_var(dependencyIdx, subDependencyIdx, 1:numTotalConfigurations) = tau_hat_var;
-            end
-            
-            fprintf('%s -- %s -- %d\n', dependency, subDependency, xyOrientation);
         end
     end
 end
@@ -453,7 +460,70 @@ else
     save('/home/kiran/ownCloud/PhD/sim_results/independence/ktauhat_biasData');
 end
 
-%% A continuiation of the above section
+%% Plot over all M the average bias for different dependency types
+if(ispc)
+    load('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\ktauhat_biasData.mat');
+elseif(ismac)
+    load('/Users/kiran/ownCloud/PhD/sim_results/independence/ktauhat_biasData');
+else
+    load('/home/kiran/ownCloud/PhD/sim_results/independence/ktauhat_biasData');
+end
+
+metricsToPlot = [7 6 4];
+yBiasGauss = zeros(3,length(M_vec)); yVarGauss = zeros(3,length(M_vec));
+yBiasFrank = zeros(3,length(M_vec)); yVarFrank = zeros(3,length(M_vec));
+yBiasGumbel = zeros(3,length(M_vec)); yVarGumbel = zeros(3,length(M_vec));
+yBiasClayton = zeros(3,length(M_vec)); yVarClayton = zeros(3,length(M_vec));
+yBiasComonotonic = zeros(3,length(M_vec)); yVarComonotonic = zeros(3,length(M_vec));
+yBiasCountermonotonic = zeros(3,length(M_vec)); yVarCountermonotonic = zeros(3,length(M_vec));
+% find all the y's for each value of M
+for ii=1:length(M_vec)
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%% TODO: Make sure that the vectors are column vecs to fit in to the 
+    %%%%%       results vectors, and not row vecs %%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    % get the Gaussian copula data
+    depTypeIdx = 1;
+    yGaussBias = squeeze(resultsXYCopula_bias(ii, depTypeIdx,:,metricsToPlot));
+    yGaussVar = squeeze(resultsXYCopula_var(ii, depTypeIdx,:,metricsToPlot));
+    
+    % get the Frank copula data
+    depTypeIdx = 2;
+    yFrankBias = squeeze(resultsXYCopula_bias(ii, depTypeIdx,:,metricsToPlot));
+    yFrankVar = squeeze(resultsXYCopula_var(ii, depTypeIdx,:,metricsToPlot));
+    
+    % get the Gumbel copula data
+    depTypeIdx = 3;
+    yGumbelBias = squeeze(resultsXYCopula_bias(ii, depTypeIdx,:,metricsToPlot));
+    yGumbelVar = squeeze(resultsXYCopula_var(ii, depTypeIdx,:,metricsToPlot));
+    
+    % get the Clayton copula data
+    depTypeIdx = 4;
+    yClaytonBias = squeeze(resultsXYCopula_bias(ii, depTypeIdx,:,metricsToPlot));
+    yClaytonVar = squeeze(resultsXYCopula_var(ii, depTypeIdx,:,metricsToPlot));
+    
+    % get comonotonic data
+    biasValsComonotonicXY = abs(squeeze(resultsXYFunctional_bias(ii, M_idx, 1,:,metricsToPlot)));
+    varValsComonotonicXY =  squeeze(resultsXYFunctional_var(ii, M_idx, 1,:,metricsToPlot));
+    
+    % get countermonotonic data
+    biasValsCountermonotonicXY = abs(squeeze(resultsXYFunctional_bias(ii, M_idx, 2,:,metricsToPlot)));
+    varValsCountermonotonicXY =  squeeze(resultsXYFunctional_var(ii, M_idx, 2,:,metricsToPlot));
+    
+    % store the data
+    yBiasGauss(:,ii) = yGaussBias; yVarGauss(:,ii) = yGaussVar;
+    yBiasFrank(:,ii) = yFrankBias; yVarFrank(:,ii) = yFrankVar;
+    yBiasGumbel(:,ii) = yGumbelBias; yVarGumbel(:,ii) = yGumbelVar;
+    yBiasClayton(:,ii) = yClaytonBias; yVarClayton(:,ii) = yClaytonVar;
+    yBiasComonotonic(:,ii) = biasValsComonotonicXY; yVarComonotonic(:,ii) = varValsComonotonicXY;
+    yBiasCountermonotonic(:,ii) = biasValsCountermonotonicXY; yVarCountermonotonic(:,ii) = varValsCountermonotonicXY;
+end
+
+% plot it
+
+%% A continuiation of the above section (plot for M=500) (old Fig. 2)
 
 if(ispc)
     load('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\ktauhat_biasData.mat');
@@ -462,6 +532,8 @@ elseif(ismac)
 else
     load('/home/kiran/ownCloud/PhD/sim_results/independence/ktauhat_biasData');
 end
+
+M_idx = find(M_vec==500);
 
 f = figure(1);
 
@@ -478,8 +550,8 @@ transparencyFactor = 0.15;
 h1 = subplot(3,2,1);
 depTypeIdx = 1;
 x = subDependenciesVec(depTypeIdx,:);
-y = squeeze(resultsXYCopula_bias(depTypeIdx,:,metricsToPlot))';
-varTmp = squeeze(resultsXYCopula_var(depTypeIdx,:,metricsToPlot))';
+y = squeeze(resultsXYCopula_bias(M_idx, depTypeIdx,:,metricsToPlot))';
+varTmp = squeeze(resultsXYCopula_var(M_idx, depTypeIdx,:,metricsToPlot))';
 e = zeros(size(subDependenciesVec,2), 2, length(metricsToPlot));
 for ii=1:length(metricsToPlot)
     e(:,1,ii) = y(ii,:)-varTmp(ii,:)/2; e(:,2,ii) = y(ii,:)+varTmp(ii,:)/2;
@@ -497,8 +569,8 @@ set(h1,'YTickLabel',a,'FontSize',20)
 h2 = subplot(3,2,2);
 depTypeIdx = 2;
 x = subDependenciesVec(depTypeIdx,:);
-y = squeeze(resultsXYCopula_bias(depTypeIdx,:,metricsToPlot))';
-varTmp = squeeze(resultsXYCopula_var(depTypeIdx,:,metricsToPlot))';
+y = squeeze(resultsXYCopula_bias(M_idx, depTypeIdx,:,metricsToPlot))';
+varTmp = squeeze(resultsXYCopula_var(M_idx, depTypeIdx,:,metricsToPlot))';
 e = zeros(size(subDependenciesVec,2), 2, 7);
 for ii=1:length(metricsToPlot)
     e(:,1,ii) = y(ii,:)-varTmp(ii,:)/2; e(:,2,ii) = y(ii,:)+varTmp(ii,:)/2;
@@ -516,8 +588,8 @@ set(h2,'YTickLabel',a,'FontSize',20)
 h3 = subplot(3,2,3);
 depTypeIdx = 3;
 x = subDependenciesVec(depTypeIdx,:);
-y = squeeze(resultsXYCopula_bias(depTypeIdx,:,metricsToPlot))';
-varTmp = squeeze(resultsXYCopula_var(depTypeIdx,:,metricsToPlot))';
+y = squeeze(resultsXYCopula_bias(M_idx, depTypeIdx,:,metricsToPlot))';
+varTmp = squeeze(resultsXYCopula_var(M_idx, depTypeIdx,:,metricsToPlot))';
 e = zeros(size(subDependenciesVec,2), 2, 7);
 for ii=1:length(metricsToPlot)
     e(:,1,ii) = y(ii,:)-varTmp(ii,:)/2; e(:,2,ii) = y(ii,:)+varTmp(ii,:)/2;
@@ -535,8 +607,8 @@ set(h3,'YTickLabel',a,'FontSize',20)
 h4 = subplot(3,2,4);
 depTypeIdx = 4;
 x = subDependenciesVec(depTypeIdx,:);
-y = squeeze(resultsXYCopula_bias(depTypeIdx,:,metricsToPlot))';
-varTmp = squeeze(resultsXYCopula_var(depTypeIdx,:,metricsToPlot))';
+y = squeeze(resultsXYCopula_bias(M_idx, depTypeIdx,:,metricsToPlot))';
+varTmp = squeeze(resultsXYCopula_var(M_idx, depTypeIdx,:,metricsToPlot))';
 e = zeros(size(subDependenciesVec,2), 2, 7);
 for ii=1:length(metricsToPlot)
     e(:,1,ii) = y(ii,:)-varTmp(ii,:)/2; e(:,2,ii) = y(ii,:)+varTmp(ii,:)/2;
@@ -551,8 +623,8 @@ a = get(h4,'YTickLabel');
 set(h4,'YTickLabel',a,'FontSize',20)
 
 subplot(3,2,5);
-biasValsMonotonicXY = abs(squeeze(resultsXYFunctional_bias(1,:,metricsToPlot)));
-varValsMonotonicXY =  squeeze(resultsXYFunctional_var(1,:,metricsToPlot));
+biasValsMonotonicXY = abs(squeeze(resultsXYFunctional_bias(M_idx, 1,:,metricsToPlot)));
+varValsMonotonicXY =  squeeze(resultsXYFunctional_var(M_idx, 1,:,metricsToPlot));
 
 % biasValsXY = abs([biasValsMonotonicXY; biasValsComonotonicXY]);
 % varValsXY  = [varValsMonotonicXY; varValsComonotonicXY];
@@ -582,8 +654,8 @@ barweb(biasValsMonotonicXY,stddevXY,width,groupnames,bw_title, bw_xlabel, bw_yla
        legendTextSize, labelTextSize, groupTextSize);
 
 subplot(3,2,6);
-biasValsComonotonicXY = abs(squeeze(resultsXYFunctional_bias(2,:,metricsToPlot)));
-varValsComonotonicXY = squeeze(resultsXYFunctional_var(2,:,metricsToPlot));
+biasValsComonotonicXY = abs(squeeze(resultsXYFunctional_bias(M_idx, 2,:,metricsToPlot)));
+varValsComonotonicXY = squeeze(resultsXYFunctional_var(M_idx, 2,:,metricsToPlot));
 biasValsComonotonicXY(biasValsComonotonicXY==0) = minVal;
 stddevXY = sqrt(varValsComonotonicXY);
 
@@ -1063,24 +1135,28 @@ fontSize = 20;
 % do the Q-Q plot
 pdContinuous = pdObjsContinuous{1};
 h1 = subplot(2,2,1); qqplot(ktauhatNullDistributionResultsContinuous(:,1), pdContinuous); grid on;
-xlabel(['Quantiles of ' sprintf('$\\mathcal{N}(%0.04f, %0.04f)$', muVecContinuous(1), sigmaVecContinuous(1))], 'FontSize', 20, 'Interpreter', 'Latex');
+xlabel({['\makebox[4in][c]{Quantiles of ' sprintf('$\\mathcal{N}(%0.02f, %0.02f)$', ...
+        abs(muVecContinuous(1)), sigmaVecContinuous(1)) '}'], '\makebox[4in][c]{(a)}'}, ...
+        'FontSize', 20, 'Interpreter', 'Latex');
 ylabel('Quantiles of Input Samples', 'FontSize', fontSize);
-title({'(a)', 'M = 100'}, 'FontSize', fontSize);
+title('M = 100', 'FontSize', fontSize);
 h1.FontSize = fontSize;
 
 pdContinuous = pdObjsContinuous{10};
 h2 = subplot(2,2,2); qqplot(ktauhatNullDistributionResultsContinuous(:,10), pdContinuous); grid on;
-xlabel(['Quantiles of ' sprintf('$\\mathcal{N}(%0.04f, %0.04f)$', muVecContinuous(10), sigmaVecContinuous(10))], 'FontSize', 20, 'Interpreter', 'Latex');
+xlabel({['\makebox[4in][c]{Quantiles of ' sprintf('$\\mathcal{N}(%0.02f, %0.02f)$', ...
+        abs(muVecContinuous(10)), sigmaVecContinuous(10)) '}'], '\makebox[4in][c]{(b)}'}, ...
+        'FontSize', 20, 'Interpreter', 'Latex');
 ylabel('Quantiles of Input Samples', 'FontSize', fontSize);
-title({'(b)', 'M = 1000'}, 'FontSize', fontSize);
+title('M = 1000', 'FontSize', fontSize);
 h2.FontSize = fontSize;
 
 h3 = subplot(2,2,3); 
 p3 = plot(M_vec, muVecContinuous, M_vec, muVecHybrid1, ...
      M_vec, muVecHybrid2, M_vec, muVecDiscrete);
-grid on; xlabel('M', 'FontSize', fontSize); 
+grid on; xlabel({'M', '(c)'}, 'FontSize', fontSize); 
 ylabel('\mu', 'FontSize', fontSize);
-title('(c)', 'FontSize', fontSize);
+% title('(c)', 'FontSize', fontSize);
 h3.FontSize = fontSize;
 p3(1).LineWidth = 3; p3(1).Marker = 'd'; p3(1).MarkerSize = 16;
 p3(2).LineWidth = 3; p3(2).Marker = 'v'; p3(2).MarkerSize = 16;
@@ -1090,9 +1166,9 @@ p3(4).LineWidth = 3; p3(4).Marker = 'x'; p3(4).MarkerSize = 16;
 h4 = subplot(2,2,4); 
 p4 = plot(M_vec, sigmaVecContinuous, M_vec, sigmaVecHybrid1, ...
      M_vec, sigmaVecHybrid2, M_vec, sigmaVecDiscrete);
-grid on; xlabel('M', 'FontSize', fontSize); 
+grid on; xlabel({'M', '(d)'}, 'FontSize', fontSize); 
 ylabel('\lambda', 'FontSize', fontSize);
-title('(d)', 'FontSize', fontSize);
+% title('(d)', 'FontSize', fontSize);
 h4.FontSize = fontSize;
 p4(1).LineWidth = 3; p4(1).Marker = 'd'; p4(1).MarkerSize = 16;
 p4(2).LineWidth = 3; p4(2).Marker = 'v'; p4(2).MarkerSize = 16;
