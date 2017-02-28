@@ -150,16 +150,17 @@ xyIdx = xyIdx + 1;
 
 %% Plot with barcharts and inset
 clc;
-figure;
+% figure;
 nCases = 9;
 dataIdx = [2 1 3 4 6 8 13 12 15];
 
 inset_width = 0.075; inset_height = 0.075;
 % inset_bufX = 0.05; inset_bufY = 0.02; % for bottom left inset
-inset_bufX = 0.17; inset_bufY = 0.15;   % for top right inset
+% inset_bufX = 0.17; inset_bufY = 0.15;   % for top right inset
 
 for ii=1:nCases
-    h = subplot(3,3,ii);
+%     h = subplot(3,3,ii);
+    h = figure;
 
     dataContinuous = xy{dataIdx(ii)};
     xContinuous = dataContinuous(:,1); yContinuous = dataContinuous(:,2);
@@ -201,11 +202,12 @@ for ii=1:nCases
     rotateXLabels( gca(), 80 )
    
     if(ii==nCases)    
-        legend({'Continuous', 'Discrete'});
+        legend({'Continuous', 'Discrete'},'Location','SouthEast');
     end
     
-    loc_inset = [h.Position(1)+inset_bufX h.Position(2)+inset_bufY inset_width inset_height];
-    ax = axes('Position',loc_inset);
+%     loc_inset = [h.Position(1)+inset_bufX h.Position(2)+inset_bufY inset_width inset_height];
+%     ax = axes('Position',loc_inset);
+    ax = axes('Position',[.7 .7 .25 .25]);
     scatter(xContinuous,yContinuous, 'k');
     ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
     
