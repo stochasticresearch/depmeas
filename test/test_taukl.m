@@ -461,6 +461,9 @@ else
 end
 
 %% Plot over all M the average bias for different dependency types
+clear;
+clc;
+
 if(ispc)
     load('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\ktauhat_biasData.mat');
 elseif(ismac)
@@ -469,7 +472,10 @@ else
     load('/home/kiran/ownCloud/PhD/sim_results/independence/ktauhat_biasData');
 end
 
-metricsToPlot = [7 6 4];
+metricsToPlot = [7 6 4];    % Experimentally, 2,5 are bad (last config)
+                            % 4 Gumbel/Frank OK, Clayton Bias (-0.02)
+                            % 3 Gumbel/Frank OK, Clayton Bias (-0.02)
+                            % 1 Clayton/Frank OK, Gumbel Bias (0.04)
 yBiasGauss = zeros(3,length(M_vec)); yVarGauss = zeros(3,length(M_vec));
 yBiasFrank = zeros(3,length(M_vec)); yVarFrank = zeros(3,length(M_vec));
 yBiasGumbel = zeros(3,length(M_vec)); yVarGumbel = zeros(3,length(M_vec));
@@ -505,25 +511,71 @@ for ii=1:length(M_vec)
     yClaytonVar = squeeze(resultsXYCopula_var(ii, depTypeIdx,:,metricsToPlot));
     
     % get comonotonic data
-    biasValsComonotonicXY = abs(squeeze(resultsXYFunctional_bias(ii, M_idx, 1,:,metricsToPlot)));
-    varValsComonotonicXY =  squeeze(resultsXYFunctional_var(ii, M_idx, 1,:,metricsToPlot));
+    biasValsComonotonicXY = abs(squeeze(resultsXYFunctional_bias(ii, 1, :, metricsToPlot)));
+    varValsComonotonicXY =  squeeze(resultsXYFunctional_var(ii, 1,:,metricsToPlot));
     
     % get countermonotonic data
-    biasValsCountermonotonicXY = abs(squeeze(resultsXYFunctional_bias(ii, M_idx, 2,:,metricsToPlot)));
-    varValsCountermonotonicXY =  squeeze(resultsXYFunctional_var(ii, M_idx, 2,:,metricsToPlot));
+    biasValsCountermonotonicXY = abs(squeeze(resultsXYFunctional_bias(ii, 2,:,metricsToPlot)));
+    varValsCountermonotonicXY =  squeeze(resultsXYFunctional_var(ii, 2,:,metricsToPlot));
     
     % store the data
-    yBiasGauss(:,ii) = yGaussBias; yVarGauss(:,ii) = yGaussVar;
-    yBiasFrank(:,ii) = yFrankBias; yVarFrank(:,ii) = yFrankVar;
-    yBiasGumbel(:,ii) = yGumbelBias; yVarGumbel(:,ii) = yGumbelVar;
-    yBiasClayton(:,ii) = yClaytonBias; yVarClayton(:,ii) = yClaytonVar;
-    yBiasComonotonic(:,ii) = biasValsComonotonicXY; yVarComonotonic(:,ii) = varValsComonotonicXY;
-    yBiasCountermonotonic(:,ii) = biasValsCountermonotonicXY; yVarCountermonotonic(:,ii) = varValsCountermonotonicXY;
+    yBiasGauss(:,ii) = mean(yGaussBias); yVarGauss(:,ii) = mean(yGaussVar);
+    yBiasFrank(:,ii) = mean(yFrankBias); yVarFrank(:,ii) = mean(yFrankVar);
+    yBiasGumbel(:,ii) = mean(yGumbelBias); yVarGumbel(:,ii) = mean(yGumbelVar);
+    yBiasClayton(:,ii) = mean(yClaytonBias); yVarClayton(:,ii) = mean(yClaytonVar);
+    yBiasComonotonic(:,ii) = mean(biasValsComonotonicXY); yVarComonotonic(:,ii) = mean(varValsComonotonicXY);
+    yBiasCountermonotonic(:,ii) = mean(biasValsCountermonotonicXY); yVarCountermonotonic(:,ii) = mean(varValsCountermonotonicXY);
 end
 
 % plot it
+figure;
+boundedline(M_vec,yBiasGauss(1,:),(yVarGauss(1,:).^(0.5))/2,'b'); hold on;
+boundedline(M_vec,yBiasGauss(2,:),(yVarGauss(2,:).^(0.5))/2,'r'); hold on;
+boundedline(M_vec,yBiasGauss(3,:),(yVarGauss(3,:).^(0.5))/2,'k');
+xlabel('M', 'FontSize', 20); ylabel('Bias', 'FontSize', 20); 
+title('Gaussian Copula', 'FontSize', 20); grid on;
+
+figure;
+boundedline(M_vec,yBiasFrank(1,:),(yVarFrank(1,:).^(0.5))/2,'b'); hold on;
+boundedline(M_vec,yBiasFrank(2,:),(yVarFrank(2,:).^(0.5))/2,'r'); hold on;
+boundedline(M_vec,yBiasFrank(3,:),(yVarFrank(3,:).^(0.5))/2,'k');
+xlabel('M', 'FontSize', 20); ylabel('Bias', 'FontSize', 20); 
+title('Frank Copula', 'FontSize', 20); grid on;
+
+figure;
+boundedline(M_vec,yBiasGumbel(1,:),(yVarGumbel(1,:).^(0.5))/2,'b'); hold on;
+boundedline(M_vec,yBiasGumbel(2,:),(yVarGumbel(2,:).^(0.5))/2,'r'); hold on;
+boundedline(M_vec,yBiasGumbel(3,:),(yVarGumbel(3,:).^(0.5))/2,'k');
+xlabel('M', 'FontSize', 20); ylabel('Bias', 'FontSize', 20); 
+title('Gumbel Copula', 'FontSize', 20); grid on;
+
+figure;
+boundedline(M_vec,yBiasClayton(1,:),(yVarClayton(1,:).^(0.5))/2,'b'); hold on;
+boundedline(M_vec,yBiasClayton(2,:),(yVarClayton(2,:).^(0.5))/2,'r'); hold on;
+boundedline(M_vec,yBiasClayton(3,:),(yVarClayton(3,:).^(0.5))/2,'k');
+xlabel('M', 'FontSize', 20); ylabel('Bias', 'FontSize', 20); 
+title('Clayton Copula', 'FontSize', 20); grid on;
+
+figure;
+boundedline(M_vec,yBiasComonotonic(1,:),(yVarComonotonic(1,:).^(0.5))/2,'b'); hold on;
+boundedline(M_vec,yBiasComonotonic(2,:),(yVarComonotonic(2,:).^(0.5))/2,'r'); hold on;
+boundedline(M_vec,yBiasComonotonic(3,:),(yVarComonotonic(3,:).^(0.5))/2,'k');
+xlabel('M', 'FontSize', 20); ylabel('Bias', 'FontSize', 20); 
+title('Comonotonic Dependency', 'FontSize', 20); grid on;
+
+figure;
+boundedline(M_vec,yBiasCountermonotonic(1,:),(yVarCountermonotonic(1,:).^(0.5))/2,'b'); hold on;
+boundedline(M_vec,yBiasCountermonotonic(2,:),(yVarCountermonotonic(2,:).^(0.5))/2,'r'); hold on;
+boundedline(M_vec,yBiasCountermonotonic(3,:),(yVarCountermonotonic(3,:).^(0.5))/2,'k');
+xlabel('M', 'FontSize', 20); ylabel('Bias', 'FontSize', 20);  
+title('Countermonotonic Dependency', 'FontSize', 20); grid on;
+
+h_legend = legend('\tau_b', '\tau_{N}', '\tau_{KL}');
+set(h_legend,'FontSize',20);
 
 %% A continuiation of the above section (plot for M=500) (old Fig. 2)
+clear;
+clc;
 
 if(ispc)
     load('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\ktauhat_biasData.mat');
