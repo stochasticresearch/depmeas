@@ -485,11 +485,6 @@ yBiasCountermonotonic = zeros(3,length(M_vec)); yVarCountermonotonic = zeros(3,l
 % find all the y's for each value of M
 for ii=1:length(M_vec)
     
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %%%%% TODO: Make sure that the vectors are column vecs to fit in to the 
-    %%%%%       results vectors, and not row vecs %%%%%
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
     % get the Gaussian copula data
     depTypeIdx = 1;
     yGaussBias = squeeze(resultsXYCopula_bias(ii, depTypeIdx,:,metricsToPlot));
