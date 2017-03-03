@@ -17,7 +17,7 @@
 %*                                                                        *
 %**************************************************************************
 
-%% Analyze the pair-wise RSDM metrics for as much alingned data as possible
+%% Analyze the pair-wise CIM metrics for as much alingned data as possible
 % for all the available stock prices & save results
 
 clear;
@@ -100,7 +100,7 @@ for ii=1:numStocksToProcess
         numSampsToProcess = min(length(returns_i),length(returns_j));
         returns_i = returns_i(1:numSampsToProcess);
         returns_j = returns_j(1:numSampsToProcess);
-        [metric, rectangleCellOut] = rsdm(returns_i,returns_j);
+        [metric, rectangleCellOut] = cim(returns_i,returns_j);
         
         R(ii,jj) = metric; 
         RectanglesCell{ii,jj} = rectangleCellOut;
@@ -180,12 +180,12 @@ for zz=1:length(depThreshVec)
                 % means both stocks returns data are stationary
 
                 % make sure that this pairwise computation is not independent
-                rsdmVal = R(ii,jj);
+                cimVal = R(ii,jj);
                 returns_i = stocksData{ii,3};
                 returns_j = stocksData{jj,3};
                 numSampsToProc = min(length(returns_i),length(returns_j));
                 tauklVal = abs(taukl(returns_i(1:numSampsToProc),returns_j(1:numSampsToProc)));
-                percentageDiff = abs(rsdmVal-tauklVal)/tauklVal;
+                percentageDiff = abs(cimVal-tauklVal)/tauklVal;
                 if(percentageDiff<=depThresh)
                     monotonicityMat(ii,jj) = 1;
                     monotonicityMat(jj,ii) = 1;
@@ -193,7 +193,7 @@ for zz=1:length(depThreshVec)
                 numMonotonicRegions = monotonicityMat(ii,jj);
 
                 numSampsProcessed = min(length(returns_i),length(returns_j));
-                pval = rsdmpval(rsdmVal, numSampsProcessed);
+                pval = cimpval(cimVal, numSampsProcessed);
                 if(pval<alpha)
 
                     if(isKey(monotonicityResults,numMonotonicRegions))

@@ -258,9 +258,9 @@ for ii=1:length(pairwiseTimeAlignedData)
         [~,pvalX] = augdf(dataX,adfTestType,lags);
         [~,pvalY] = augdf(dataY,adfTestType,lags);
         if(pvalX<alpha && pvalY<alpha)
-            [metric, rectangleCellOut] = rsdm(dataX,dataY);
+            [metric, rectangleCellOut] = cim(dataX,dataY);
             tauklval = taukl(dataX,dataY);
-            pval = rsdmpval(metric, length(dataX));
+            pval = cimpval(metric, length(dataX));
             if(pval<alpha)
                 res.R(jj) = metric;
                 res.RectanglesCell{jj} = rectangleCellOut;
@@ -306,9 +306,9 @@ for zz=1:length(depThreshVec)
         for jj=1:28
             if(res.validVec(jj))
                 % count the monotonicity after ensuring we didn't overfit
-                rsdmVal = res.R(jj);
+                cimVal = res.R(jj);
                 tauklVal = res.tauklVec(jj);
-                percentageDiff = abs(rsdmVal-tauklVal)/tauklVal;
+                percentageDiff = abs(cimVal-tauklVal)/tauklVal;
                 if(percentageDiff<=depThresh)
                     numMonotonicRegions = 1;
                 else

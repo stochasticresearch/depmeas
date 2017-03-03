@@ -37,7 +37,7 @@ hdVal = hd(x,y,z);
 hsicVal = hsic(x,y,z,numR);
 data = struct(); data.X = x; data.Y = y; data.Z = z; cmiVal = cmi(data);
 cmaVal = cassor(data);
-rscdmVal = rscdm(y,z,x);
+ccimVal = ccim(y,z,x);
 fprintf('>>> ^ Structure-1\n');
 fprintf('\t cm=%0.03f\n', cmVal);
 fprintf('\t hd=%0.03f\n', hdVal);
@@ -45,7 +45,7 @@ fprintf('\t pdcor=%0.03f\n', pdcorVal);
 fprintf('\t hsic=%0.03f\n', hsicVal);
 fprintf('\t cmi=%0.03f\n', cmiVal);
 fprintf('\t cma=%0.03f\n', cmaVal);
-fprintf('\t rscdm=%0.03f\n', rscdmVal);
+fprintf('\t ccim=%0.03f\n', ccimVal);
 
 % ^structure-2
 x = rand(M,1);
@@ -58,7 +58,7 @@ hdVal = hd(x,y,z);
 hsicVal = hsic(x,y,z,numR);
 data = struct(); data.X = x; data.Y = y; data.Z = z; cmiVal = cmi(data);
 cmaVal = cassor(data);
-rscdmVal = rscdm(y,z,x);
+ccimVal = ccim(y,z,x);
 fprintf('>>> ^ Structure-2\n');
 fprintf('\t cm=%0.03f\n', cmVal);
 fprintf('\t hd=%0.03f\n', hdVal);
@@ -66,7 +66,7 @@ fprintf('\t pdcor=%0.03f\n', pdcorVal);
 fprintf('\t hsic=%0.03f\n', hsicVal);
 fprintf('\t cmi=%0.03f\n', cmiVal);
 fprintf('\t cma=%0.03f\n', cmaVal);
-fprintf('\t rscdm=%0.03f\n', rscdmVal);
+fprintf('\t ccim=%0.03f\n', ccimVal);
 
 % ^structure-3
 x = rand(M,1);
@@ -79,7 +79,7 @@ hdVal = hd(x,y,z);
 hsicVal = hsic(x,y,z,numR);
 data = struct(); data.X = x; data.Y = y; data.Z = z; cmiVal = cmi(data);
 cmaVal = cassor(data);
-rscdmVal = rscdm(y,z,x);
+ccimVal = ccim(y,z,x);
 fprintf('>>> ^ Structure-3\n');
 fprintf('\t cm=%0.03f\n', cmVal);
 fprintf('\t hd=%0.03f\n', hdVal);
@@ -87,7 +87,7 @@ fprintf('\t pdcor=%0.03f\n', pdcorVal);
 fprintf('\t hsic=%0.03f\n', hsicVal);
 fprintf('\t cmi=%0.03f\n', cmiVal);
 fprintf('\t cma=%0.03f\n', cmaVal);
-fprintf('\t rscdm=%0.03f\n', rscdmVal);
+fprintf('\t ccim=%0.03f\n', ccimVal);
 
 % vstructure-1
 y = rand(M,1); z = rand(M,1);
@@ -99,7 +99,7 @@ hdVal = hd(x,y,z);
 hsicVal = hsic(x,y,z,numR);
 data = struct(); data.X = x; data.Y = y; data.Z = z; cmiVal = cmi(data);
 cmaVal = cassor(data);
-rscdmVal = rscdm(y,z,x);
+ccimVal = ccim(y,z,x);
 fprintf('>>> v Structure-1\n');
 fprintf('\t cm=%0.03f\n', cmVal);
 fprintf('\t hd=%0.03f\n', hdVal);
@@ -107,7 +107,7 @@ fprintf('\t pdcor=%0.03f\n', pdcorVal);
 fprintf('\t hsic=%0.03f\n', hsicVal);
 fprintf('\t cmi=%0.03f\n', cmiVal);
 fprintf('\t cma=%0.03f\n', cmaVal);
-fprintf('\t rscdm=%0.03f\n', rscdmVal);
+fprintf('\t ccim=%0.03f\n', ccimVal);
 
 % vstructure-2
 y = rand(M,1); z = rand(M,1);
@@ -119,7 +119,7 @@ hdVal = hd(x,y,z);
 hsicVal = hsic(x,y,z,numR);
 data = struct(); data.X = x; data.Y = y; data.Z = z; cmiVal = cmi(data);
 cmaVal = cassor(data);
-rscdmVal = rscdm(y,z,x);
+ccimVal = ccim(y,z,x);
 fprintf('>>> v Structure-2\n');
 fprintf('\t cm=%0.03f\n', cmVal);
 fprintf('\t hd=%0.03f\n', hdVal);
@@ -127,7 +127,7 @@ fprintf('\t pdcor=%0.03f\n', pdcorVal);
 fprintf('\t hsic=%0.03f\n', hsicVal);
 fprintf('\t cmi=%0.03f\n', cmiVal);
 fprintf('\t cma=%0.03f\n', cmaVal);
-fprintf('\t rscdm=%0.03f\n', rscdmVal);
+fprintf('\t ccim=%0.03f\n', ccimVal);
 
 % vstructure-3
 y = rand(M,1); z = rand(M,1);
@@ -139,7 +139,7 @@ hdVal = hd(x,y,z);
 hsicVal = hsic(x,y,z,numR);
 data = struct(); data.X = x; data.Y = y; data.Z = z; cmiVal = cmi(data);
 cmaVal = cassor(data);
-rscdmVal = rscdm(y,z,x);
+ccimVal = ccim(y,z,x);
 fprintf('>>> v Structure-3\n');
 fprintf('\t cm=%0.03f\n', cmVal);
 fprintf('\t hd=%0.03f\n', hdVal);
@@ -147,4 +147,4 @@ fprintf('\t pdcor=%0.03f\n', pdcorVal);
 fprintf('\t hsic=%0.03f\n', hsicVal);
 fprintf('\t cmi=%0.03f\n', cmiVal);
 fprintf('\t cma=%0.03f\n', cmaVal);
-fprintf('\t rscdm=%0.03f\n', rscdmVal);
+fprintf('\t ccim=%0.03f\n', ccimVal);

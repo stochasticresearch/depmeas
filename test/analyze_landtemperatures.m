@@ -64,7 +64,7 @@ for ii=1:numCountries
     end
 end
 
-% compute the pairwise rsdm metrics for appropriate data
+% compute the pairwise CIM metrics for appropriate data
 R = zeros(numCountries);
 RectanglesCell = cell(numCountries);
 tauklMat = zeros(numCountries);
@@ -91,8 +91,8 @@ for ii=1:numCountries
             numSampsToProc = min(length(countryIData),length(countryJData));
             countryIData = countryIData(end-numSampsToProc+1:end);
             countryJData = countryJData(end-numSampsToProc+1:end);
-            [metric, rectangleCellOut] = rsdm(countryIData,countryJData);
-            pval = rsdmpval(metric, numSampsToProc);
+            [metric, rectangleCellOut] = cim(countryIData,countryJData);
+            pval = cimpval(metric, numSampsToProc);
             if(pval<alpha)
                 R(ii,jj) = metric; R(jj,ii) = metric;
                 RectanglesCell{ii,jj} = rectangleCellOut; RectanglesCell{jj,ii} = rectangleCellOut;
@@ -141,9 +141,9 @@ for zz=1:length(depThreshVec)
                 % significant
                 
                 % ensure we didn't overfit and compute the monotonicity
-                rsdmVal = R(ii,jj);
+                cimVal = R(ii,jj);
                 tauklVal = tauklMat(ii,jj);
-                percentageDiff = abs(rsdmVal-tauklVal)/tauklVal;
+                percentageDiff = abs(cimVal-tauklVal)/tauklVal;
                 if(percentageDiff<=depThresh)
                     numMonotonicRegions = 1;
                 else

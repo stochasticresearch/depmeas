@@ -58,7 +58,7 @@ for ii=1:length(files)
         if(size(data,2)>100)
             data = data(:,1:100);
         end
-        [R, RectanglesCell] = pairrsdm( data );
+        [R, RectanglesCell] = paircim( data );
         % compute the "monotonicity" of the data
         sz = size(RectanglesCell);
         monotonicityMat = zeros(sz);
@@ -131,16 +131,16 @@ for zz=1:length(depThreshVec)
             load(fnameWithPath);
 
             % Find all the pairwise dependencies that were flagged as
-            % nonmonotonic, and compare the value of RSDM to taukl, if they are
+            % nonmonotonic, and compare the value of CIM to taukl, if they are
             % sufficiently close, it means that we have overfit, so we can
             % conclude that the dependency is indeed actually monotonic
             nonMonotonicIdx = find(monotonicityMat>1); nonMonotonicIdx = nonMonotonicIdx';
             for idx=nonMonotonicIdx
                 [iIdx,jIdx] = ind2sub(size(monotonicityMat), idx);
-                % get the RSDM value
-                rsdmVal = R(iIdx,jIdx);
+                % get the CIM value
+                cimVal = R(iIdx,jIdx);
                 tauklVal = abs(taukl(data(:,iIdx),data(:,jIdx)));
-                percentageDiff = abs(rsdmVal-tauklVal)/tauklVal;
+                percentageDiff = abs(cimVal-tauklVal)/tauklVal;
                 if(percentageDiff<=depThresh)
                     % means we overfit, and we correct for that here
                     monotonicityMat(iIdx,jIdx) = 1;
@@ -152,7 +152,7 @@ for zz=1:length(depThreshVec)
             validDepMat = zeros(size(monotonicityMat));
             for jj=1:size(R,1)
                 for kk=jj+1:size(R,1)
-                    pval = rsdmpval(R(jj,kk), numDataPoints);
+                    pval = cimpval(R(jj,kk), numDataPoints);
                     if(pval<alpha)
                         validDepMat(jj,kk) = 1; % we flag this as non-independent, and
                                                 % thus we will process it

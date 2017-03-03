@@ -32,8 +32,8 @@ nsim = 500;
 gammaVec = 0:0.1:1;
 
 numDepTypes = 6;
-rsdmResultsMat = zeros(length(gammaVec), numDepTypes, nsim);        % for comparision of acceptance rates
-rscdmResultsMat = zeros(length(gammaVec), numDepTypes, nsim);
+cimResultsMat = zeros(length(gammaVec), numDepTypes, nsim);        % for comparision of acceptance rates
+ccimResultsMat = zeros(length(gammaVec), numDepTypes, nsim);
 cmaSurrResultsMat = zeros(length(gammaVec), numDepTypes, nsim);     % for comparision of aceptance rate
 cmaResultsMat = zeros(length(gammaVec), numDepTypes, nsim);
 pdcorrResultsMat = zeros(length(gammaVec), numDepTypes, nsim);
@@ -41,8 +41,8 @@ pdcorrPValMat = zeros(length(gammaVec), numDepTypes, nsim);
 pcorrResultsMat = zeros(length(gammaVec), numDepTypes, nsim);
 pcorrPValMat = zeros(length(gammaVec), numDepTypes, nsim);
 
-rsdmResultsVec = zeros(1,nsim);
-rscdmResultsVec = zeros(1,nsim);
+cimResultsVec = zeros(1,nsim);
+ccimResultsVec = zeros(1,nsim);
 cmaSurrResultsVec = zeros(1,nsim);
 cmaResultsVec = zeros(1,nsim);
 pdcorrResultsVec = zeros(1,nsim);
@@ -78,8 +78,8 @@ for gammaIdx=1:length(gammaVec)
                     X = gamma*((Y-0.5).^2 + cos(4*pi*Z)) + (1-gamma)*eps;
             end
             
-            rsdmVal = rsdm(Y,Z);        % for calculating the CI/CD test statistic
-            rscdmVal = rscdm(Y,Z,X);
+            cimVal = cim(Y,Z);        % for calculating the CI/CD test statistic
+            ccimVal = ccim(Y,Z,X);
             [~, pdcorVal, ~, pdcor_pval] = pdcov(Y,Z,X);
             [pcorrVal,pcorr_pval] = partialcorr(Y,Z,X);
 
@@ -91,8 +91,8 @@ for gammaIdx=1:length(gammaVec)
             surrData.X = cmaSurrData.Y; surrData.Y = cmaSurrData.Z; surrData.Z = cmaSurrData.X;
             cmaSurrVal = cassor(surrData);
             
-            rsdmResultsVec(ii) = rsdmVal;
-            rscdmResultsVec(ii) = rscdmVal;
+            cimResultsVec(ii) = cimVal;
+            ccimResultsVec(ii) = ccimVal;
             
             cmaSurrResultsVec(ii) = cmaSurrVal;
             cmaResultsVec(ii) = cmaVal;
@@ -104,8 +104,8 @@ for gammaIdx=1:length(gammaVec)
             pcorrPValVec(ii) = pcorr_pval;
         end
         
-        rsdmResultsMat(gammaIdx, jj, :) = rsdmResultsVec;
-        rscdmResultsMat(gammaIdx, jj, :) = rscdmResultsVec;
+        cimResultsMat(gammaIdx, jj, :) = cimResultsVec;
+        ccimResultsMat(gammaIdx, jj, :) = ccimResultsVec;
         
         cmaSurrResultsMat(gammaIdx, jj, :) = cmaSurrResultsVec;
         cmaResultsMat(gammaIdx, jj, :) = cmaResultsVec;
@@ -118,11 +118,11 @@ for gammaIdx=1:length(gammaVec)
     end
     % save the results in case the computer crashes :(
     if(ispc)
-        save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rscdm_CD.mat');
+        save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\ccim_CD.mat');
     elseif(ismac)
-        save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rscdm_CD.mat');
+        save('/Users/Kiran/ownCloud/PhD/sim_results/independence/ccim_CD.mat');
     elseif(isunix)
-        save('/home/kiran/ownCloud/PhD/sim_results/independence/rscdm_CD.mat');
+        save('/home/kiran/ownCloud/PhD/sim_results/independence/ccim_CD.mat');
     end
 
 end
@@ -133,17 +133,17 @@ end
 
 % save the results
 if(ispc)
-    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rscdm_CD.mat');
+    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\ccim_CD.mat');
 elseif(ismac)
-    save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rscdm_CD.mat');
+    save('/Users/Kiran/ownCloud/PhD/sim_results/independence/ccim_CD.mat');
 elseif(isunix)
-    save('/home/kiran/ownCloud/PhD/sim_results/independence/rscdm_CD.mat');
+    save('/home/kiran/ownCloud/PhD/sim_results/independence/ccim_CD.mat');
 end
 
 % compute acceptance rates
 pdcorr_acceptance = pdcorrPValMat<significance_thresh;
 pcorr_acceptance = pcorrPValMat<significance_thresh;
-rscdm_acceptance = rscdmResultsMat>rsdmResultsMat;
+ccim_acceptance = ccimResultsMat>cimResultsMat;
 cma_acceptance = cmaResultsMat>cmaSurrResultsMat;
 
 % plot the dependence metric results versus gamma for each dep type
@@ -151,15 +151,15 @@ figure;
 
 h1 = subplot(3,2,1);
 depIdx = 1;
-meanRscdmRes = mean(squeeze(rscdmResultsMat(:,depIdx,:)),2);
-meanRscdmAcceptanceRate = mean(squeeze(rscdm_acceptance(:,depIdx,:)),2);
+meanccimRes = mean(squeeze(ccimResultsMat(:,depIdx,:)),2);
+meanccimAcceptanceRate = mean(squeeze(ccim_acceptance(:,depIdx,:)),2);
 meanPdcorrRes = mean(squeeze(pdcorrResultsMat(:,depIdx,:)),2);
 meanPdcorrAcceptanceRate = mean(squeeze(pdcorr_acceptance(:,depIdx,:)),2);
 meanPcorrRes = mean(squeeze(pcorrResultsMat(:,depIdx,:)),2);
 meanPcorrAcceptanceRate = mean(squeeze(pcorr_acceptance(:,depIdx,:)),2);
 meanCmaRes = mean(squeeze(cmaResultsMat(:,depIdx,:)),2);
 meanCmaAcceptanceRate = mean(squeeze(cma_acceptance(:,depIdx,:)),2);
-plot(gammaVec, meanRscdmAcceptanceRate, 'o-.', ...
+plot(gammaVec, meanccimAcceptanceRate, 'o-.', ...
      gammaVec, meanPdcorrAcceptanceRate, 'x-.', ...
      gammaVec, meanPcorrAcceptanceRate, 'd-.', ...
      gammaVec, meanCmaAcceptanceRate, '+-.');
@@ -170,15 +170,15 @@ h1.FontSize = 20;
 
 h2 = subplot(3,2,2);
 depIdx = 2;
-meanRscdmRes = mean(squeeze(rscdmResultsMat(:,depIdx,:)),2);
-meanRscdmAcceptanceRate = mean(squeeze(rscdm_acceptance(:,depIdx,:)),2);
+meanccimRes = mean(squeeze(ccimResultsMat(:,depIdx,:)),2);
+meanccimAcceptanceRate = mean(squeeze(ccim_acceptance(:,depIdx,:)),2);
 meanPdcorrRes = mean(squeeze(pdcorrResultsMat(:,depIdx,:)),2);
 meanPdcorrAcceptanceRate = mean(squeeze(pdcorr_acceptance(:,depIdx,:)),2);
 meanPcorrRes = mean(squeeze(pcorrResultsMat(:,depIdx,:)),2);
 meanPcorrAcceptanceRate = mean(squeeze(pcorr_acceptance(:,depIdx,:)),2);
 meanCmaRes = mean(squeeze(cmaResultsMat(:,depIdx,:)),2);
 meanCmaAcceptanceRate = mean(squeeze(cma_acceptance(:,depIdx,:)),2);
-plot(gammaVec, meanRscdmAcceptanceRate, 'o-.', ...
+plot(gammaVec, meanccimAcceptanceRate, 'o-.', ...
      gammaVec, meanPdcorrAcceptanceRate, 'x-.', ...
      gammaVec, meanPcorrAcceptanceRate, 'd-.', ...
      gammaVec, meanCmaAcceptanceRate, '+-.');
@@ -189,15 +189,15 @@ h2.FontSize = 20;
 
 h3 = subplot(3,2,3);
 depIdx = 3;
-meanRscdmRes = mean(squeeze(rscdmResultsMat(:,depIdx,:)),2);
-meanRscdmAcceptanceRate = mean(squeeze(rscdm_acceptance(:,depIdx,:)),2);
+meanccimRes = mean(squeeze(ccimResultsMat(:,depIdx,:)),2);
+meanccimAcceptanceRate = mean(squeeze(ccim_acceptance(:,depIdx,:)),2);
 meanPdcorrRes = mean(squeeze(pdcorrResultsMat(:,depIdx,:)),2);
 meanPdcorrAcceptanceRate = mean(squeeze(pdcorr_acceptance(:,depIdx,:)),2);
 meanPcorrRes = mean(squeeze(pcorrResultsMat(:,depIdx,:)),2);
 meanPcorrAcceptanceRate = mean(squeeze(pcorr_acceptance(:,depIdx,:)),2);
 meanCmaRes = mean(squeeze(cmaResultsMat(:,depIdx,:)),2);
 meanCmaAcceptanceRate = mean(squeeze(cma_acceptance(:,depIdx,:)),2);
-plot(gammaVec, meanRscdmAcceptanceRate, 'o-.', ...
+plot(gammaVec, meanccimAcceptanceRate, 'o-.', ...
      gammaVec, meanPdcorrAcceptanceRate, 'x-.', ...
      gammaVec, meanPcorrAcceptanceRate, 'd-.', ...
      gammaVec, meanCmaAcceptanceRate, '+-.');
@@ -208,15 +208,15 @@ h3.FontSize = 20;
 
 h4 = subplot(3,2,4);
 depIdx = 4;
-meanRscdmRes = mean(squeeze(rscdmResultsMat(:,depIdx,:)),2);
-meanRscdmAcceptanceRate = mean(squeeze(rscdm_acceptance(:,depIdx,:)),2);
+meanccimRes = mean(squeeze(ccimResultsMat(:,depIdx,:)),2);
+meanccimAcceptanceRate = mean(squeeze(ccim_acceptance(:,depIdx,:)),2);
 meanPdcorrRes = mean(squeeze(pdcorrResultsMat(:,depIdx,:)),2);
 meanPdcorrAcceptanceRate = mean(squeeze(pdcorr_acceptance(:,depIdx,:)),2);
 meanPcorrRes = mean(squeeze(pcorrResultsMat(:,depIdx,:)),2);
 meanPcorrAcceptanceRate = mean(squeeze(pcorr_acceptance(:,depIdx,:)),2);
 meanCmaRes = mean(squeeze(cmaResultsMat(:,depIdx,:)),2);
 meanCmaAcceptanceRate = mean(squeeze(cma_acceptance(:,depIdx,:)),2);
-plot(gammaVec, meanRscdmAcceptanceRate, 'o-.', ...
+plot(gammaVec, meanccimAcceptanceRate, 'o-.', ...
      gammaVec, meanPdcorrAcceptanceRate, 'x-.', ...
      gammaVec, meanPcorrAcceptanceRate, 'd-.', ...
      gammaVec, meanCmaAcceptanceRate, '+-.');
@@ -227,15 +227,15 @@ h4.FontSize = 20;
 
 h5 = subplot(3,2,5);
 depIdx = 5;
-meanRscdmRes = mean(squeeze(rscdmResultsMat(:,depIdx,:)),2);
-meanRscdmAcceptanceRate = mean(squeeze(rscdm_acceptance(:,depIdx,:)),2);
+meanccimRes = mean(squeeze(ccimResultsMat(:,depIdx,:)),2);
+meanccimAcceptanceRate = mean(squeeze(ccim_acceptance(:,depIdx,:)),2);
 meanPdcorrRes = mean(squeeze(pdcorrResultsMat(:,depIdx,:)),2);
 meanPdcorrAcceptanceRate = mean(squeeze(pdcorr_acceptance(:,depIdx,:)),2);
 meanPcorrRes = mean(squeeze(pcorrResultsMat(:,depIdx,:)),2);
 meanPcorrAcceptanceRate = mean(squeeze(pcorr_acceptance(:,depIdx,:)),2);
 meanCmaRes = mean(squeeze(cmaResultsMat(:,depIdx,:)),2);
 meanCmaAcceptanceRate = mean(squeeze(cma_acceptance(:,depIdx,:)),2);
-plot(gammaVec, meanRscdmAcceptanceRate, 'o-.', ...
+plot(gammaVec, meanccimAcceptanceRate, 'o-.', ...
      gammaVec, meanPdcorrAcceptanceRate, 'x-.', ...
      gammaVec, meanPcorrAcceptanceRate, 'd-.', ...
      gammaVec, meanCmaAcceptanceRate, '+-.');
@@ -246,15 +246,15 @@ h5.FontSize = 20;
 
 h6 = subplot(3,2,6);
 depIdx = 6;
-meanRscdmRes = mean(squeeze(rscdmResultsMat(:,depIdx,:)),2);
-meanRscdmAcceptanceRate = mean(squeeze(rscdm_acceptance(:,depIdx,:)),2);
+meanccimRes = mean(squeeze(ccimResultsMat(:,depIdx,:)),2);
+meanccimAcceptanceRate = mean(squeeze(ccim_acceptance(:,depIdx,:)),2);
 meanPdcorrRes = mean(squeeze(pdcorrResultsMat(:,depIdx,:)),2);
 meanPdcorrAcceptanceRate = mean(squeeze(pdcorr_acceptance(:,depIdx,:)),2);
 meanPcorrRes = mean(squeeze(pcorrResultsMat(:,depIdx,:)),2);
 meanPcorrAcceptanceRate = mean(squeeze(pcorr_acceptance(:,depIdx,:)),2);
 meanCmaRes = mean(squeeze(cmaResultsMat(:,depIdx,:)),2);
 meanCmaAcceptanceRate = mean(squeeze(cma_acceptance(:,depIdx,:)),2);
-plot(gammaVec, meanRscdmAcceptanceRate, 'o-.', ...
+plot(gammaVec, meanccimAcceptanceRate, 'o-.', ...
      gammaVec, meanPdcorrAcceptanceRate, 'x-.', ...
      gammaVec, meanPcorrAcceptanceRate, 'd-.', ...
      gammaVec, meanCmaAcceptanceRate, '+-.');
@@ -263,7 +263,7 @@ title('(f)', 'FontSize', 20);
 grid on;
 h6.FontSize = 20; 
 
-legend('RSCDM', 'PDCORR', 'PCORR', 'CMA');  % manually move this using the mouse to a
+legend('CCIM', 'PDCORR', 'PCORR', 'CMA');  % manually move this using the mouse to a
                                             % good location
 
 %% Conditional Independence Test
@@ -281,8 +281,8 @@ significance_thresh = 0.05;
 gammaVec = 0:0.1:1;
 
 numDepTypes = 6;
-rsdmResultsMat = zeros(length(gammaVec), numDepTypes, nsim);        % for comparision of acceptance rates
-rscdmResultsMat = zeros(length(gammaVec), numDepTypes, nsim);
+cimResultsMat = zeros(length(gammaVec), numDepTypes, nsim);        % for comparision of acceptance rates
+ccimResultsMat = zeros(length(gammaVec), numDepTypes, nsim);
 cmaSurrResultsMat = zeros(length(gammaVec), numDepTypes, nsim);     % for comparision of aceptance rate
 cmaResultsMat = zeros(length(gammaVec), numDepTypes, nsim);
 pdcorrResultsMat = zeros(length(gammaVec), numDepTypes, nsim);
@@ -290,8 +290,8 @@ pdcorrPValMat = zeros(length(gammaVec), numDepTypes, nsim);
 pcorrResultsMat = zeros(length(gammaVec), numDepTypes, nsim);
 pcorrPValMat = zeros(length(gammaVec), numDepTypes, nsim);
 
-rsdmResultsVec = zeros(1,nsim);
-rscdmResultsVec = zeros(1,nsim);
+cimResultsVec = zeros(1,nsim);
+ccimResultsVec = zeros(1,nsim);
 cmaSurrResultsVec = zeros(1,nsim);
 cmaResultsVec = zeros(1,nsim);
 pdcorrResultsVec = zeros(1,nsim);
@@ -332,8 +332,8 @@ for gammaIdx=1:length(gammaVec)
                     Z = gamma*cos(4*pi*X) + (1-gamma)*eps;
             end
             
-            rsdmVal = rsdm(Y,Z);        % for calculating the CI/CD test statistic
-            rscdmVal = rscdm(Y,Z,X);
+            cimVal = cim(Y,Z);        % for calculating the CI/CD test statistic
+            ccimVal = ccim(Y,Z,X);
             [~, pdcorVal, ~, pdcor_pval] = pdcov(Y,Z,X);
             [pcorrVal,pcorr_pval] = partialcorr(Y,Z,X);
             
@@ -345,8 +345,8 @@ for gammaIdx=1:length(gammaVec)
             surrData.X = cmaSurrData.Y; surrData.Y = cmaSurrData.Z; surrData.Z = cmaSurrData.X;
             cmaSurrVal = cassor(surrData);
             
-            rsdmResultsVec(ii) = rsdmVal;
-            rscdmResultsVec(ii) = rscdmVal;
+            cimResultsVec(ii) = cimVal;
+            ccimResultsVec(ii) = ccimVal;
             
             cmaSurrResultsVec(ii) = cmaSurrVal;
             cmaResultsVec(ii) = cmaVal;
@@ -358,8 +358,8 @@ for gammaIdx=1:length(gammaVec)
             pcorrPValVec(ii) = pcorr_pval;
         end
         
-        rsdmResultsMat(gammaIdx, jj, :) = rsdmResultsVec;
-        rscdmResultsMat(gammaIdx, jj, :) = rscdmResultsVec;
+        cimResultsMat(gammaIdx, jj, :) = cimResultsVec;
+        ccimResultsMat(gammaIdx, jj, :) = ccimResultsVec;
         
         cmaSurrResultsMat(gammaIdx, jj, :) = cmaSurrResultsVec;
         cmaResultsMat(gammaIdx, jj, :) = cmaResultsVec;
@@ -373,42 +373,42 @@ for gammaIdx=1:length(gammaVec)
     end
     % save the results in case the computer crashes
     if(ispc)
-        save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rscdm_CI.mat');
+        save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\ccim_CI.mat');
     elseif(ismac)
-        save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rscdm_CI.mat');
+        save('/Users/Kiran/ownCloud/PhD/sim_results/independence/ccim_CI.mat');
     elseif(isunix)
-        save('/home/kiran/ownCloud/PhD/sim_results/independence/rscdm_CI.mat');
+        save('/home/kiran/ownCloud/PhD/sim_results/independence/ccim_CI.mat');
     end
 end
 
 % save the results
 if(ispc)
-    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\rscdm_CI.mat');
+    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\ccim_CI.mat');
 elseif(ismac)
-    save('/Users/Kiran/ownCloud/PhD/sim_results/independence/rscdm_CI.mat');
+    save('/Users/Kiran/ownCloud/PhD/sim_results/independence/ccim_CI.mat');
 elseif(isunix)
-    save('/home/kiran/ownCloud/PhD/sim_results/independence/rscdm_CI.mat');
+    save('/home/kiran/ownCloud/PhD/sim_results/independence/ccim_CI.mat');
 end
 
 % compute acceptance rates
 pdcorr_acceptance = pdcorrPValMat<significance_thresh;
 pcorr_acceptance = pcorrPValMat<significance_thresh;
-rscdm_acceptance = rscdmResultsMat>rsdmResultsMat;
+ccim_acceptance = ccimResultsMat>cimResultsMat;
 cma_acceptance = cmaResultsMat>cmaSurrResultsMat;
 
 figure;
 
 h1 = subplot(3,2,1);
 depIdx = 1;
-meanRscdmRes = mean(squeeze(rscdmResultsMat(:,depIdx,:)),2);
-meanRscdmAcceptanceRate = mean(squeeze(rscdm_acceptance(:,depIdx,:)),2);
+meanccimRes = mean(squeeze(ccimResultsMat(:,depIdx,:)),2);
+meanccimAcceptanceRate = mean(squeeze(ccim_acceptance(:,depIdx,:)),2);
 meanPdcorrRes = mean(squeeze(pdcorrResultsMat(:,depIdx,:)),2);
 meanPdcorrAcceptanceRate = mean(squeeze(pdcorr_acceptance(:,depIdx,:)),2);
 meanPcorrRes = mean(squeeze(pcorrResultsMat(:,depIdx,:)),2);
 meanPcorrAcceptanceRate = mean(squeeze(pcorr_acceptance(:,depIdx,:)),2);
 meanCmaRes = mean(squeeze(cmaResultsMat(:,depIdx,:)),2);
 meanCmaAcceptanceRate = mean(squeeze(cma_acceptance(:,depIdx,:)),2);
-plot(gammaVec, 1-meanRscdmAcceptanceRate, 'o-.', ...
+plot(gammaVec, 1-meanccimAcceptanceRate, 'o-.', ...
      gammaVec, 1-meanPdcorrAcceptanceRate, 'x-.', ...
      gammaVec, 1-meanPcorrAcceptanceRate, 'd-.', ...
      gammaVec, 1-meanCmaAcceptanceRate, '+-.');
@@ -419,15 +419,15 @@ h1.FontSize = 20;
 
 h2 = subplot(3,2,2);
 depIdx = 2;
-meanRscdmRes = mean(squeeze(rscdmResultsMat(:,depIdx,:)),2);
-meanRscdmAcceptanceRate = mean(squeeze(rscdm_acceptance(:,depIdx,:)),2);
+meanccimRes = mean(squeeze(ccimResultsMat(:,depIdx,:)),2);
+meanccimAcceptanceRate = mean(squeeze(ccim_acceptance(:,depIdx,:)),2);
 meanPdcorrRes = mean(squeeze(pdcorrResultsMat(:,depIdx,:)),2);
 meanPdcorrAcceptanceRate = mean(squeeze(pdcorr_acceptance(:,depIdx,:)),2);
 meanPcorrRes = mean(squeeze(pcorrResultsMat(:,depIdx,:)),2);
 meanPcorrAcceptanceRate = mean(squeeze(pcorr_acceptance(:,depIdx,:)),2);
 meanCmaRes = mean(squeeze(cmaResultsMat(:,depIdx,:)),2);
 meanCmaAcceptanceRate = mean(squeeze(cma_acceptance(:,depIdx,:)),2);
-plot(gammaVec, 1-meanRscdmAcceptanceRate, 'o-.', ...
+plot(gammaVec, 1-meanccimAcceptanceRate, 'o-.', ...
      gammaVec, 1-meanPdcorrAcceptanceRate, 'x-.', ...
      gammaVec, 1-meanPcorrAcceptanceRate, 'd-.', ...
      gammaVec, 1-meanCmaAcceptanceRate, '+-.');
@@ -438,15 +438,15 @@ h2.FontSize = 20;
 
 h3 = subplot(3,2,3);
 depIdx = 3;
-meanRscdmRes = mean(squeeze(rscdmResultsMat(:,depIdx,:)),2);
-meanRscdmAcceptanceRate = mean(squeeze(rscdm_acceptance(:,depIdx,:)),2);
+meanccimRes = mean(squeeze(ccimResultsMat(:,depIdx,:)),2);
+meanccimAcceptanceRate = mean(squeeze(ccim_acceptance(:,depIdx,:)),2);
 meanPdcorrRes = mean(squeeze(pdcorrResultsMat(:,depIdx,:)),2);
 meanPdcorrAcceptanceRate = mean(squeeze(pdcorr_acceptance(:,depIdx,:)),2);
 meanPcorrRes = mean(squeeze(pcorrResultsMat(:,depIdx,:)),2);
 meanPcorrAcceptanceRate = mean(squeeze(pcorr_acceptance(:,depIdx,:)),2);
 meanCmaRes = mean(squeeze(cmaResultsMat(:,depIdx,:)),2);
 meanCmaAcceptanceRate = mean(squeeze(cma_acceptance(:,depIdx,:)),2);
-plot(gammaVec, 1-meanRscdmAcceptanceRate, 'o-.', ...
+plot(gammaVec, 1-meanccimAcceptanceRate, 'o-.', ...
      gammaVec, 1-meanPdcorrAcceptanceRate, 'x-.', ...
      gammaVec, 1-meanPcorrAcceptanceRate, 'd-.', ...
      gammaVec, 1-meanCmaAcceptanceRate, '+-.');
@@ -457,15 +457,15 @@ h3.FontSize = 20;
 
 h4 = subplot(3,2,4);
 depIdx = 4;
-meanRscdmRes = mean(squeeze(rscdmResultsMat(:,depIdx,:)),2);
-meanRscdmAcceptanceRate = mean(squeeze(rscdm_acceptance(:,depIdx,:)),2);
+meanccimRes = mean(squeeze(ccimResultsMat(:,depIdx,:)),2);
+meanccimAcceptanceRate = mean(squeeze(ccim_acceptance(:,depIdx,:)),2);
 meanPdcorrRes = mean(squeeze(pdcorrResultsMat(:,depIdx,:)),2);
 meanPdcorrAcceptanceRate = mean(squeeze(pdcorr_acceptance(:,depIdx,:)),2);
 meanPcorrRes = mean(squeeze(pcorrResultsMat(:,depIdx,:)),2);
 meanPcorrAcceptanceRate = mean(squeeze(pcorr_acceptance(:,depIdx,:)),2);
 meanCmaRes = mean(squeeze(cmaResultsMat(:,depIdx,:)),2);
 meanCmaAcceptanceRate = mean(squeeze(cma_acceptance(:,depIdx,:)),2);
-plot(gammaVec, 1-meanRscdmAcceptanceRate, 'o-.', ...
+plot(gammaVec, 1-meanccimAcceptanceRate, 'o-.', ...
      gammaVec, 1-meanPdcorrAcceptanceRate, 'x-.', ...
      gammaVec, 1-meanPcorrAcceptanceRate, 'd-.', ...
      gammaVec, 1-meanCmaAcceptanceRate, '+-.');
@@ -476,15 +476,15 @@ h4.FontSize = 20;
 
 h5 = subplot(3,2,5);
 depIdx = 5;
-meanRscdmRes = mean(squeeze(rscdmResultsMat(:,depIdx,:)),2);
-meanRscdmAcceptanceRate = mean(squeeze(rscdm_acceptance(:,depIdx,:)),2);
+meanccimRes = mean(squeeze(ccimResultsMat(:,depIdx,:)),2);
+meanccimAcceptanceRate = mean(squeeze(ccim_acceptance(:,depIdx,:)),2);
 meanPdcorrRes = mean(squeeze(pdcorrResultsMat(:,depIdx,:)),2);
 meanPdcorrAcceptanceRate = mean(squeeze(pdcorr_acceptance(:,depIdx,:)),2);
 meanPcorrRes = mean(squeeze(pcorrResultsMat(:,depIdx,:)),2);
 meanPcorrAcceptanceRate = mean(squeeze(pcorr_acceptance(:,depIdx,:)),2);
 meanCmaRes = mean(squeeze(cmaResultsMat(:,depIdx,:)),2);
 meanCmaAcceptanceRate = mean(squeeze(cma_acceptance(:,depIdx,:)),2);
-plot(gammaVec, 1-meanRscdmAcceptanceRate, 'o-.', ...
+plot(gammaVec, 1-meanccimAcceptanceRate, 'o-.', ...
      gammaVec, 1-meanPdcorrAcceptanceRate, 'x-.', ...
      gammaVec, 1-meanPcorrAcceptanceRate, 'd-.', ...
      gammaVec, 1-meanCmaAcceptanceRate, '+-.');
@@ -495,15 +495,15 @@ h5.FontSize = 20;
 
 h6 = subplot(3,2,6);
 depIdx = 6;
-meanRscdmRes = mean(squeeze(rscdmResultsMat(:,depIdx,:)),2);
-meanRscdmAcceptanceRate = mean(squeeze(rscdm_acceptance(:,depIdx,:)),2);
+meanccimRes = mean(squeeze(ccimResultsMat(:,depIdx,:)),2);
+meanccimAcceptanceRate = mean(squeeze(ccim_acceptance(:,depIdx,:)),2);
 meanPdcorrRes = mean(squeeze(pdcorrResultsMat(:,depIdx,:)),2);
 meanPdcorrAcceptanceRate = mean(squeeze(pdcorr_acceptance(:,depIdx,:)),2);
 meanPcorrRes = mean(squeeze(pcorrResultsMat(:,depIdx,:)),2);
 meanPcorrAcceptanceRate = mean(squeeze(pcorr_acceptance(:,depIdx,:)),2);
 meanCmaRes = mean(squeeze(cmaResultsMat(:,depIdx,:)),2);
 meanCmaAcceptanceRate = mean(squeeze(cma_acceptance(:,depIdx,:)),2);
-plot(gammaVec, 1-meanRscdmAcceptanceRate, 'o-.', ...
+plot(gammaVec, 1-meanccimAcceptanceRate, 'o-.', ...
      gammaVec, 1-meanPdcorrAcceptanceRate, 'x-.', ...
      gammaVec, 1-meanPcorrAcceptanceRate, 'd-.', ...
      gammaVec, 1-meanCmaAcceptanceRate, '+-.');
@@ -512,7 +512,7 @@ title('(f)', 'FontSize', 20);
 grid on;
 h6.FontSize = 20; 
 
-legend('RSCDM', 'PDCORR', 'PCORR', 'CMA');  % manually move this using the mouse to a
+legend('CCIM', 'PDCORR', 'PCORR', 'CMA');  % manually move this using the mouse to a
                                             % good location
 
 %% Do a conditionally independent test
@@ -535,16 +535,16 @@ x = rand(M,1);
 % y = x + noise*randn(M,1); z = 4*(x-0.5).^2 + noise*randn(M,1);
 y = 4*(x-0.5).^2 + noise*randn(M,1); z = cos(4*pi*x) + noise*randn(M,1);
 
-rsdm1 = rsdm(x, y);
-rsdm2 = rsdm(x, z);
-rsdm3 = rsdm(y, z);
-% RSCDM conditions X on Y and Z, and sees how related Y and Z
+cim1 = cim(x, y);
+cim2 = cim(x, z);
+cim3 = cim(y, z);
+% ccim conditions X on Y and Z, and sees how related Y and Z
 % are to each other ... in this graphical model, they should be UNRELATED
 % after the effect of X is removed... i.e. close to independent.  To see
 % why, look at the graphical model, Y indep Z | X according to
 % d-separation.  So if we condition upon X (i.e. remove teh effect of X on
 % Y and Z separately), then we should get independence.
-[rscdmVal, RxAligned, RyAligned] = rscdm(y,z,x);
+[ccimVal, RxAligned, RyAligned] = ccim(y,z,x);
 [~, pdcorVal] = pdcov(y, z, x); pdcorVal = abs(pdcorVal);
 partialCorrVal = abs(partialcorr(y,z,x));
 data.X = y; data.Y = z; data.Z = x; cassorVal = abs(cassor(data));
@@ -554,17 +554,17 @@ fontSize = 20;
 
 h1 = subplot(3,12,1:3);
 scatter(x,y); grid on; xlabel('x', 'FontSize', fontSize); ylabel('y', 'FontSize', fontSize); 
-title(sprintf('RSDM=%0.2f', rsdm1), 'FontSize', fontSize);
+title(sprintf('cim=%0.2f', cim1), 'FontSize', fontSize);
 h1.FontSize = fontSize;
 
 h2 = subplot(3,12,5:8);
 scatter(y,z); grid on; xlabel('y', 'FontSize', fontSize); ylabel('z', 'FontSize', fontSize); 
-title(sprintf('RSDM=%0.2f', rsdm3), 'FontSize', fontSize);
+title(sprintf('cim=%0.2f', cim3), 'FontSize', fontSize);
 h2.FontSize = fontSize;
 
 h3 = subplot(3,12,10:12);
 scatter(x,z); grid on; xlabel('x', 'FontSize', fontSize); ylabel('z', 'FontSize', fontSize); 
-title(sprintf('RSDM=%0.2f', rsdm2), 'FontSize', fontSize);
+title(sprintf('cim=%0.2f', cim2), 'FontSize', fontSize);
 h3.FontSize = fontSize;
 
 h4 = subplot(3,12,13:17);
@@ -581,8 +581,8 @@ h6 = subplot(3,12,25:29);
 scatter(RxAligned,RyAligned); grid on; 
 xlabel('r_{y|x}', 'FontSize', fontSize); ylabel('r_{z|x}', 'FontSize', fontSize);  
 % title(sprintf('%0.02f/%0.02f/%0.02f/%0.02f/%0.02f', ...
-%     rscdmVal, pdcorVal, partialCorrVal, cassorVal, hdVal), 'FontSize', fontSize);
-title(sprintf('RSCDM=%0.02f', rscdmVal), 'FontSize', fontSize);
+%     ccimVal, pdcorVal, partialCorrVal, cassorVal, hdVal), 'FontSize', fontSize);
+title(sprintf('CCIM=%0.02f', ccimVal), 'FontSize', fontSize);
 h6.FontSize = fontSize;
 
 h7 = subplot(3,12,32:36);
@@ -592,7 +592,7 @@ h7.FontSize = fontSize;
 
 %% Do a conditionally dependent test
 
-% Tests Conditional Independence w/ RSDM and the residuals processing
+% Tests Conditional Independence w/ cim and the residuals processing
 % algorithm.
 
 clear;
@@ -614,13 +614,13 @@ z = rand(M,1);
 % x = y + (z-0.5).^2 + noise*randn(M,1);
 x = (y-0.5).^2 + cos(4*pi*z) + noise*randn(M,1);
 
-rsdm1 = rsdm(x, y);
-rsdm2 = rsdm(x, z);
-rsdm3 = rsdm(y, z);
+cim1 = cim(x, y);
+cim2 = cim(x, z);
+cim3 = cim(y, z);
 % In this graphical model, Y and Z are independent of each other, but when
 % conditioned upon X, they become dependent.  Refer to the rules of
 % d-separation to see why, this is a V-Structure!
-[rscdmVal, RxAligned, RyAligned] = rscdm(y,z,x);
+[ccimVal, RxAligned, RyAligned] = ccim(y,z,x);
 [~, pdcorVal] = pdcov(y, z, x); pdcorVal = abs(pdcorVal);
 partialCorrVal = abs(partialcorr(y,z,x));
 data.X = y; data.Y = z; data.Z = x; cassorVal = abs(cassor(data));
@@ -630,17 +630,17 @@ fontSize = 20;
 
 h1 = subplot(3,12,1:3);
 scatter(x,y); grid on; xlabel('x', 'FontSize', fontSize); ylabel('y', 'FontSize', fontSize); 
-title(sprintf('RSDM=%0.2f', rsdm1), 'FontSize', fontSize);
+title(sprintf('cim=%0.2f', cim1), 'FontSize', fontSize);
 h1.FontSize = fontSize;
 
 h2 = subplot(3,12,5:8);
 scatter(y,z); grid on; xlabel('y', 'FontSize', fontSize); ylabel('z', 'FontSize', fontSize); 
-title(sprintf('RSDM=%0.2f', rsdm3), 'FontSize', fontSize);
+title(sprintf('cim=%0.2f', cim3), 'FontSize', fontSize);
 h2.FontSize = fontSize;
 
 h3 = subplot(3,12,10:12);
 scatter(x,z); grid on; xlabel('x', 'FontSize', fontSize); ylabel('z', 'FontSize', fontSize); 
-title(sprintf('RSDM=%0.2f', rsdm2), 'FontSize', fontSize);
+title(sprintf('cim=%0.2f', cim2), 'FontSize', fontSize);
 h3.FontSize = fontSize;
 
 h4 = subplot(3,12,13:17);
@@ -657,8 +657,8 @@ h6 = subplot(3,12,25:29);
 scatter(RxAligned,RyAligned); grid on; 
 xlabel('r_y', 'FontSize', fontSize); ylabel('r_z', 'FontSize', fontSize);  
 % title(sprintf('%0.02f/%0.02f/%0.02f/%0.02f/%0.02f', ...
-%     rscdmVal, pdcor_val, partialCorrVal, cassorVal, hdVal), 'FontSize', fontSize);
-title(sprintf('RSCDM=%0.02f', rscdmVal), 'FontSize', fontSize);
+%     ccimVal, pdcor_val, partialCorrVal, cassorVal, hdVal), 'FontSize', fontSize);
+title(sprintf('CCIM=%0.02f', ccimVal), 'FontSize', fontSize);
 h6.FontSize = fontSize;
 
 subplot(3,12,32:36);
@@ -687,37 +687,37 @@ x = rand(M,1);
 % y = x + noise*randn(M,1); z = 4*(x-0.5).^2 + noise*randn(M,1);
 y = 4*(x-0.5).^2 + noise*randn(M,1); z = cos(4*pi*x) + noise*randn(M,1);
 
-rsdm1 = rsdm(x, y);
-rsdm2 = rsdm(x, z);
-rsdm3 = rsdm(y, z);
-% RSCDM conditions X on Y and Z, and sees how related Y and Z
+cim1 = cim(x, y);
+cim2 = cim(x, z);
+cim3 = cim(y, z);
+% ccim conditions X on Y and Z, and sees how related Y and Z
 % are to each other ... in this graphical model, they should be UNRELATED
 % after the effect of X is removed... i.e. close to independent.  To see
 % why, look at the graphical model, Y indep Z | X according to
 % d-separation.  So if we condition upon X (i.e. remove teh effect of X on
 % Y and Z separately), then we should get independence.
-[rscdmVal, RxAligned, RyAligned] = rscdm(y,z,x);
+[ccimVal, RxAligned, RyAligned] = ccim(y,z,x);
 fontSize = 20;
 
 h1 = subplot(2,2,1);
 scatter(x,y); grid on; xlabel('x', 'FontSize', fontSize); ylabel('y', 'FontSize', fontSize); 
-title(sprintf('RSDM=%0.2f', rsdm1), 'FontSize', fontSize);
+title(sprintf('cim=%0.2f', cim1), 'FontSize', fontSize);
 h1.FontSize = fontSize;
 
 h2 = subplot(2,2,3);
 scatter(y,z); grid on; xlabel('y', 'FontSize', fontSize); ylabel('z', 'FontSize', fontSize); 
-title(sprintf('RSDM=%0.2f', rsdm3), 'FontSize', fontSize);
+title(sprintf('cim=%0.2f', cim3), 'FontSize', fontSize);
 h2.FontSize = fontSize;
 
 h3 = subplot(2,2,2);
 scatter(x,z); grid on; xlabel('x', 'FontSize', fontSize); ylabel('z', 'FontSize', fontSize); 
-title(sprintf('RSDM=%0.2f', rsdm2), 'FontSize', fontSize);
+title(sprintf('cim=%0.2f', cim2), 'FontSize', fontSize);
 h3.FontSize = fontSize;
 
 h4 = subplot(2,2,4);
 scatter(RxAligned,RyAligned); grid on; 
 xlabel('r_{y|x}', 'FontSize', fontSize); ylabel('r_{z|x}', 'FontSize', fontSize);  
 % title(sprintf('%0.02f/%0.02f/%0.02f/%0.02f/%0.02f', ...
-%     rscdmVal, pdcorVal, partialCorrVal, cassorVal, hdVal), 'FontSize', fontSize);
-title(sprintf('RSCDM=%0.02f', rscdmVal), 'FontSize', fontSize);
+%     ccimVal, pdcorVal, partialCorrVal, cassorVal, hdVal), 'FontSize', fontSize);
+title(sprintf('CCIM=%0.02f', ccimVal), 'FontSize', fontSize);
 h4.FontSize = fontSize;

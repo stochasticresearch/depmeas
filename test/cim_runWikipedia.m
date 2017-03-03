@@ -51,7 +51,7 @@ yy = discretizeRv(yContinuous,numDiscreteIntervals)';
 xy{xyIdx} = [xContinuous yContinuous]; xxyy{xyIdx} = [xx yy];
 xyIdx = xyIdx + 1;
 
-rsdmBias = rsdm(xContinuous, yContinuous);
+cimBias = cim(xContinuous, yContinuous);
 rdcBias = rdc(xContinuous,yContinuous,rdc_k,rdc_s);
 dcorrBias = dcor(xContinuous, yContinuous);
 corrBias = corr(xContinuous,yContinuous);
@@ -167,7 +167,7 @@ for ii=1:nCases
     dataDiscrete = xxyy{dataIdx(ii)};
     xDiscrete = dataDiscrete(:,1); yDiscrete = dataDiscrete(:,2);
     
-    rsdmValContinuous = rsdm(xContinuous, yContinuous);
+    cimValContinuous = cim(xContinuous, yContinuous);
     rdcValContinuous = rdc(xContinuous,yContinuous,rdc_k,rdc_s);
     minestatsContinuous = mine(xContinuous',yContinuous',mine_alpha,mine_c,'mic_e');
     mic_e_valContinuous = minestatsContinuous.mic;
@@ -176,7 +176,7 @@ for ii=1:nCases
     cosValContinuous = cosdv(xContinuous,yContinuous);
     ccorrValContinuous = ccor(xContinuous,yContinuous);
     
-    rsdmValDiscrete = rsdm(xDiscrete, yDiscrete);
+    cimValDiscrete = cim(xDiscrete, yDiscrete);
     rdcValDiscrete = rdc(xDiscrete,yDiscrete,rdc_k,rdc_s);
     minestatsDiscrete = mine(xDiscrete',yDiscrete',mine_alpha,mine_c,'mic_e');
     mic_e_valDiscrete = minestatsDiscrete.mic;
@@ -187,7 +187,7 @@ for ii=1:nCases
 %     ccorrValDiscrete = ccor(xDiscrete,yDiscrete);
     ccorrValDiscrete = 0;   % glitches b/c it is only meant for discrete
     
-    barVals = [rsdmValContinuous rsdmValDiscrete; ...
+    barVals = [cimValContinuous cimValDiscrete; ...
                rdcValContinuous rdcValDiscrete; ...
                dcorrValContinuous dcorrValDiscrete; ...
                mic_e_valContinuous mic_e_valDiscrete; ...
@@ -230,7 +230,7 @@ for ii=1:nCases
     set(h,'XTick',[],'YTick',[],'XColor','w','YColor','w','box','off')
     
     % compute the dependency and put as title
-    rsdmValContinuous = rsdm(xContinuous, yContinuous, rsdm1_minscanincr, rsdm1_diffthresh, rsdm1_alpha);
+    cimValContinuous = cim(xContinuous, yContinuous);
     rdcValContinuous = rdc(xContinuous,yContinuous,rdc_k,rdc_s);
     minestatsContinuous = mine(xContinuous',yContinuous',mine_alpha,mine_c,'mic_e');
     mic_e_valContinuous = minestatsContinuous.mic;
@@ -238,20 +238,20 @@ for ii=1:nCases
     corrValContinuous = corr(xContinuous,yContinuous);
 
     if(ii==1)
-        rsdmPrint = rsdmValContinuous;
+        cimPrint = cimValContinuous;
         rdcPrint = rdcValContinuous;
         dcorrPrint = dcorrValContinuous;
         mic_e_print = mic_e_valContinuous;
         corrPrint = corrValContinuous;
     else
-        rsdmPrint = rsdmValContinuous-rsdmBias;
+        cimPrint = cimValContinuous-cimBias;
         rdcPrint = rdcValContinuous-rdcBias;
         dcorrPrint = mic_e_valContinuous-mic_e_bias;
         mic_e_print = mic_e_valContinuous-mic_e_bias;
         corrPrint = corrValContinuous - corrBias;
     end
     
-    title({[strcat('\fontsize{22} {\color{blue}', sprintf('%1.2f}|',rsdmPrint)), ...
+    title({[strcat('\fontsize{22} {\color{blue}', sprintf('%1.2f}|',cimPrint)), ...
            strcat('{\color{red}', sprintf('%1.2f}|', dcorrPrint)), ...       
            strcat('{\color{orange}', sprintf('%1.2f}|', mic_e_print))]; ...
            [strcat('{\color{magenta}', sprintf('%1.2f}|', corrPrint)), ...
@@ -273,7 +273,7 @@ for ii=1:nCases
     set(h,'XTick',[],'YTick',[],'XColor','w','YColor','w','box','off')
     
     % compute the dependency and put as title
-    rsdmValContinuous = rsdm(xContinuous, yContinuous, rsdm1_minscanincr, rsdm1_diffthresh, rsdm1_alpha);
+    cimValContinuous = cim(xContinuous, yContinuous);
     rdcValContinuous = rdc(xContinuous,yContinuous,rdc_k,rdc_s);
     minestatsContinuous = mine(xContinuous',yContinuous',mine_alpha,mine_c,'mic_e');
     mic_e_valContinuous = minestatsContinuous.mic;
@@ -281,20 +281,20 @@ for ii=1:nCases
     corrValContinuous = corr(xContinuous,yContinuous);
 
     if(ii==1)
-        rsdmPrint = rsdmValContinuous;
+        cimPrint = cimValContinuous;
         rdcPrint = rdcValContinuous;
         dcorrPrint = dcorrValContinuous;
         mic_e_print = mic_e_valContinuous;
         corrPrint = corrValContinuous;
     else
-        rsdmPrint = rsdmValContinuous-rsdmBias;
+        cimPrint = cimValContinuous-cimBias;
         rdcPrint = rdcValContinuous-rdcBias;
         dcorrPrint = mic_e_valContinuous-mic_e_bias;
         mic_e_print = mic_e_valContinuous-mic_e_bias;
         corrPrint = corrValContinuous - corrBias;
     end
     
-    title({[strcat('\fontsize{22} {\color{blue}', sprintf('%1.2f}|',rsdmPrint)), ...
+    title({[strcat('\fontsize{22} {\color{blue}', sprintf('%1.2f}|',cimPrint)), ...
            strcat('{\color{red}', sprintf('%1.2f}|', dcorrPrint)), ...       
            strcat('{\color{orange}', sprintf('%1.2f}|', mic_e_print))]; ...
            [strcat('{\color{magenta}', sprintf('%1.2f}|', corrPrint)), ...

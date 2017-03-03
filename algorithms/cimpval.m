@@ -1,14 +1,14 @@
-function [pval] = rsdmpval(rsdmVal, M, varargin)
-%RSDMPVAL - computes the p-value of a given RSDM measure and the number of
-%samples upon which that RSDM measure was calculated against independence
+function [pval] = cimpval(cimVal, M, varargin)
+%CIMPVAL - computes the p-value of a given CIM statistic and the number of
+%samples upon which that CIM statistic was calculated against independence
 %hypothesis
 % Inputs:
-%  rsdmVal - the rsdm measure
-%  M - the sample size used to compute this rsdm measure
-%  varargin{1} - type of data for which this RSDM metric was computed,
+%  cimVal - the CIM measure
+%  M - the sample size used to compute this CIM measure
+%  varargin{1} - type of data for which this CIM metric was computed,
 %                continuous, discrete, hybrid1, or hybrid2.  continuous is
 %                default
-% values are hard-coded, look at the script rsdm_runPower which has a
+% values are hard-coded, look at the script cim_runPower which has a
 % execution-cell inside it that generates these vectors!
         
 alphaVecContinuous = [9.0945 9.2333 9.6349 9.9561 9.8710 9.5267 9.7412 10.2604 9.4023 ...
@@ -71,6 +71,6 @@ M_vec = [M_vec 1500:500:10000];
 alpha = interp1(M_vec, alphaVec, M, 'spline');
 beta = interp1(M_vec, betaVec, M, 'spline');
 
-pval = 1-betacdf(rsdmVal, alpha, beta);
+pval = 1-betacdf(cimVal, alpha, beta);
 
 end

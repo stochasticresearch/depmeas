@@ -1,7 +1,7 @@
-function [R, RectanglesCell] = pairrsdm( X )
-%PAIRRSDM - computes pairwise dependency metrics of a given vector
+function [R, RectanglesCell] = paircim( X )
+%PAIRCIM - computes pairwise dependency metrics of a given vector
 % Inputs:
-%  X - a matrix of observations from which pairwise RSDM metrics are
+%  X - a matrix of observations from which pairwise CIM statistics are
 %  computed.
 % Outputs:
 %  R - a matrix which contains pairwise correlations of all columns in X
@@ -32,8 +32,8 @@ for ii=1:n
     x = X(:,ii);
     parfor jj=ii+1:n
         y = X(:,jj);        
-        [rsdmVal, rco] = rsdm(x,y);
-        R(ii,jj) = rsdmVal;
+        [cimVal, rco] = cim(x,y);
+        R(ii,jj) = cimVal;
         
         RectanglesCell{ii,jj} = rco;
     end

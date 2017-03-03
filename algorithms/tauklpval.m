@@ -3,12 +3,12 @@ function [pval] = tauklpval(ktauhatVal, M, varargin)
 %samples upon which that ktauhat measure was calculated against independence
 %hypothesis
 % Inputs:
-%  rsdmVal - the rsdm measure
-%  M - the sample size used to compute this rsdm measure
-%  varargin{1} - type of data for which this RSDM metric was computed,
+%  ktauhatVal - the ktauhat measure
+%  M - the sample size used to compute this statistic
+%  varargin{1} - type of data for which this ktauhat metric was computed,
 %                continuous, discrete, hybrid1, or hybrid2.  continuous is
 %                default
-% values are hard-coded, look at the script rsdm_runPower which has a
+% values are hard-coded, look at the script test_taukl which has a
 % execution-cell inside it that generates these vectors!
         
 muVecContinuous = [-0.0006 -0.0010 0.0017 0.0003 -0.0003 0.0007 -0.0000 -0.0006 0.0005 0.0002];

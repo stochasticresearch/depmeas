@@ -8,7 +8,7 @@ hiRangeFilename = 'rsdmPower_CoS_cCorr_ticE_M_850_1500.mat';
 outputFilename  = 'rsdmPower_CoS_cCorr_ticE_M_25_1500.mat';
 
 if(ispc)
-    folder = 'C:\\Users\\Kiran\\ownCloud\\PhD\sim_results\\independence';
+    folder = 'C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence';
 elseif(ismac)
     folder = '/Users/Kiran/ownCloud/PhD/sim_results/independence';
 else % assume unix
@@ -58,7 +58,7 @@ hiRangeFilename = 'rsdmPower_M_775_1500.mat';
 outputFilename  = 'rsdmPower.mat';
 
 if(ispc)
-    folder = 'C:\\Users\\Kiran\\ownCloud\\PhD\sim_results\\independence';
+    folder = 'C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence';
 elseif(ismac)
     folder = '/Users/Kiran/ownCloud/PhD/sim_results/independence';
 else % assume unix
@@ -119,7 +119,7 @@ f2name = 'power_CoS_cCorr_ticE.mat';
 outputFilename = 'power_all.mat';
 
 if(ispc)
-    folder = 'C:\\Users\\Kiran\\ownCloud\\PhD\sim_results\\independence';
+    folder = 'C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence';
 elseif(ismac)
     folder = '/Users/Kiran/ownCloud/PhD/sim_results/independence';
 else % assume unix
@@ -149,7 +149,7 @@ f2name = 'power_all.mat';
 outputFilename = 'power_all.mat';
 
 if(ispc)
-    folder = 'C:\\Users\\Kiran\\ownCloud\\PhD\sim_results\\independence';
+    folder = 'C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence';
 elseif(ismac)
     folder = '/Users/Kiran/ownCloud/PhD/sim_results/independence';
 else % assume unix
@@ -181,7 +181,7 @@ f2name = 'power_M_500.mat';
 outputFilename = 'power_M_500.mat';
 
 if(ispc)
-    folder = 'C:\\Users\\Kiran\\ownCloud\\PhD\sim_results\\independence';
+    folder = 'C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence';
 elseif(ismac)
     folder = '/Users/Kiran/ownCloud/PhD/sim_results/independence';
 else % assume unix
@@ -215,7 +215,7 @@ f2name = 'power_M_500.mat';
 outputFilename = 'power_M_500.mat';
 
 if(ispc)
-    folder = 'C:\\Users\\Kiran\\ownCloud\\PhD\sim_results\\independence';
+    folder = 'C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence';
 elseif(ismac)
     folder = '/Users/Kiran/ownCloud/PhD/sim_results/independence';
 else % assume unix
@@ -245,7 +245,7 @@ f2name = 'power_M_500.mat';
 outputFilename = 'power_M_500.mat';
 
 if(ispc)
-    folder = 'C:\\Users\\Kiran\\ownCloud\\PhD\sim_results\\independence';
+    folder = 'C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence';
 elseif(ismac)
     folder = '/Users/Kiran/ownCloud/PhD/sim_results/independence';
 else % assume unix
@@ -275,7 +275,7 @@ f2name = 'rsdmPower_rsdm_M_675_1050_overfitstrategy1.mat';
 outputFilename = 'rsdmPower_rsdm_25_1050_overfitstrategy1.mat';
 
 if(ispc)
-    folder = 'C:\\Users\\Kiran\\ownCloud\\PhD\sim_results\\independence';
+    folder = 'C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence';
 elseif(ismac)
     folder = '/Users/Kiran/ownCloud/PhD/sim_results/independence';
 else % assume unix
@@ -322,7 +322,7 @@ f2name = 'rsdmPower_rsdm_M_1500_1075_overfitstrategy1.mat';
 outputFilename = 'rsdmPower_rsdm_M_25_1500_overfitstrategy1.mat';
 
 if(ispc)
-    folder = 'C:\\Users\\Kiran\\ownCloud\\PhD\sim_results\\independence';
+    folder = 'C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence';
 elseif(ismac)
     folder = '/Users/Kiran/ownCloud/PhD/sim_results/independence';
 else % assume unix
@@ -370,8 +370,8 @@ f1name = 'rsdmPower_rsdm_M_25_1500_overfitstrategy1.mat';
 f2name = 'power_all.mat';
 
 if(ispc)
-    folder1 = 'C:\\Users\\Kiran\\ownCloud\\PhD\sim_results\\independence\\backup';
-    folder2 = 'C:\\Users\\Kiran\\ownCloud\\PhD\sim_results\\independence';
+    folder1 = 'C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\backup';
+    folder2 = 'C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence';
 elseif(ismac)
     folder1 = '/Users/Kiran/ownCloud/PhD/sim_results/independence/backup';
     folder2 = '/Users/Kiran/ownCloud/PhD/sim_results/independence';

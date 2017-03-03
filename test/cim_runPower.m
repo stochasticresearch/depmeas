@@ -129,7 +129,7 @@ for l=num_noise_test_min:num_noise_test_max
             x = rand(M,1)*(xMax-xMin)+xMin;
             
             % calculate the metrics
-            rsdmNull(ii) = rsdm(x, y);
+            rsdmNull(ii) = cim(x, y);
             dcorrNull(ii) = dcor(x, y);
             % compute MICe
             minestats = mine(x',y',mine_alpha,mine_c,'mic_e');
@@ -186,7 +186,7 @@ for l=num_noise_test_min:num_noise_test_max
             end
             
             % calculate the metrics
-            rsdmAlt(ii) = rsdm(x, y);
+            rsdmAlt(ii) = cim(x, y);
             dcorrAlt(ii) = dcor(x, y);
             % compute MICe
             minestats = mine(x',y',mine_alpha,mine_c,'mic_e');
@@ -562,7 +562,7 @@ for m=1:length(M_vec)
                 x = rand(M,1)*(xMax-xMin)+xMin;
 
                 % calculate the metrics
-                rsdmNull(ii) = rsdm(x, y);
+                rsdmNull(ii) = cim(x, y);
                 dcorrNull(ii) = dcor(x, y);
                 % compute MICe
                 minestats = mine(x',y',mine_alpha,mine_c,'mic_e');
@@ -619,7 +619,7 @@ for m=1:length(M_vec)
                 end
 
                 % calculate the metrics
-                rsdmAlt(ii) = rsdm(x, y);
+                rsdmAlt(ii) = cim(x, y);
                 dcorrAlt(ii) = dcor(x, y);
                 % compute MICe
                 minestats = mine(x',y',mine_alpha,mine_c,'mic_e');
@@ -931,7 +931,7 @@ hh8(4).LineWidth = 1.5;
 hh8(5).LineWidth = 1.5;
 hh8(6).LineWidth = 1.5;
 
-%% Characterize null distribution (X indep Y) experimentally for \hat{RSDM}
+%% Characterize null distribution (X indep Y) experimentally for \hat{CIM}
 clear;
 clc;
 
@@ -966,15 +966,15 @@ for ii=1:nsim
         x_discrete = discretizeRv(x,numDiscreteIntervals)';
         y_discrete = discretizeRv(y,numDiscreteIntervals)';
     
-        % compute RSDM
-        rsdmNullDistributionResultsContinuous(ii,jj) = rsdm(x, y);
-        rsdmNullDistributionResultsHybrid1(ii,jj) = rsdm(x_discrete,y);
-        rsdmNullDistributionResultsHybrid2(ii,jj) = rsdm(x,y_discrete);
-        rsdmNullDistributionResultsDiscrete(ii,jj) = rsdm(x_discrete,y_discrete);
+        % compute CIM
+        rsdmNullDistributionResultsContinuous(ii,jj) = cim(x, y);
+        rsdmNullDistributionResultsHybrid1(ii,jj) = cim(x_discrete,y);
+        rsdmNullDistributionResultsHybrid2(ii,jj) = cim(x,y_discrete);
+        rsdmNullDistributionResultsDiscrete(ii,jj) = cim(x_discrete,y_discrete);
     end
 end
 
-% plot distribution of RSDM under the null distribution 
+% plot distribution of CIM under the null distribution 
 M_vec_toPlot = M_vec(1:initLen);
 legendCell = cell(1,length(M_vec_toPlot));
 subplot(2,2,1);
@@ -985,7 +985,7 @@ for ii=1:length(M_vec_toPlot)
 end
 grid on;
 legend(legendCell);
-title('Distribution of RSDM_{approx}, X-C,Y-C');
+title('Distribution of CIM_{approx}, X-C,Y-C');
 
 subplot(2,2,2);
 for ii=1:length(M_vec_toPlot)
@@ -995,7 +995,7 @@ for ii=1:length(M_vec_toPlot)
 end
 grid on;
 legend(legendCell);
-title('Distribution of RSDM_{approx}, X-D,Y-C');
+title('Distribution of CIM_{approx}, X-D,Y-C');
 
 subplot(2,2,3);
 for ii=1:length(M_vec_toPlot)
@@ -1005,7 +1005,7 @@ for ii=1:length(M_vec_toPlot)
 end
 grid on;
 legend(legendCell);
-title('Distribution of RSDM_{approx}, X-C,Y-D');
+title('Distribution of CIM_{approx}, X-C,Y-D');
 
 subplot(2,2,4);
 for ii=1:length(M_vec_toPlot)
@@ -1015,7 +1015,7 @@ for ii=1:length(M_vec_toPlot)
 end
 grid on;
 legend(legendCell);
-title('Distribution of RSDM_{approx}, X-D,Y-D');
+title('Distribution of CIM_{approx}, X-D,Y-D');
 
 D_continuous_cell = cell(1,length(M_vec));  PD_continuous_cell = cell(1,length(M_vec));
 D_hybrid1_cell = cell(1,length(M_vec));  PD_hybrid1_cell = cell(1,length(M_vec));
@@ -1403,7 +1403,7 @@ end
 %                             alphaVecHybrid1,    betaVecHybrid1,
 %                             alphaVecHybrid2,    betaVecHybrid2,
 %                             alphaVecDiscrete,   betaVecDiscrete
-% in order to fill in the values for rsdmpval function
+% in order to fill in the values for cimpval function
 
 fontSize = 20;
 
@@ -1786,7 +1786,7 @@ else
     save('/home/kiran/ownCloud/PhD/sim_results/independence/rsdmPower_CoS_M_25_1500.mat');
 end
 
-%% RSDM only parameric power curves
+%% CIM only parameric power curves
 % TODO: merge these results back in w/ the other power vs sample-size
 % calculations ...
 
@@ -1874,8 +1874,8 @@ for m=1:length(M_vec)
                 x = rand(M,1)*(xMax-xMin)+xMin;
 
                 % calculate the metrics
-                % compute RSDM
-                rsdmNull(ii) = rsdm(x,y);
+                % compute CIM
+                rsdmNull(ii) = cim(x,y);
             end
 
             % compute the rejection cutoffs
@@ -1914,8 +1914,8 @@ for m=1:length(M_vec)
                 end
 
                 % calculate the metrics
-                % compute RSDM
-                rsdmAlt(ii) = rsdm(x,y);
+                % compute CIM
+                rsdmAlt(ii) = cim(x,y);
             end
 
             % compute the power
@@ -2125,7 +2125,7 @@ else
     save('/home/kiran/ownCloud/PhD/sim_results/independence/rsdmPower_MI_M_100.mat');
 end
 
-%% Plot RSDM vs KNN-1,KNN-6,KNN-20,Shannon Adaptive Partitioning, vonMises Expansion
+%% Plot CIM vs KNN-1,KNN-6,KNN-20,Shannon Adaptive Partitioning, vonMises Expansion
 
 M = 500;
 

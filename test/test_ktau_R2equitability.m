@@ -44,13 +44,13 @@ for ii=1:nrow
         y = x;
         noise = randn(M,1)*sqrt(var(y)*(Rinv-1));
         y = y+noise;
-        res_f1(ii,jj) = rsdm(x,y);
+        res_f1(ii,jj) = corr(x,y,'type','kendall');
         
         x = rand(M,1)*10+2;
         y = exp(x);
         noise = randn(M,1)*sqrt(var(y)*(Rinv-1));
         y = y+noise;
-        res_f2(ii,jj) = rsdm(x,y);
+        res_f2(ii,jj) = corr(x,y,'type','kendall');
     end
     
     R = R + 0.01;
