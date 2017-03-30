@@ -77,6 +77,7 @@ for ii=1:length(sRhoVec)
    
 end
 
+figure;
 % plot
 subplot(2,2,1);
 plot(sRhoVec,entropyVecSRho(1,:),kTauVec,entropyVecKTau(1,:));
@@ -101,3 +102,17 @@ plot(sRhoVec,entropyVecSRho(4,:),kTauVec,entropyVecKTau(4,:));
 title('Clayton Copula');
 legend('\rho','\tau'); grid on;
 xlabel('\kappa'); ylabel('-H')
+
+% Plot all of the different copula's on one plot to reproduce Fig.2 in SMS
+% paper
+figure;
+plot(sRhoVec,entropyVecSRho(1,:), ...
+     sRhoVec,entropyVecSRho(2,:), ...
+     sRhoVec,entropyVecSRho(3,:), ...
+     sRhoVec,entropyVecSRho(4,:) );
+legend('Gaussian','Frank','Gumbel','Clayton')
+xlabel('\rho');
+ylabel('E(-H)')
+grid on;
+
+%% Compute the prior's for each distribution.
