@@ -100,20 +100,26 @@ fontSize = 20;
 
 M = 500;
 x = rand(M,1)*10+2;
-y1 = x; y2 = exp(x);
 sigma = 2;
 noise = sigma*randn(M,1);
+y1 = x; y2 = exp(x); y3 = exp(x+noise);
 
 u = pobs(x);
 v1 = pobs(y1); v1_n = pobs(y1+noise);
 v2 = pobs(y2); v2_n = pobs(y2+noise);
+v3 = pobs(y3); v3_n = pobs(y3);
 
-subplot(2,2,1); scatter(x,y1); grid on;
+subplot(3,2,1); scatter(x,y1); grid on;
 xlabel({'x','(a)'}, 'FontSize', 20); ylabel('y', 'FontSize', 20);
-subplot(2,2,2); scatter(u,v1_n); grid on;
+subplot(3,2,2); scatter(u,v1_n); grid on;
 xlabel({'u','(b)'}, 'FontSize', 20); ylabel('v', 'FontSize', 20);
 
-subplot(2,2,3); scatter(x,y2); grid on;
+subplot(3,2,3); scatter(x,y2); grid on;
 xlabel({'x','(c)'}, 'FontSize', 20); ylabel('y', 'FontSize', 20);
-subplot(2,2,4); scatter(u,v2_n); grid on;
+subplot(3,2,4); scatter(u,v2_n); grid on;
 xlabel({'u','(d)'}, 'FontSize', 20); ylabel('v', 'FontSize', 20);
+
+subplot(3,2,5); scatter(x,y3); grid on;
+xlabel({'x','(e)'}, 'FontSize', 20); ylabel('y', 'FontSize', 20);
+subplot(3,2,6); scatter(u,v3_n); grid on;
+xlabel({'u','(f)'}, 'FontSize', 20); ylabel('v', 'FontSize', 20);
