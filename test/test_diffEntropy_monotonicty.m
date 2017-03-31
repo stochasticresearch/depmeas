@@ -115,4 +115,30 @@ xlabel('\rho');
 ylabel('E(-H)')
 grid on;
 
-%% Compute the prior's for each distribution.
+% plot just the priors
+p_prior = zeros(3,length(sRhoVec));
+
+for ii=1:length(sRhoVec)
+    rho_s = sRhoVec(ii);
+    p_prior(1,ii) = hcbn_prior('Gaussian',rho_s);
+    p_prior(2,ii) = hcbn_prior('Gumbel',rho_s);
+    p_prior(3,ii) = hcbn_prior('Clayton',rho_s);
+end
+
+subplot(1,2,1);
+plot(sRhoVec,p_prior);
+grid on;
+xlabel('rho_s');
+ylabel('Prior');
+
+% Compute & Plot the Posteriors
+p_posterior = zeros(3,length(sRhoVec));
+p_posterior(1,:) = entropyVecSRho(1,:) + log(p_prior(1,:));
+p_posterior(2,:) = entropyVecSRho(3,:) + log(p_prior(2,:));
+p_posterior(3,:) = entropyVecSRho(4,:) + log(p_prior(3,:));
+subplot(1,2,2);
+plot(sRhoVec,p_posterior);
+grid on;
+xlabel('rho_s');
+ylabel('Posterior');
+legend('Gaussian', 'Gumbel', 'Clayton');
