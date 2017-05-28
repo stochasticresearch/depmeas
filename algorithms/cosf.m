@@ -32,6 +32,9 @@ function [metric] = cosf(x, y)
 u = pobs(x);
 v = pobs(y);
 
+[u,I] = sort(u);
+v = v(I);
+
 n = length(x);
 E_copula = zeros(1,n);
 
