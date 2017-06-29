@@ -69,25 +69,11 @@ CIM <- function(data) {
   net <- mrnet(mim)
 }
 
-availableDataSources = c("rogers1000","syntren300","syntren1000","gnw1565","gnw2000","all")
 # we choose to run the datasources separately so that we can compare the performance for each dataset individually
 # rather than an aggregate
-
-# loop over each available datasource
-for(ds in availableDataSources) {
-  print(sprintf('Running datasource %s \n', ds))
-  comp <- netbenchmark(datasources.names=ds, 
-                       methods=c("CIM", "MIEmpirical", "MI.SG", "Kendall", "Pearson"),verbose=FALSE,
-                       seed = 123) 
-  # save the results
-  fnameOut = sprintf("/home/kiran/ownCloud/PhD/sim_results/mrnet_%s_cim.RData",ds)
-  save(list = ls(all.names = TRUE), file = fnameOut, envir = .GlobalEnv)
-  
-  # VISUALIZE
-  #aupr <- comp[[1]][,-(1:2)]
-  
-  #make the name look pretty (it still doesn't look *amazing*... :/ )
-  #library("tools") 
-  #colnames(aupr) <- sapply(colnames(aupr),file_path_sans_ext) 
-  #boxplot(aupr, main="All Data", ylab=expression('AUPR'[20]))
-}
+comp <- netbenchmark(datasources.names="syntren300", 
+                     methods=c("CIM", "MIEmpirical", "MI.SG", "Kendall", "Pearson"),verbose=FALSE,
+                     seed = 123) 
+# save the results
+fnameOut = "/home/kiran/ownCloud/PhD/sim_results/mrnet_syntren300_cim.RData"
+save(list = ls(all.names = TRUE), file = fnameOut, envir = .GlobalEnv)
