@@ -77,7 +77,7 @@ availableDataSources = c("rogers1000","syntren300","syntren1000","gnw1565","gnw2
 for(ds in availableDataSources) {
   print(sprintf('Running datasource %s \n', ds))
   comp <- netbenchmark(datasources.names=ds, 
-                       methods=c("CIM", "MIEmpirical", "MI.SG", "Kendall", "Pearson"),verbose=FALSE,
+                       methods=c("CIM", "MIEmpirical", "MIsg", "Kendall", "Pearson"),verbose=FALSE,
                        seed = 123) 
   # save the results
   fnameOut = sprintf("/home/kiran/ownCloud/PhD/sim_results/mrnet_%s_cim.RData",ds)
