@@ -41,24 +41,6 @@ for(ds in availableDataSources) {
   }
 }
 
-if(RUN_CIM) {
-  for(ds in availableDataSources) {
-    inputFname = sprintf("%s.Rdata", ds)
-    fullPathIn = file.path(dataRepo,inputFname)
-    load(file=fullPathIn)
-    
-    for(i in seq_along(data.list)){
-      inputData <- as.data.frame(data.list[[i]])
-      top20.aupr <- netbenchmark.data(methods=c("CIM"),data = inputData,
-                                      true.net=true.net,plot=FALSE)
-      # save the output
-      outputFname = sprintf("%s_CIM.Rdata", ds)
-      fullPathOut = file.path(outputFolder,outputFname)
-      save(list=c("top20.aupr"), file = fullPathOut)
-    }
-  }
-}
-
 ###############################################################################
 # load the data
 #fname = '/home/kiran/ownCloud/PhD/sim_results/netbenchmark/data/syntren300.Rdata'
