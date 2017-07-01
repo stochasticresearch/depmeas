@@ -83,5 +83,6 @@ availableDataSources = c("rogers1000","syntren300","syntren1000","gnw1565","gnw2
 for(ds in availableDataSources) {
   netbenchmark_data_gen(datasources.names=ds,
                         datasets.num=150,
+                        seed=1234,
                         outputFolder="/home/kiran/data/netbenchmark/inputs")
 }

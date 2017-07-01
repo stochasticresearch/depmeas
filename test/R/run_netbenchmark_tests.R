@@ -37,7 +37,7 @@ Pearson <- function(data){
 } 
 
 availableDataSources = c("syntren300","rogers1000","syntren1000","gnw1565","gnw2000")
-dataRepo = "/home/kiran/data/netbenchmark/inputs/"
+dataRepo = "/home/kiran/data/netbenchmark/inputs"
 outputFolder = "/home/kiran/data/netbenchmark/r_outputs"
 
 for(ds in availableDataSources) {
@@ -50,7 +50,8 @@ for(ds in availableDataSources) {
     inputData <- as.data.frame(data.list[[i]])
     top20.aupr <- netbenchmark.data(methods=c("MIEmpirical", "MImm", "MIshrink", "MIsg", "Kendall", "Pearson"),
                                     data = inputData,
-                                    true.net=true.net,plot=FALSE)
+                                    true.net=true.net,plot=FALSE,
+                                    verbose=FALSE)
     # save the output
     outputFname = sprintf("%s.Rdata", ds)
     fullPathOut = file.path(outputFolder,outputFname)
