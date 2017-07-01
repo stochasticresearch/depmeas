@@ -36,13 +36,9 @@ Pearson <- function(data){
   net <- mrnet(mim)
 } 
 
-availableDataSources = c("syntren300","rogers1000","syntren1000","gnw1565","gnw2000")
-dataRepo = "/home/kiran/data/netbenchmark/inputs"
-outputFolder = "/home/kiran/data/netbenchmark/r_outputs"
-
-for(ds in availableDataSources) {
+for(ds in c("syntren300","rogers1000","syntren1000","gnw1565","gnw2000")) {
   inputFname = sprintf("%s.Rdata", ds)
-  fullPathIn = file.path(dataRepo,inputFname)
+  fullPathIn = file.path("/home/kiran/data/netbenchmark/inputs",inputFname)
   load(file=fullPathIn)
   
   for(i in seq_along(data.list)){
@@ -53,8 +49,8 @@ for(ds in availableDataSources) {
                                     true.net=true.net,plot=FALSE,
                                     verbose=FALSE)
     # save the output
-    outputFname = sprintf("%s.Rdata", ds)
-    fullPathOut = file.path(outputFolder,outputFname)
+    outputFname = sprintf("%s_%d.Rdata", ds, i)
+    fullPathOut = file.path("/home/kiran/data/netbenchmark/r_outputs",outputFname)
     save(list=c("top20.aupr"), file = fullPathOut)
   }
 }
