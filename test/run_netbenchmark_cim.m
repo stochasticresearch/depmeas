@@ -10,7 +10,7 @@ p = gcp
 
 dataRepo = '/home/kiran/data/netbenchmark/inputs/';
 dataSourcesToProcess = {'syntren300','rogers1000','syntren1000','gnw1565','gnw2000'};
-dataOutputFolder = '/home/kiran/data/netbenchmark/outputs';
+dataOutputFolder = '/home/kiran/data/netbenchmark/matlab_outputs';
 numDatasets = 150;
 
 dispstat('','init'); % One time only initialization
