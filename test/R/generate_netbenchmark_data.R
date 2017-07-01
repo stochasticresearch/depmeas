@@ -81,5 +81,7 @@ datasets is bigger than the orginal number of experiments in the datasource:
 
 availableDataSources = c("rogers1000","syntren300","syntren1000","gnw1565","gnw2000")
 for(ds in availableDataSources) {
-  netbenchmark_data_gen(datasources.names=ds)
+  netbenchmark_data_gen(datasources.names=ds,
+                        datasets.num=150,
+                        outputFolder="/home/kiran/data/netbenchmark/inputs")
 }

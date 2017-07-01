@@ -8,9 +8,10 @@ myCluster.NumWorkers = 6;
 saveProfile(myCluster);
 p = gcp
 
-dataRepo = '/home/kiran/ownCloud/PhD/sim_results/netbenchmark/data/';
+dataRepo = '/home/kiran/data/netbenchmark/inputs/';
 dataSourcesToProcess = {'syntren300','rogers1000','syntren1000','gnw1565','gnw2000'};
-numDatasets = 5;
+dataOutputFolder = '/home/kiran/data/netbenchmark/outputs';
+numDatasets = 150;
 
 dispstat('','init'); % One time only initialization
 dispstat(sprintf('Begining the simulation...\n'),'keepthis','timestamp');
@@ -26,7 +27,7 @@ for dataSourceIdx=1:length(dataSourcesToProcess)
         X = data;
         R = paircim_v4_cc_mexoffload( X );
         
-        fOut = fullfile(dataRepo,sprintf('%s_%d_output.mat',dataSource,ii));
+        fOut = fullfile(dataOutputFolder,sprintf('%s_%d_output.mat',dataSource,ii));
         save(fOut,'R');
     end
 end

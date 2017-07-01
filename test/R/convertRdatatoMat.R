@@ -7,7 +7,7 @@ writeMat <- R.matlab::writeMat
 readMat <- R.matlab::readMat
 
 availableDataSources = c("rogers1000","syntren300","syntren1000","gnw1565","gnw2000")
-dataRepo = "/home/kiran/ownCloud/PhD/sim_results/netbenchmark/data/"
+dataRepo = "/home/kiran/data/netbenchmark/inputs/"
 
 for(ds in availableDataSources) {
   inputFname = sprintf("%s.Rdata", ds)
