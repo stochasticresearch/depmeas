@@ -3,8 +3,6 @@
 rm(list = ls())
 cat("\014")
 
-RUN_CIM = 0;
-
 library(netbenchmark)
 library(minet)
 
