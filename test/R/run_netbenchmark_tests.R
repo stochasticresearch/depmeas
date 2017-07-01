@@ -16,8 +16,23 @@ MIEmpirical <- function(data){
   net <- mrnet(mim)
 } 
 
+MImm <- function(data){ 
+  mim <- build.mim(data, estimator = "mi.mm", disc = "equalfreq")
+  net <- mrnet(mim)
+} 
+
+MIshrink <- function(data){ 
+  mim <- build.mim(data, estimator = "mi.shrink", disc = "equalfreq")
+  net <- mrnet(mim)
+} 
+
 MIsg <- function(data){ 
   mim <- build.mim(data, estimator = "mi.sg", disc = "equalfreq")
+  net <- mrnet(mim)
+} 
+
+Pearson <- function(data){ 
+  mim <- build.mim(data, estimator = "pearson")
   net <- mrnet(mim)
 } 
 
@@ -31,8 +46,10 @@ for(ds in availableDataSources) {
   load(file=fullPathIn)
   
   for(i in seq_along(data.list)){
+    message('Processing ', ds, '[', i, '/',  length(data.list), ']')
     inputData <- as.data.frame(data.list[[i]])
-    top20.aupr <- netbenchmark.data(methods=c("Kendall", "MIEmpirical", "MIsg"),data = inputData,
+    top20.aupr <- netbenchmark.data(methods=c("MIEmpirical", "MImm", "MIshrink", "MIsg", "Kendall", "Pearson"),
+                                    data = inputData,
                                     true.net=true.net,plot=FALSE)
     # save the output
     outputFname = sprintf("%s.Rdata", ds)
