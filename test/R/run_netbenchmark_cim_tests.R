@@ -165,8 +165,7 @@ for(ds in availableDataSources) {
   # load the datasource to get the true network
   inputFname = file.path(inputRepo,sprintf("%s.Rdata",ds))
   load(inputFname)
-  #for(i in seq_along(data.list)){
-  for(i in seq_along(1:3)){
+  for(i in seq_along(data.list)){
     inputFname = sprintf("%s_%d_output.mat", ds, i)
     fullPathIn = file.path(matlabResultsRepo,inputFname)
 
