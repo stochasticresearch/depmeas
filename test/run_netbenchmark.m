@@ -25,7 +25,7 @@ for dataSourceIdx=1:length(dataSourcesToProcess)
         load(fIn);
         
         X = data;
-        [R_cim,R_knn1,R_knn6,R_knn20,R_vmeMI,R_apMI] = pair_all_cc_mex( X );
+        [R_cim,R_knn1,R_knn6,R_knn20,R_vmeMI,R_apMI,R_tau] = pair_all_cc_mex( X );
         
         fOut = fullfile(dataOutputFolder,sprintf('%s_%d_cim_output.mat',dataSource,ii));
         save(fOut,'R_cim');
@@ -39,6 +39,8 @@ for dataSourceIdx=1:length(dataSourcesToProcess)
         save(fOut,'R_vmeMI');
         fOut = fullfile(dataOutputFolder,sprintf('%s_%d_ap_output.mat',dataSource,ii));
         save(fOut,'R_apMI');
+        fOut = fullfile(dataOutputFolder,sprintf('%s_%d_tau_output.mat',dataSource,ii));
+        save(fOut,'R_tau');
     end
 end
 

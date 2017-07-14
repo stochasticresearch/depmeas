@@ -1,4 +1,4 @@
-function [R_cim,R_mi_knn1,R_mi_knn6,R_mi_knn20,R_mi_vme,R_mi_ap] = ...
+function [R_cim,R_mi_knn1,R_mi_knn6,R_mi_knn20,R_mi_vme,R_mi_ap,R_tau] = ...
     pair_all_cc_mex( X )
 %PAIRCIM - computes pairwise dependency metrics of a given vector
 % Inputs:
@@ -32,6 +32,7 @@ R_mi_knn6  = zeros(n,n);
 R_mi_knn20 = zeros(n,n);
 R_mi_vme   = zeros(n,n);
 R_mi_ap    = zeros(n,n);
+R_tau      = zeros(n,n);
 
 minScanIncr = 0.015625;
 
@@ -46,6 +47,7 @@ for ii=1:n
         knn20Val = KraskovMI_cc_mex(x,y,20);
         vmeVal = vmeMI_interface(x,y);
         apVal  = apMI_interface(x,y);
+        tauVal = corr(x,y,'type','Kendall');
         
         R_cim(ii,jj)      = cimVal;
         R_mi_knn1(ii,jj)  = knn1Val;
@@ -53,6 +55,7 @@ for ii=1:n
         R_mi_knn20(ii,jj) = knn20Val;
         R_mi_vme(ii,jj)   = vmeVal;
         R_mi_ap(ii,jj)    = apVal;
+        R_tau(ii,jj)      = tauVal;
     end
 end
 
@@ -76,5 +79,8 @@ R_mi_vme(1:n+1:n*n) = 0;   % set the diagonal to 0, to match R's MINET package
 
 R_mi_ap=R_mi_ap+R_mi_ap';
 R_mi_ap(1:n+1:n*n) = 0;   % set the diagonal to 0, to match R's MINET package
+
+R_tau=R_tau+R_tau';
+R_tau(1:n+1:n*n) = 0;   % set the diagonal to 0, to match R's MINET package
 
 end
