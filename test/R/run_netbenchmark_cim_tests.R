@@ -149,6 +149,18 @@ CIM <- function(ds, true.net){
   net <- mrnet(mim)
 } 
 
+MatlabMI <- function(ds, true.net) {
+  # load the MIM matrix that was processed in Matlab
+  mim <- readMat(ds[1])
+  
+  # assign the names so that evaluate works properly
+  colnames(mim) <- colnames(true.net)
+  rownames(mim) <- rownames(true.net)
+  
+  # construct the mrnet network
+  net <- mrnet(mim)
+}
+
 availableDataSources = c("syntren300","rogers1000","syntren1000","gnw1565","gnw2000")
 
 if(Sys.info()["sysname"]=="Darwin") {  # mac
@@ -166,15 +178,31 @@ for(ds in availableDataSources) {
   inputFname = file.path(inputRepo,sprintf("%s.Rdata",ds))
   load(inputFname)
   for(i in seq_along(data.list)){
-    inputFname = sprintf("%s_%d_output.mat", ds, i)
-    fullPathIn = file.path(matlabResultsRepo,inputFname)
+    cimInputFname   = sprintf("%s_%d_cim_output.mat", ds, i)
+    knn1InputFname  = sprintf("%s_%d_knn1_output.mat", ds, i)
+    knn6InputFname  = sprintf("%s_%d_knn6_output.mat", ds, i)
+    knn20InputFname = sprintf("%s_%d_knn20_output.mat", ds, i)
+    vmeInputFname   = sprintf("%s_%d_vme_output.mat", ds, i)
+    apInputFname    = sprintf("%s_%d_ap_output.mat", ds, i)
+    # TODO: do TAU if you see any anomalous results ...
 
-    cim_top20.aupr <- netbenchmark_custom.data(methods=c("CIM"),data = fullPathIn,
+    cim_top20.aupr   <- netbenchmark_custom.data(methods=c("CIM"),data = file.path(matlabResultsRepo,cimInputFname),
                                     true.net=true.net,plot=FALSE,verbose=FALSE)
+    knn1_top20.aupr  <- netbenchmark_custom.data(methods=c("MatlabMI"),data = file.path(matlabResultsRepo,knn1InputFname),
+                                    true.net=true.net,plot=FALSE,verbose=FALSE)
+    knn6_top20.aupr  <- netbenchmark_custom.data(methods=c("MatlabMI"),data = file.path(matlabResultsRepo,knn6InputFname),
+                                    true.net=true.net,plot=FALSE,verbose=FALSE)
+    knn20_top20.aupr <- netbenchmark_custom.data(methods=c("MatlabMI"),data = file.path(matlabResultsRepo,knn20InputFname),
+                                    true.net=true.net,plot=FALSE,verbose=FALSE)
+    vme_top20.aupr   <- netbenchmark_custom.data(methods=c("MatlabMI"),data = file.path(matlabResultsRepo,vmeInputFname),
+                                    true.net=true.net,plot=FALSE,verbose=FALSE)
+    ap_top20.aupr    <- netbenchmark_custom.data(methods=c("MatlabMI"),data = file.path(matlabResultsRepo,apInputFname),
+                                    true.net=true.net,plot=FALSE,verbose=FALSE)
+    
     print(cim_top20.aupr$`AUPRtop20%`)
 
     # save the output
-    outputFname = sprintf("%s_%d_CIM.Rdata", ds, i)
+    outputFname = sprintf("%s_%d_cim.Rdata", ds, i)
     fullPathOut = file.path(rResultsRepo,outputFname)
     save(list=c("cim_top20.aupr"), file = fullPathOut)
   }
