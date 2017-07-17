@@ -151,7 +151,7 @@ CIM <- function(ds, true.net){
 
 MatlabMI <- function(ds, true.net) {
   # load the MIM matrix that was processed in Matlab
-  mim <- readMat(ds[1])
+  mim <- readMat(ds[1])$R
   
   # assign the names so that evaluate works properly
   colnames(mim) <- colnames(true.net)
@@ -200,11 +200,14 @@ for(ds in availableDataSources) {
                                     true.net=true.net,plot=FALSE,verbose=FALSE)
     
     print(cim_top20.aupr$`AUPRtop20%`)
+    #print(knn1_top20.aupr$`AUPRtop20%`)
 
     # save the output
-    outputFname = sprintf("%s_%d_cim.Rdata", ds, i)
+    outputFname = sprintf("%s_%d_matlab.Rdata", ds, i)
     fullPathOut = file.path(rResultsRepo,outputFname)
-    save(list=c("cim_top20.aupr"), file = fullPathOut)
+    save(list=c("cim_top20.aupr","knn1_top20.aupr","knn6_top20.aupr","knn20_top20.aupr",
+                "vme_top20.aupr","ap_top20.aupr"),file = fullPathOut)
+    #save(list=c("cim_top20.aupr"),file = fullPathOut)
   }
 }
 

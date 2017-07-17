@@ -23,6 +23,6 @@ for datasetIdx=1:length(datasetsToPlot)
     boxplot(A.data,'Labels',A.colheaders);
     title(sprintf('%s',ds));
     grid on;
-    ylabel('max(AUPR)')
+    ylabel('max[AUPR_{20}]')
 
 end

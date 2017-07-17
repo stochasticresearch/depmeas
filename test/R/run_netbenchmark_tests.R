@@ -36,7 +36,10 @@ Pearson <- function(data){
   net <- mrnet(mim)
 } 
 
-for(ds in c("syntren300","rogers1000","syntren1000","gnw1565","gnw2000")) {
+#for(ds in c("syntren300","rogers1000","syntren1000","gnw1565","gnw2000")) {
+##### Need to still run gnw1565 for datasets (116-150)
+##### Need to still run gnw2000 for datasets (106-150)
+for(ds in c("gnw2000")) {
   inputFname = sprintf("%s.Rdata", ds)
   fullPathIn = file.path("/home/kiran/data/netbenchmark/inputs",inputFname)
   load(file=fullPathIn)

@@ -55,14 +55,20 @@ for(ds in c("syntren300")) {
     rf = file.path(rResultsRepo_cnr,sprintf("%s_%d.Rdata",ds,i))
     load(rf)
     # load the Matlab estimator data
-    mf = file.path(rResultsRepo_cnr,sprintf("%s_%d_CIM.Rdata",ds,i))
+    mf = file.path(rResultsRepo_cnr,sprintf("%s_%d_matlab.Rdata",ds,i))
     load(mf)
     # merge
-    top20.aupr$`AUPRtop20%`$CIM = cim_top20.aupr$`AUPRtop20%`$CIM
+    top20.aupr$`AUPRtop20%`$CIM   = cim_top20.aupr$`AUPRtop20%`$CIM
+    top20.aupr$`AUPRtop20%`$KNN1  = knn1_top20.aupr$`AUPRtop20%`$MatlabMI
+    top20.aupr$`AUPRtop20%`$KNN6  = knn6_top20.aupr$`AUPRtop20%`$MatlabMI
+    top20.aupr$`AUPRtop20%`$KNN20 = knn20_top20.aupr$`AUPRtop20%`$MatlabMI
+    top20.aupr$`AUPRtop20%`$vME   = vme_top20.aupr$`AUPRtop20%`$MatlabMI
+    top20.aupr$`AUPRtop20%`$AP    = ap_top20.aupr$`AUPRtop20%`$MatlabMI
+    
     merged_df <- rbind(merged_df, top20.aupr$`AUPRtop20%`)
   }
   # store off merged data
-  merged_df <- arrange.vars(merged_df, c("CIM"=1,"Kendall"=2))
+  merged_df <- arrange.vars(merged_df, c("CIM"=1,"Kendall"=2,"KNN1"=3,"KNN6"=4,"KNN20"=5,"vME"=6,"AP"=7))
   print(merged_df)
   fOut = file.path(combinedResultsRepo_cnr,sprintf("%s_combined.csv",ds))
   write.table(merged_df,fOut,sep=",",row.names=FALSE)
