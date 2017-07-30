@@ -5,13 +5,16 @@ close all;
 
 datasetsToPlot = {'syntren300'};
 if(ispc)
-    error('fill in!')
+    combinedDataRepo = 'C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\netbenchmark';
 elseif(ismac)
-    combinedDataRepo = '/Users/Kiran/data/netbenchmark/combined_outputs';
+    combinedDataRepo = '/Users/Kiran/ownCloud/PhD/sim_results/netbenchmark';
 else
-    combinedDataRepo = '/home/kiran/data/netbenchmark/combined_outputs';
+    combinedDataRepo = '/home/kiran/ownCloud/PhD/sim_results/netbenchmark';
 end
 
+estimatorsToPlot = {'"CIM"', '"Kendall"', '"KNN1"', '"KNN6"', '"KNN20"', '"vME"', '"AP"', '"rand"'};
+cellfind = @(string)(@(cell_contents)(strcmp(string,cell_contents)));
+fontSizeVal = 20;
 for datasetIdx=1:length(datasetsToPlot)
     figure;
 
@@ -19,10 +22,21 @@ for datasetIdx=1:length(datasetsToPlot)
     combinedDataFile = fullfile(combinedDataRepo,sprintf('%s_combined.csv',ds));
     A = importdata(combinedDataFile);
     
+    % select the correct columns from the data, based on which estimators
+    % are desired to be plotted
+    idxs = zeros(1,length(estimatorsToPlot));
+    for ii=1:length(estimatorsToPlot)
+        fIdx = find(cellfun(cellfind(estimatorsToPlot{ii}),A.colheaders));
+        idxs(ii) = fIdx;
+    end
+    x = A.data(:,idxs);
+    y = strrep(A.colheaders(idxs),'"','');
+    
     % box plot the results for each column
-    boxplot(A.data,'Labels',A.colheaders);
-    title(sprintf('%s',ds));
+    h = boxplot(x,'Labels',y,'Notch','on');
+    title(sprintf('%s',ds), 'FontSize', fontSizeVal);
     grid on;
-    ylabel('max[AUPR_{20}]')
-
+    ylabel('max[AUPR_{20}]', 'FontSize', fontSizeVal);
+    hh = gca;
+    hh.FontSize = fontSizeVal;
 end
