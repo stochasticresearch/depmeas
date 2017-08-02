@@ -37,3 +37,4 @@ else
     msi = 0.015625;
 end
 [metric,regionRectangle] = cim_cc_mex(x,y,msi);
+% [metric,regionRectangle] = cim_cc(x,y,msi);

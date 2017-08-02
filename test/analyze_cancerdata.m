@@ -76,7 +76,11 @@ clear;
 clc;
 dbstop if error;
 
-parpool;
+myCluster = parcluster('local');
+myCluster.NumWorkers = 6;
+saveProfile(myCluster);
+p = gcp;
+
 % suppress rank-deficient warnings for regression fitting (we aren't
 % concerned with that for our current analysis)
 pctRunOnAll warning('off','MATLAB:rankDeficientMatrix');
@@ -148,8 +152,7 @@ end
 
 % restore normal Matlab warning settings
 pctRunOnAll warning('on','MATLAB:rankDeficientMatrix');
-
-p = gcp;
+% shutdown the parallel pool
 delete(p)
 
 %%
