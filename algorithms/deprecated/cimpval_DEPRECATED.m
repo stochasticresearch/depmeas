@@ -1,4 +1,4 @@
-function [pval] = cimpval(cimVal, M, varargin)
+function [pval] = cimpval_DEPRECATED(cimVal, M, varargin)
 %CIMPVAL - computes the p-value of a given CIM statistic and the number of
 %samples upon which that CIM statistic was calculated against independence
 %hypothesis

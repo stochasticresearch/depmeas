@@ -17,6 +17,57 @@
 %*                                                                        *
 %**************************************************************************
 
+%% An experiment to determine the skewnewss of the univariate distributions
+clear;
+clc;
+dbstop if error;
+
+if(ispc)
+    rootDir = 'C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\cancer';
+elseif(ismac)
+    rootDir = '/Users/Kiran/ownCloud/PhD/sim_results/cancer';
+else
+    rootDir = '/home/kiran/ownCloud/PhD/sim_results/cancer';
+end
+
+files = dir(fullfile(rootDir,'csv_files'));
+
+col=@(x)reshape(x,numel(x),1);
+boxplot2=@(C,varargin)boxplot(cell2mat(cellfun(col,col(C),'uni',0)),cell2mat(arrayfun(@(I)I*ones(numel(C{I}),1),col(1:numel(C)),'uni',0)),varargin{:});
+skewCell = cell(1,length(files));
+labelsCell = cell(1,length(files));
+skewCellIdx = 1;
+for ii=1:length(files)
+    fname = files(ii).name;
+    [~,name,ext] = fileparts(fname);
+    if(strcmpi(ext,'.csv'))
+        fnameWithPath = fullfile(rootDir, 'csv_files', fname);
+        fprintf('Processing file=%s\n', fnameWithPath);
+        % process this file
+        data = csvread(fnameWithPath);
+        data = data';
+        
+        skewVec = zeros(1,size(data,2));
+        for jj=1:length(skewVec)
+            skewVal = skewness(data(:,jj));
+            skewVec(jj) = skewVal;
+        end
+        [skewVecSorted,I] = sort(skewVec);
+        idxVec1 = find(skewVecSorted>=-1); idxVec2 = find(skewVecSorted<=1);
+        II = I(idxVec1(1):idxVec2(end));
+        if(length(II)>100)
+            dataToProcess = data(:,II(1:100));
+        else
+            dataToProcess = data(:,II);
+        end
+        
+        skewCell{skewCellIdx} = skewVec;
+        labelsCell{skewCellIdx} = strcat(fname(1:5),':',sprintf('%d/%d',size(dataToProcess,2),size(data,2)));
+        skewCellIdx = skewCellIdx + 1;
+    end
+end
+boxplot2(skewCell(1:skewCellIdx-1),'Labels',labelsCell(1:skewCellIdx-1),'PlotStyle','compact')
+
 %%
 % Compute monotonicity results of cancer datasets provided by the 
 % Broad Institute
@@ -38,6 +89,8 @@ else
     rootDir = '/home/kiran/ownCloud/PhD/sim_results/cancer';
 end
 
+minSkew = -1; maxSkew = 1; maxPairwiseDimToProcess = 100;
+
 files = dir(fullfile(rootDir,'csv_files'));
 for ii=1:length(files)
     fname = files(ii).name;
@@ -55,10 +108,24 @@ for ii=1:length(files)
         % transpose the data, b/c computational biologists like to store
         % data in row vectors instead of column vectors ... :/
         data = data';
-        if(size(data,2)>100)
-            data = data(:,1:100);
+        
+        skewVec = zeros(1,size(data,2));
+        for jj=1:size(data,2)
+            skewVal = skewness(data(:,jj));
+            skewVec(jj) = skewVal;
         end
-        [R, RectanglesCell] = paircim( data );
+        [skewVecSorted,I] = sort(skewVec);
+        idxVec1 = find(skewVecSorted>=-1); idxVec2 = find(skewVecSorted<=1);
+        II = I(idxVec1(1):idxVec2(end));
+        
+        % process upto top 100 least skewed data columns pairwise
+        if(length(II)>maxPairwiseDimToProcess)
+            dataToProcess = data(:,II(1:maxPairwiseDimToProcess));
+        else
+            dataToProcess = data(:,II);
+        end
+        
+        [R, RectanglesCell] = paircim( dataToProcess );
         % compute the "monotonicity" of the data
         sz = size(RectanglesCell);
         monotonicityMat = zeros(sz);
@@ -75,7 +142,7 @@ for ii=1:length(files)
         I = triu(monotonicityMat,1)~=0;
         monotonicityVec = monotonicityMat(I);
         [uniques, numUniques] = count_unique(monotonicityVec);
-        save(outFile, 'R', 'RectanglesCell', 'monotonicityMat', 'uniques', 'numUniques', 'data');
+        save(outFile, 'R', 'RectanglesCell', 'monotonicityMat', 'uniques', 'numUniques', 'dataToProcess');
     end
 end
 

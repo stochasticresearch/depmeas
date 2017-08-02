@@ -1,5 +1,5 @@
 function [metric, resid, residAssocIdxs] = ...
-    cim_s(x, y, varargin)
+    cim_s_DEPRECATED(x, y, varargin)
 %CIM_S - Streaming Copula Index for Detecting Dependence and Monotonicity between
 %Stochastic Signals.  See associated paper... to be published and preprint
 %located here: 
