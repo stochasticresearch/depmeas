@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.coder" plugin-version="R2016a">
-  <configuration build-checksum="3852128923" file="C:\Users\Kiran\Documents\GitHub\depmeas\algorithms\cim_cc.prj" location="C:\Users\Kiran\Documents\GitHub\depmeas\algorithms" name="cim_cc" target="target.unifiedcoder" target-name="MATLAB Coder">
+  <configuration build-checksum="2175915993" file="/home/kiran/stochasticresearch/depmeas/algorithms/cim_cc.prj" location="/home/kiran/stochasticresearch/depmeas/algorithms" name="cim_cc" target="target.unifiedcoder" target-name="MATLAB Coder">
     <profile key="profile.mex">
       <param.BuiltInstrumentedMex>false</param.BuiltInstrumentedMex>
       <param.RanInstrumentedMex>false</param.RanInstrumentedMex>
@@ -190,7 +190,7 @@
       <param.HardwareSizeChar.Production>8</param.HardwareSizeChar.Production>
       <param.HardwareSizeShort.Production>16</param.HardwareSizeShort.Production>
       <param.HardwareSizeInt.Production>32</param.HardwareSizeInt.Production>
-      <param.HardwareSizeLong.Production>32</param.HardwareSizeLong.Production>
+      <param.HardwareSizeLong.Production>64</param.HardwareSizeLong.Production>
       <param.HardwareSizeLongLong.Production>64</param.HardwareSizeLongLong.Production>
       <param.HardwareSizeFloat.Production>32</param.HardwareSizeFloat.Production>
       <param.HardwareSizeDouble.Production>64</param.HardwareSizeDouble.Production>
@@ -211,7 +211,7 @@
       <param.HardwareSizeChar.Target>8</param.HardwareSizeChar.Target>
       <param.HardwareSizeShort.Target>16</param.HardwareSizeShort.Target>
       <param.HardwareSizeInt.Target>32</param.HardwareSizeInt.Target>
-      <param.HardwareSizeLong.Target>32</param.HardwareSizeLong.Target>
+      <param.HardwareSizeLong.Target>64</param.HardwareSizeLong.Target>
       <param.HardwareSizeLongLong.Target>64</param.HardwareSizeLongLong.Target>
       <param.HardwareSizeFloat.Target>32</param.HardwareSizeFloat.Target>
       <param.HardwareSizeDouble.Target>64</param.HardwareSizeDouble.Target>
@@ -329,7 +329,6 @@
         <param.HardwareSizeChar.Production />
         <param.HardwareSizeShort.Production />
         <param.HardwareSizeInt.Production />
-        <param.HardwareSizeLong.Production />
         <param.HardwareSizeLongLong.Production />
         <param.HardwareSizeFloat.Production />
         <param.HardwareSizeDouble.Production />
@@ -343,7 +342,6 @@
         <param.HardwareSizeChar.Target />
         <param.HardwareSizeShort.Target />
         <param.HardwareSizeInt.Target />
-        <param.HardwareSizeLong.Target />
         <param.HardwareSizeLongLong.Target />
         <param.HardwareSizeFloat.Target />
         <param.HardwareSizeDouble.Target />
@@ -734,7 +732,7 @@
     <param.HighlightPotentialRowMajorIssues>false</param.HighlightPotentialRowMajorIssues>
     <param.ExternalFcnMajority>column</param.ExternalFcnMajority>
     <param.UseGlobals>option.UseGlobals.No</param.UseGlobals>
-    <param.outputfile>${PROJECT_ROOT}\codegen\lib\cim_cc\cim_cc.lib</param.outputfile>
+    <param.outputfile>${PROJECT_ROOT}/codegen/lib/cim_cc/cim_cc.a</param.outputfile>
     <param.version>R2012a</param.version>
     <param.HasECoderFeatures>true</param.HasECoderFeatures>
     <param.HasGpuCoder>true</param.HasGpuCoder>
@@ -758,19 +756,19 @@
     <var.gc.lastOutputRoot />
     <var.gc.lastOutputType />
     <var.gc.preBuildChecksum />
-    <var.cfi.lastOutputRoot>codegen\mex\cim_cc</var.cfi.lastOutputRoot>
-    <var.cfi.preBuildChecksum>2042465844</var.cfi.preBuildChecksum>
+    <var.cfi.lastOutputRoot>codegen/mex/cim_cc</var.cfi.lastOutputRoot>
+    <var.cfi.preBuildChecksum>4103162784</var.cfi.preBuildChecksum>
     <var.lastCfiTestSnippet>x = rand(500,1); y = x; msi = 0.015625; [m,r] = cim_cc(x,y,msi)</var.lastCfiTestSnippet>
     <var.outdatedOnRestore>false</var.outdatedOnRestore>
     <var.lastUserSourceChecksum />
-    <var.sourceSetState>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;sourceModel&gt;&lt;primarySourceFiles&gt;&lt;file&gt;C:\Users\Kiran\Documents\GitHub\copula\algorithms\pobs_sorted_cc.m&lt;/file&gt;&lt;file&gt;C:\Users\Kiran\Documents\GitHub\depmeas\algorithms\cim_cc.m&lt;/file&gt;&lt;file&gt;C:\Users\Kiran\Documents\GitHub\depmeas\algorithms\kendallsTauNumer1.m&lt;/file&gt;&lt;file&gt;C:\Users\Kiran\Documents\GitHub\depmeas\algorithms\taukl_cc.m&lt;/file&gt;&lt;file&gt;C:\Users\Kiran\Documents\GitHub\depmeas\algorithms\uniqueSorted.m&lt;/file&gt;&lt;/primarySourceFiles&gt;&lt;fixedPointSourceFiles/&gt;&lt;fixedPointSourceRegistered&gt;false&lt;/fixedPointSourceRegistered&gt;&lt;fixedPointSourceSelected&gt;false&lt;/fixedPointSourceSelected&gt;&lt;/sourceModel&gt;</var.sourceSetState>
+    <var.sourceSetState>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;sourceModel&gt;&lt;primarySourceFiles&gt;&lt;file&gt;/home/kiran/stochasticresearch/copula/algorithms/pobs_sorted_cc.m&lt;/file&gt;&lt;file&gt;/home/kiran/stochasticresearch/depmeas/algorithms/cim_cc.m&lt;/file&gt;&lt;file&gt;/home/kiran/stochasticresearch/depmeas/algorithms/kendallsTauNumer1.m&lt;/file&gt;&lt;file&gt;/home/kiran/stochasticresearch/depmeas/algorithms/taukl_cc.m&lt;/file&gt;&lt;file&gt;/home/kiran/stochasticresearch/depmeas/algorithms/uniqueSorted.m&lt;/file&gt;&lt;/primarySourceFiles&gt;&lt;fixedPointSourceFiles/&gt;&lt;fixedPointSourceRegistered&gt;false&lt;/fixedPointSourceRegistered&gt;&lt;fixedPointSourceSelected&gt;false&lt;/fixedPointSourceSelected&gt;&lt;/sourceModel&gt;</var.sourceSetState>
     <param.forceMexBuild>false</param.forceMexBuild>
     <param.configImportActive>false</param.configImportActive>
     <var.boundToGui>true</var.boundToGui>
     <param.mex.outputfile>cim_cc_mex</param.mex.outputfile>
     <param.grt.outputfile>cim_cc</param.grt.outputfile>
     <param.artifact>option.target.artifact.lib</param.artifact>
-    <param.outputfile>${PROJECT_ROOT}\codegen\lib\cim_cc\cim_cc.lib</param.outputfile>
+    <param.outputfile>${PROJECT_ROOT}/codegen/lib/cim_cc/cim_cc.a</param.outputfile>
     <param.EnableAutoExtrinsicCalls>true</param.EnableAutoExtrinsicCalls>
     <param.UsePreconditions>false</param.UsePreconditions>
     <param.FeatureFlags />
@@ -899,13 +897,13 @@
       <param.FixedPointUseDesignRanges />
     </unset>
     <fileset.entrypoints>
-      <file custom-data-expanded="false" value="${PROJECT_ROOT}\cim_cc.m">
+      <file custom-data-expanded="false" value="${PROJECT_ROOT}/cim_cc.m">
         <Marker>1501666166147</Marker>
       </file>
     </fileset.entrypoints>
     <fileset.testbench />
     <fileset.inputtypes>
-      <file custom-data-expanded="false" value="${PROJECT_ROOT}\cim_cc.m">
+      <file custom-data-expanded="false" value="${PROJECT_ROOT}/cim_cc.m">
         <Inputs fileName="cim_cc.m" functionName="cim_cc">
           <Input Name="x" typeId="0" />
           <Input Name="y" typeId="0" />
@@ -932,11 +930,11 @@
       </file>
     </fileset.inputtypes>
     <build-deliverables>
-      <file location="${PROJECT_ROOT}\codegen\lib\cim_cc" name="cim_cc.lib" optional="false">C:\Users\Kiran\Documents\GitHub\depmeas\algorithms\codegen\lib\cim_cc\cim_cc.lib</file>
+      <file location="${PROJECT_ROOT}/codegen/lib/cim_cc" name="cim_cc.a" optional="false">/home/kiran/stochasticresearch/depmeas/algorithms/codegen/lib/cim_cc/cim_cc.a</file>
     </build-deliverables>
     <workflow />
     <matlab>
-      <root>C:\Program Files\MATLAB\R2017a</root>
+      <root>/usr/local/MATLAB/R2017a</root>
       <toolboxes>
         <toolbox name="fixedpoint" />
         <toolbox name="matlabcoder" />
@@ -965,18 +963,18 @@
       </toolbox>
     </matlab>
     <platform>
-      <unix>false</unix>
+      <unix>true</unix>
       <mac>false</mac>
-      <windows>true</windows>
+      <windows>false</windows>
       <win2k>false</win2k>
       <winxp>false</winxp>
       <vista>false</vista>
-      <linux>false</linux>
+      <linux>true</linux>
       <solaris>false</solaris>
-      <osver>6.2</osver>
+      <osver>4.10.0-28-generic</osver>
       <os32>false</os32>
       <os64>true</os64>
-      <arch>win64</arch>
+      <arch>glnxa64</arch>
       <matlab>true</matlab>
     </platform>
   </configuration>
