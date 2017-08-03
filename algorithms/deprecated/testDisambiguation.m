@@ -10,3 +10,9 @@ r1Out = disambiguateRectangleMat(r1);
 
 % r3 = [[0 0.45 0 1]' [0.45 1 0 1]'];
 % r3Out = disambiguateRectangleMat(r3)
+
+% r4 = [0 0.5 0 0.5 0 0.5; ...
+%       0.5 1 0.5 1 0.5 1; ...
+%       0 0 0.25 0.25 0.75 0.75; ...
+%       0.25 0.25 0.75 0.75 1 1];
+% r4Out = disambiguateRectangleMat(r4);

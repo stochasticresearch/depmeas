@@ -210,7 +210,7 @@ for zz=1:length(depThreshVec)
                 [iIdx,jIdx] = ind2sub(size(monotonicityMat), idx);
                 % get the CIM value
                 cimVal = R(iIdx,jIdx);
-                tauklVal = abs(taukl(dataToProcess(:,iIdx),dataToProcess(:,jIdx)));
+                tauklVal = abs(taukl_cc(dataToProcess(:,iIdx),dataToProcess(:,jIdx)));
                 percentageDiff = abs(cimVal-tauklVal)/tauklVal;
                 if(percentageDiff<=depThresh)
                     % means we overfit, and we correct for that here

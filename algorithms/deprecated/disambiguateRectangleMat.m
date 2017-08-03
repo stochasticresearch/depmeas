@@ -14,13 +14,14 @@ if(mod(numRects,2)==0)
             rectMatOut = rectMatIn;
         else
             % merge greedily and recursively
-            g1StartIdx = 1;
-            g1StopIdx = breakPts(1);
-            g2StartIdx = breakPts(1)+1;
+            mergeStartIdx = 1;
+            g1StartIdx = mergeStartIdx;
+            g1StopIdx = breakPts(mergeStartIdx);
+            g2StartIdx = breakPts(mergeStartIdx)+1;
             if(length(breakPts)==1)
                 g2StopIdx = numRects;
             else
-                g2StopIdx = breakPts(2);
+                g2StopIdx = breakPts(mergeStartIdx+1);
             end
             if(isequal(rectMatIn(checkIdxs(1),g1StartIdx:g1StopIdx),...
                        rectMatIn(checkIdxs(1),g2StartIdx:g2StopIdx)) && ...

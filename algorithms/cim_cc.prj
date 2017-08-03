@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.coder" plugin-version="R2016a">
-  <configuration build-checksum="2175915993" file="/home/kiran/stochasticresearch/depmeas/algorithms/cim_cc.prj" location="/home/kiran/stochasticresearch/depmeas/algorithms" name="cim_cc" target="target.unifiedcoder" target-name="MATLAB Coder">
+  <configuration build-checksum="3355907330" file="/home/kiran/stochasticresearch/depmeas/algorithms/cim_cc.prj" location="/home/kiran/stochasticresearch/depmeas/algorithms" name="cim_cc" target="target.unifiedcoder" target-name="MATLAB Coder">
     <profile key="profile.mex">
       <param.BuiltInstrumentedMex>false</param.BuiltInstrumentedMex>
       <param.RanInstrumentedMex>false</param.RanInstrumentedMex>
@@ -757,7 +757,7 @@
     <var.gc.lastOutputType />
     <var.gc.preBuildChecksum />
     <var.cfi.lastOutputRoot>codegen/mex/cim_cc</var.cfi.lastOutputRoot>
-    <var.cfi.preBuildChecksum>4103162784</var.cfi.preBuildChecksum>
+    <var.cfi.preBuildChecksum>3173484923</var.cfi.preBuildChecksum>
     <var.lastCfiTestSnippet>x = rand(500,1); y = x; msi = 0.015625; [m,r] = cim_cc(x,y,msi)</var.lastCfiTestSnippet>
     <var.outdatedOnRestore>false</var.outdatedOnRestore>
     <var.lastUserSourceChecksum />

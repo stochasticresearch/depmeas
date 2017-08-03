@@ -35,14 +35,10 @@ end
 % list all available data
 files = dir(fullfile(rootDir,'normalized_files'));
 numStocksToProcess = length(files)-2;   % the -2 is to exclude '.' and '..'
-stocksData = cell(numStocksToProcess,4);   
+stocksData = cell(numStocksToProcess,3);   
                                         % {1} = stock name
-                                        % {2} = raw data
-                                        % {3} = first difference of closing
-                                        %       price
-                                        % {4} = results of augmented
-                                        %       dickey-fuller test of
-                                        %       stationarity
+                                        % {2} = date/time in string
+                                        % {3} = close price
 
 % https://www.kevinsheppard.com/images/9/95/MFE_Toolbox_Documentation.pdf
 % See Page 57 for why the two options below make sense
@@ -63,21 +59,22 @@ for ii=1:length(files)
         % process this file
         fid = fopen(fnameWithPath);
         header = fgetl(fid);
-        data = textscan(fid, '%*s %f %f %f %f %*[^\n]', 'delimiter', ',');
+        headerFields = strsplit(header,',');
+        if(length(headerFields)==7)
+            % try to use the "adjusted" closing price
+            data = textscan(fid, '%s %f %f %f %f %f %f', 'delimiter', ',');
+            closePrice = data{7};
+        else
+            % if we don't have an adjusted close price, use just the
+            % closing price
+            data = textscan(fid, '%s %f %f %f %f %*[^\n]', 'delimiter', ',');
+            closePrice = data{5};
+        end
         fclose(fid);
         
         stocksData{jj,1} = name;
-        stocksData{jj,2} = data;
-        closePrice = data{4};
-        % compute returns data
-        returnsData = closePrice(1:end-1)-closePrice(2:end);
-        stocksData{jj,3} = returnsData;
-        % compute augmented dickey-fuller test of stationarity on the
-        % returns
-        [adftest.stat,adftest.pval,adftest.critval,adftest.resid] = ...
-            augdf(returnsData,adfTestType,lags);
-        stocksData{jj,4} = adftest;
-        
+        stocksData{jj,2} = data{1};
+        stocksData{jj,3} = closePrice;        
         jj = jj + 1;
     end
 end
@@ -89,21 +86,103 @@ p = gcp();
 % concerned with that for our current analysis)
 pctRunOnAll warning('off','MATLAB:rankDeficientMatrix');
 
+dispstat('','init'); % One time only initialization
+dispstat(sprintf('Begining the simulation...\n'),'keepthis','timestamp');
+
 % now perform monotonicity analysis
 R = zeros(numStocksToProcess,numStocksToProcess);
+dfResults = cell(numStocksToProcess,numStocksToProcess);
+pValMat = zeros(numStocksToProcess,numStocksToProcess);
 RectanglesCell = cell(numStocksToProcess,numStocksToProcess);
+tauklMat = zeros(numStocksToProcess,numStocksToProcess);
 for ii=1:numStocksToProcess
-    fprintf('Processing Data # %d\n', ii);
+    dispstat(sprintf('Processing Data # %d', ii),'timestamp','keepthis');
     parfor jj=ii+1:numStocksToProcess
-        returns_i = stocksData{ii,3};
-        returns_j = stocksData{jj,3};
-        numSampsToProcess = min(length(returns_i),length(returns_j));
-        returns_i = returns_i(1:numSampsToProcess);
-        returns_j = returns_j(1:numSampsToProcess);
-        [metric, rectangleCellOut] = cim(returns_i,returns_j);
+        dispstat(sprintf('%d/%d',jj, numStocksToProcess),'timestamp');
         
+        datetime_i = stocksData{ii,2};
+        datetime_j = stocksData{jj,2};
+        
+        % time-align the data
+        minDatetime_i = datetime(datetime_i{1});
+        maxDatetime_i = datetime(datetime_i{end});
+        minDatetime_j = datetime(datetime_j{1});
+        maxDatetime_j = datetime(datetime_j{end});
+        
+        if(minDatetime_i>=minDatetime_j)
+            minDatetime = minDatetime_i;
+        else
+            minDatetime = minDatetime_j;
+        end
+        if(maxDatetime_i<=maxDatetime_j)
+            maxDatetime = maxDatetime_i;
+        else
+            maxDatetime = maxDatetime_j;
+        end
+        % get the indices that correspond to this for both the i and j
+        % vectors
+        iMinIdx = -999; iMaxIdx = -999;
+        jMinIdx = -999; jMaxIdx = -999;
+        for kk=1:length(datetime_i)
+            if(strcmpi(datetime_i{kk},datestr(minDatetime,'yyyy-mm-dd')))
+                iMinIdx = kk;
+                break;
+            end
+        end
+        for kk=1:length(datetime_i)
+            if(strcmpi(datetime_i{kk},datestr(maxDatetime,'yyyy-mm-dd')))
+                iMaxIdx = kk;
+                break;
+            end
+        end
+        for kk=1:length(datetime_j)
+            if(strcmpi(datetime_j{kk},datestr(minDatetime,'yyyy-mm-dd')))
+                jMinIdx = kk;
+                break;
+            end
+        end
+        for kk=1:length(datetime_j)
+            if(strcmpi(datetime_j{kk},datestr(maxDatetime,'yyyy-mm-dd')))
+                jMaxIdx = kk;
+                break;
+            end
+        end
+        if(iMinIdx==-999 || iMaxIdx==-999 || jMinIdx==-999 || jMaxIdx==-999)
+            error('Min/Max idxs not found!');
+        end
+        
+        % some additional error checking
+        if(~strcmpi(datetime_i{iMinIdx},datetime_j{jMinIdx}) || ... 
+           ~strcmpi(datetime_i{iMaxIdx},datetime_j{jMaxIdx}) )
+           error('Dates Mismatch!');
+        end
+        
+        % get the closing price data
+        data_i = stocksData{ii,3}; data_i = data_i(iMinIdx:iMaxIdx);
+        data_j = stocksData{jj,3}; data_j = data_j(jMinIdx:jMaxIdx);
+        
+        if(length(data_i)~=length(data_j))
+            error('Data length mismatch!');
+        end
+        
+        % compute returns from closing price data
+        returns_i = diff(data_i);
+        returns_j = diff(data_j);
+        
+        % compute dependency and monotonicity analysis
+        [metric, rectangleCellOut] = cim(returns_i,returns_j);
         R(ii,jj) = metric; 
         RectanglesCell{ii,jj} = rectangleCellOut;
+        tauklMat(ii,jj) = taukl_cc(returns_i,returns_j);
+        
+        % compute p-value
+        pValMat(ii,jj) = cimpval(metric,length(returns_i));
+        
+        % compute dickey-fuller test
+        [~,augdf_i_pval] = augdf(returns_i,adfTestType,lags);
+        [~,augdf_j_pval] = augdf(returns_j,adfTestType,lags);
+        dfResults{ii,jj} = [augdf_i_pval augdf_j_pval];
+        
     end
 end
 
@@ -155,13 +234,14 @@ end
 load(fullfile(rootDir,'stocks_results.mat'));
 
 numStocksProcessed = size(monotonicityMat,1);
-alpha = 0.05;       % significance level for Dickey-Fuller tests
+alpha = 0.05;       % significance level for Dickey-Fuller tests & dependency confirmation
+
 % we only aggregate results for where the Dickey-Fuller confirms that the
 % data is indeed stationary
 validIdxs = zeros(1,numStocksProcessed);
 for ii=1:numStocksProcessed
     adfTestResults = stocksData{ii,4};
-    if(adfTestResults.pval < alpha)
+    if(adfTestResults.pval <= alpha)
         validIdxs(ii) = 1;
     end
 end
@@ -176,33 +256,26 @@ for zz=1:length(depThreshVec)
     numTotalDepsAnalyzed = 0;
     for ii=1:numStocksProcessed
         for jj=ii+1:numStocksProcessed
-            if(validIdxs(ii) && validIdxs(jj))
-                % means both stocks returns data are stationary
-
+            dfResultsVec = dfResults{ii,jj};
+            pvalRes = pvalMat(ii,jj);
+            % means both stocks returns data are stationary
+            if(isequal(dfResultsVec,[1 1]) && pvalRes<=alpha)
                 % make sure that this pairwise computation is not independent
                 cimVal = R(ii,jj);
-                returns_i = stocksData{ii,3};
-                returns_j = stocksData{jj,3};
-                numSampsToProc = min(length(returns_i),length(returns_j));
-                tauklVal = abs(taukl(returns_i(1:numSampsToProc),returns_j(1:numSampsToProc)));
+                tauklVal = tauklMat(ii,jj);
+        
                 percentageDiff = abs(cimVal-tauklVal)/tauklVal;
                 if(percentageDiff<=depThresh)
                     monotonicityMat(ii,jj) = 1;
                     monotonicityMat(jj,ii) = 1;
                 end
                 numMonotonicRegions = monotonicityMat(ii,jj);
-
-                numSampsProcessed = min(length(returns_i),length(returns_j));
-                pval = cimpval(cimVal, numSampsProcessed);
-                if(pval<alpha)
-
-                    if(isKey(monotonicityResults,numMonotonicRegions))
-                        monotonicityResults(numMonotonicRegions) = monotonicityResults(numMonotonicRegions) + 1;
-                    else
-                        monotonicityResults(numMonotonicRegions) = 1;
-                    end
-                    numTotalDepsAnalyzed = numTotalDepsAnalyzed + 1;
+                if(isKey(monotonicityResults,numMonotonicRegions))
+                    monotonicityResults(numMonotonicRegions) = monotonicityResults(numMonotonicRegions) + 1;
+                else
+                    monotonicityResults(numMonotonicRegions) = 1;
                 end
+                numTotalDepsAnalyzed = numTotalDepsAnalyzed + 1;
             end
         end
     end
@@ -228,7 +301,6 @@ else
     rootDir = '/home/kiran/ownCloud/PhD/sim_results/stocks';
 end
 load(fullfile(rootDir,'finalMonotonicityResults.mat'));
-
 
 maxCount = 0;
 for ii=1:length(depThreshVec)
