@@ -95,10 +95,11 @@ dfResults = cell(numStocksToProcess,numStocksToProcess);
 pValMat = zeros(numStocksToProcess,numStocksToProcess);
 RectanglesCell = cell(numStocksToProcess,numStocksToProcess);
 tauklMat = zeros(numStocksToProcess,numStocksToProcess);
+dataCell = cell(numStocksToProcess,numStocksToProcess);
 for ii=1:numStocksToProcess
-    dispstat(sprintf('Processing Data # %d', ii),'timestamp','keepthis');
+    dispstat(sprintf('Processing Data # %d/%d', ii,numStocksToProcess),'timestamp','keepthis');
     parfor jj=ii+1:numStocksToProcess
-        dispstat(sprintf('%d/%d',jj, numStocksToProcess),'timestamp');
+%         dispstat(sprintf('%d/%d',jj, numStocksToProcess),'timestamp');
         
         datetime_i = stocksData{ii,2};
         datetime_j = stocksData{jj,2};
@@ -173,7 +174,7 @@ for ii=1:numStocksToProcess
         [metric, rectangleCellOut] = cim(returns_i,returns_j);
         R(ii,jj) = metric; 
         RectanglesCell{ii,jj} = rectangleCellOut;
-        tauklMat(ii,jj) = taukl_cc(returns_i,returns_j);
+        tauklMat(ii,jj) = taukl(returns_i,returns_j);
         
         % compute p-value
         pValMat(ii,jj) = cimpval(metric,length(returns_i));
@@ -183,6 +184,7 @@ for ii=1:numStocksToProcess
         [~,augdf_j_pval] = augdf(returns_j,adfTestType,lags);
         dfResults{ii,jj} = [augdf_i_pval augdf_j_pval];
         
+        dataCell{ii,jj} = [returns_i returns_j];
     end
 end
 
@@ -236,38 +238,37 @@ load(fullfile(rootDir,'stocks_results.mat'));
 numStocksProcessed = size(monotonicityMat,1);
 alpha = 0.05;       % significance level for Dickey-Fuller tests & dependency confirmation
 
-% we only aggregate results for where the Dickey-Fuller confirms that the
-% data is indeed stationary
-validIdxs = zeros(1,numStocksProcessed);
-for ii=1:numStocksProcessed
-    adfTestResults = stocksData{ii,4};
-    if(adfTestResults.pval <= alpha)
-        validIdxs(ii) = 1;
-    end
-end
-
 depThreshVec = [0.01 0.05 0.1 0.15 0.2 0.25];
 finalMonotonicityResults = cell(1,length(depThreshVec));
+cimValThresh = 0.4;
 
+% a cell array useful for post-processing and analysis
+flagList = cell(length(depThreshVec),100);
 for zz=1:length(depThreshVec)
     depThresh = depThreshVec(zz);
     fprintf('Processing depThresh=%0.02f\n', depThresh);
     monotonicityResults = containers.Map('KeyType', 'int32', 'ValueType', 'int32');
     numTotalDepsAnalyzed = 0;
+    flagListIdx = 1;
     for ii=1:numStocksProcessed
         for jj=ii+1:numStocksProcessed
             dfResultsVec = dfResults{ii,jj};
-            pvalRes = pvalMat(ii,jj);
+            pvalRes = pValMat(ii,jj);
+            cimVal = R(ii,jj);
             % means both stocks returns data are stationary
-            if(isequal(dfResultsVec,[1 1]) && pvalRes<=alpha)
+            if(dfResultsVec(1)<=alpha && dfResultsVec(2)<=alpha && ...
+               pvalRes<=alpha && cimVal>=cimValThresh)
                 % make sure that this pairwise computation is not independent
-                cimVal = R(ii,jj);
                 tauklVal = tauklMat(ii,jj);
         
                 percentageDiff = abs(cimVal-tauklVal)/tauklVal;
                 if(percentageDiff<=depThresh)
                     monotonicityMat(ii,jj) = 1;
                     monotonicityMat(jj,ii) = 1;
+                end
+                if(monotonicityMat(ii,jj)>1)
+                    flagList{zz,flagListIdx} = [ii jj];
+                    flagListIdx = flagListIdx + 1;
                 end
                 numMonotonicRegions = monotonicityMat(ii,jj);
                 if(isKey(monotonicityResults,numMonotonicRegions))

@@ -171,7 +171,7 @@ end
 
 alpha = 0.05;       % for p-value comparison
 depThreshVec = [0.01 0.05 0.1 0.15 0.2 0.25];
-% depThreshVec = [0.05];
+cimValThresh = 0.4;
 finalMonotonicityResults = cell(1,length(depThreshVec));
 
 for zz=1:length(depThreshVec)
@@ -210,7 +210,7 @@ for zz=1:length(depThreshVec)
                 [iIdx,jIdx] = ind2sub(size(monotonicityMat), idx);
                 % get the CIM value
                 cimVal = R(iIdx,jIdx);
-                tauklVal = abs(taukl_cc(dataToProcess(:,iIdx),dataToProcess(:,jIdx)));
+                tauklVal = abs(taukl(dataToProcess(:,iIdx),dataToProcess(:,jIdx)));
                 percentageDiff = abs(cimVal-tauklVal)/tauklVal;
                 if(percentageDiff<=depThresh)
                     % means we overfit, and we correct for that here
@@ -223,8 +223,9 @@ for zz=1:length(depThreshVec)
             validDepMat = zeros(size(monotonicityMat));
             for jj=1:size(R,1)
                 for kk=jj+1:size(R,1)
-                    pval = cimpval(R(jj,kk), numDataPoints);
-                    if(pval<alpha)
+                    cimVal = R(jj,kk);
+                    pval = cimpval(cimVal, numDataPoints);
+                    if(pval<=alpha && cimVal>=cimValThresh)
                         validDepMat(jj,kk) = 1; % we flag this as non-independent, and
                                                 % thus we will process it
                         validDepMat(kk,jj) = 1;
@@ -276,6 +277,7 @@ for zz=1:length(depThreshVec)
             end
         end
     end
+    zz
     numTotalDepsAnalyzed
     keys(monotonicityResults)
     values(monotonicityResults)
