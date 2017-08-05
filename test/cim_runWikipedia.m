@@ -23,11 +23,11 @@
 clear;
 clc;
 
-n = 800;
+n = 1000;
 rhos = [0.8, 0.4, 0.0, -0.4, -0.8];
 
 nCases = 18;
-numDiscreteIntervals = 6;
+numDiscreteIntervals = 15;
 
 % configure RDC
 rdc_k = 20;

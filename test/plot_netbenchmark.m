@@ -39,4 +39,5 @@ for datasetIdx=1:length(datasetsToPlot)
     ylabel('max[AUPR_{20}]', 'FontSize', fontSizeVal);
     hh = gca;
     hh.FontSize = fontSizeVal;
+    set(h,'LineWidth',3);
 end
