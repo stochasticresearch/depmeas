@@ -36,7 +36,7 @@ delimiterIn = ',';
 headerlinesIn = 1;
 pollutionData = importdata(fname,delimiterIn,headerlinesIn);
 
-minSamps = 100;
+minSamps = 120;  % ~4 months of data
 
 siteNums = pollutionData.data(:,1);
 siteNumsUnique = unique(siteNums);
@@ -49,9 +49,9 @@ for ii=1:numSites
     siteI_idx  = find(pollutionData.data(:,1)==siteI);
     siteIDates = pollutionData.data(siteI_idx,2);
     siteI_NO2  = pollutionData.data(siteI_idx,3);
-    siteI_O3   = pollutionData.data(siteI_idx,3);
-    siteI_SO2  = pollutionData.data(siteI_idx,3);
-    siteI_CO   = pollutionData.data(siteI_idx,3);
+    siteI_O3   = pollutionData.data(siteI_idx,4);
+    siteI_SO2  = pollutionData.data(siteI_idx,5);
+    siteI_CO   = pollutionData.data(siteI_idx,6);
     
     iDataChunkIdxs = find(diff(siteIDates)~=1);
     
@@ -60,9 +60,9 @@ for ii=1:numSites
         siteJ_idx = find(pollutionData.data(:,1)==siteJ);
         siteJDates = pollutionData.data(siteJ_idx,2);
         siteJ_NO2  = pollutionData.data(siteJ_idx,3);
-        siteJ_O3   = pollutionData.data(siteJ_idx,3);
-        siteJ_SO2  = pollutionData.data(siteJ_idx,3);
-        siteJ_CO   = pollutionData.data(siteJ_idx,3);
+        siteJ_O3   = pollutionData.data(siteJ_idx,4);
+        siteJ_SO2  = pollutionData.data(siteJ_idx,5);
+        siteJ_CO   = pollutionData.data(siteJ_idx,6);
         
         prevIdx = 1;
         for kk=1:length(iDataChunkIdxs)
@@ -259,7 +259,7 @@ for ii=1:length(pairwiseTimeAlignedData)
         [~,pvalY] = augdf(dataY,adfTestType,lags);
         if(pvalX<alpha && pvalY<alpha)
             [metric, rectangleCellOut] = cim(dataX,dataY);
-            tauklval = taukl(dataX,dataY);
+            tauklval = taukl_cc(dataX,dataY);
             pval = cimpval(metric, length(dataX));
             if(pval<alpha)
                 res.R(jj) = metric;

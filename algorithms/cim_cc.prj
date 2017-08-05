@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.coder" plugin-version="R2016a">
-  <configuration build-checksum="2535861038" file="/Users/kiran/stochasticresearch/depmeas/algorithms/cim_cc.prj" location="/Users/kiran/stochasticresearch/depmeas/algorithms" name="cim_cc" target="target.unifiedcoder" target-name="MATLAB Coder">
+  <configuration build-checksum="3355907330" file="/home/kiran/stochasticresearch/depmeas/algorithms/cim_cc.prj" location="/home/kiran/stochasticresearch/depmeas/algorithms" name="cim_cc" target="target.unifiedcoder" target-name="MATLAB Coder">
     <profile key="profile.mex">
       <param.BuiltInstrumentedMex>false</param.BuiltInstrumentedMex>
       <param.RanInstrumentedMex>false</param.RanInstrumentedMex>
@@ -24,6 +24,7 @@
       <param.EnableDebugging>false</param.EnableDebugging>
       <param.GenerateReport>true</param.GenerateReport>
       <param.LaunchReport>false</param.LaunchReport>
+      <param.ReportPotentialDifferences>true</param.ReportPotentialDifferences>
       <param.DefaultTestFile />
       <param.MergeInstrumentationResults>false</param.MergeInstrumentationResults>
       <param.VerificationMode>option.VerificationMode.None</param.VerificationMode>
@@ -79,6 +80,7 @@
         <param.EnableDebugging />
         <param.GenerateReport />
         <param.LaunchReport />
+        <param.ReportPotentialDifferences />
         <param.DefaultTestFile />
         <param.MergeInstrumentationResults />
         <param.VerificationMode />
@@ -154,6 +156,7 @@
       <param.GenerateCodeReplacementReport>false</param.GenerateCodeReplacementReport>
       <param.HighlightPotentialDataTypeIssues>false</param.HighlightPotentialDataTypeIssues>
       <param.LaunchReport>false</param.LaunchReport>
+      <param.ReportPotentialDifferences>true</param.ReportPotentialDifferences>
       <param.SILDebugging>false</param.SILDebugging>
       <param.CodeExecutionProfiling>false</param.CodeExecutionProfiling>
       <param.DefaultTestFile />
@@ -292,6 +295,7 @@
         <param.GenerateCodeReplacementReport />
         <param.HighlightPotentialDataTypeIssues />
         <param.LaunchReport />
+        <param.ReportPotentialDifferences />
         <param.SILDebugging />
         <param.CodeExecutionProfiling />
         <param.DefaultTestFile />
@@ -725,10 +729,13 @@
     </param.TestSnippets>
     <param.DefaultImportExportVariable>config</param.DefaultImportExportVariable>
     <param.RowMajor>false</param.RowMajor>
+    <param.HighlightPotentialRowMajorIssues>false</param.HighlightPotentialRowMajorIssues>
+    <param.ExternalFcnMajority>column</param.ExternalFcnMajority>
     <param.UseGlobals>option.UseGlobals.No</param.UseGlobals>
     <param.outputfile>${PROJECT_ROOT}/codegen/lib/cim_cc/cim_cc.a</param.outputfile>
     <param.version>R2012a</param.version>
     <param.HasECoderFeatures>true</param.HasECoderFeatures>
+    <param.HasGpuCoder>true</param.HasGpuCoder>
     <param.mex.mainhtml />
     <param.grt.mainhtml />
     <param.CallGeneratedCodeFromTest>true</param.CallGeneratedCodeFromTest>
@@ -750,11 +757,11 @@
     <var.gc.lastOutputType />
     <var.gc.preBuildChecksum />
     <var.cfi.lastOutputRoot>codegen/mex/cim_cc</var.cfi.lastOutputRoot>
-    <var.cfi.preBuildChecksum>1147022596</var.cfi.preBuildChecksum>
+    <var.cfi.preBuildChecksum>3173484923</var.cfi.preBuildChecksum>
     <var.lastCfiTestSnippet>x = rand(500,1); y = x; msi = 0.015625; [m,r] = cim_cc(x,y,msi)</var.lastCfiTestSnippet>
     <var.outdatedOnRestore>false</var.outdatedOnRestore>
     <var.lastUserSourceChecksum />
-    <var.sourceSetState>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;sourceModel&gt;&lt;primarySourceFiles&gt;&lt;file&gt;/Users/kiran/stochasticresearch/copula/algorithms/pobs_sorted_cc.m&lt;/file&gt;&lt;file&gt;/Users/kiran/stochasticresearch/copula_experiments/kendallsTauNumer1.m&lt;/file&gt;&lt;file&gt;/Users/kiran/stochasticresearch/copula_experiments/uniqueSorted.m&lt;/file&gt;&lt;file&gt;/Users/kiran/stochasticresearch/depmeas/algorithms/cim_cc.m&lt;/file&gt;&lt;file&gt;/Users/kiran/stochasticresearch/depmeas/algorithms/taukl_cc.m&lt;/file&gt;&lt;/primarySourceFiles&gt;&lt;fixedPointSourceFiles/&gt;&lt;fixedPointSourceRegistered&gt;false&lt;/fixedPointSourceRegistered&gt;&lt;fixedPointSourceSelected&gt;false&lt;/fixedPointSourceSelected&gt;&lt;/sourceModel&gt;</var.sourceSetState>
+    <var.sourceSetState>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;sourceModel&gt;&lt;primarySourceFiles&gt;&lt;file&gt;/home/kiran/stochasticresearch/copula/algorithms/pobs_sorted_cc.m&lt;/file&gt;&lt;file&gt;/home/kiran/stochasticresearch/depmeas/algorithms/cim_cc.m&lt;/file&gt;&lt;file&gt;/home/kiran/stochasticresearch/depmeas/algorithms/kendallsTauNumer1.m&lt;/file&gt;&lt;file&gt;/home/kiran/stochasticresearch/depmeas/algorithms/taukl_cc.m&lt;/file&gt;&lt;file&gt;/home/kiran/stochasticresearch/depmeas/algorithms/uniqueSorted.m&lt;/file&gt;&lt;/primarySourceFiles&gt;&lt;fixedPointSourceFiles/&gt;&lt;fixedPointSourceRegistered&gt;false&lt;/fixedPointSourceRegistered&gt;&lt;fixedPointSourceSelected&gt;false&lt;/fixedPointSourceSelected&gt;&lt;/sourceModel&gt;</var.sourceSetState>
     <param.forceMexBuild>false</param.forceMexBuild>
     <param.configImportActive>false</param.configImportActive>
     <var.boundToGui>true</var.boundToGui>
@@ -803,6 +810,7 @@
     <param.fpDataRoot />
     <param.fpUserFileChecksum />
     <var.snapshotChecksum />
+    <param.fpLastConvertChecksum />
     <var.functionBlockSid />
     <param.fptSignedness>false</param.fptSignedness>
     <var.FixedPointAnalysisMode>option.FixedPointAnalysisMode.Sim</var.FixedPointAnalysisMode>
@@ -811,10 +819,13 @@
       <param.objective />
       <param.DefaultImportExportVariable />
       <param.RowMajor />
+      <param.HighlightPotentialRowMajorIssues />
+      <param.ExternalFcnMajority />
       <param.UseGlobals />
       <param.outputfile />
       <param.version />
       <param.HasECoderFeatures />
+      <param.HasGpuCoder />
       <param.mex.mainhtml />
       <param.grt.mainhtml />
       <param.CallGeneratedCodeFromTest />
@@ -879,6 +890,7 @@
       <param.fpDataRoot />
       <param.fpUserFileChecksum />
       <var.snapshotChecksum />
+      <param.fpLastConvertChecksum />
       <var.functionBlockSid />
       <param.fptSignedness />
       <var.FixedPointAnalysisMode />
@@ -918,11 +930,11 @@
       </file>
     </fileset.inputtypes>
     <build-deliverables>
-      <file location="${PROJECT_ROOT}/codegen/lib/cim_cc" name="cim_cc.a" optional="false">/Users/kiran/stochasticresearch/depmeas/algorithms/codegen/lib/cim_cc/cim_cc.a</file>
+      <file location="${PROJECT_ROOT}/codegen/lib/cim_cc" name="cim_cc.a" optional="false">/home/kiran/stochasticresearch/depmeas/algorithms/codegen/lib/cim_cc/cim_cc.a</file>
     </build-deliverables>
     <workflow />
     <matlab>
-      <root>/Applications/MATLAB_R2016b.app</root>
+      <root>/usr/local/MATLAB/R2017a</root>
       <toolboxes>
         <toolbox name="fixedpoint" />
         <toolbox name="matlabcoder" />
@@ -952,17 +964,17 @@
     </matlab>
     <platform>
       <unix>true</unix>
-      <mac>true</mac>
+      <mac>false</mac>
       <windows>false</windows>
       <win2k>false</win2k>
       <winxp>false</winxp>
       <vista>false</vista>
-      <linux>false</linux>
+      <linux>true</linux>
       <solaris>false</solaris>
-      <osver>10.12.6</osver>
+      <osver>4.10.0-28-generic</osver>
       <os32>false</os32>
       <os64>true</os64>
-      <arch>maci64</arch>
+      <arch>glnxa64</arch>
       <matlab>true</matlab>
     </platform>
   </configuration>

@@ -229,10 +229,17 @@ while ax1max<=1
     if(ax1max>1)
         if(metricRectanglePrev>=0)
             metricVec(rectanglesIdx) = metricRectanglePrev;
-            numPtsVec(rectanglesIdx) = length(matchPts);
+            numPtsVec(rectanglesIdx) = length(ax1pts)-sum(numPtsVec(1:rectanglesIdx));
             rectangles(:,rectanglesIdx) = [ax1min 1 ax2min ax2max];
         end
     end
+end
+
+% means we never matched with any points, so compute tau for the range
+if(metricRectanglePrev<0)
+    metricVec(rectanglesIdx) = abs(taukl_cc( ax1pts,ax2pts ));
+    numPtsVec(rectanglesIdx) = length(ax1pts)-sum(numPtsVec(1:rectanglesIdx));
+    rectangles(:,rectanglesIdx) = [0 1 ax2min ax2max];
 end
 
 end

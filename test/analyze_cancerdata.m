@@ -76,7 +76,11 @@ clear;
 clc;
 dbstop if error;
 
-parpool;
+myCluster = parcluster('local');
+myCluster.NumWorkers = 6;
+saveProfile(myCluster);
+p = gcp;
+
 % suppress rank-deficient warnings for regression fitting (we aren't
 % concerned with that for our current analysis)
 pctRunOnAll warning('off','MATLAB:rankDeficientMatrix');
@@ -148,8 +152,7 @@ end
 
 % restore normal Matlab warning settings
 pctRunOnAll warning('on','MATLAB:rankDeficientMatrix');
-
-p = gcp;
+% shutdown the parallel pool
 delete(p)
 
 %%
@@ -168,6 +171,7 @@ end
 
 alpha = 0.05;       % for p-value comparison
 depThreshVec = [0.01 0.05 0.1 0.15 0.2 0.25];
+cimValThresh = 0.4;
 finalMonotonicityResults = cell(1,length(depThreshVec));
 
 for zz=1:length(depThreshVec)
@@ -180,8 +184,8 @@ for zz=1:length(depThreshVec)
     for ii=1:length(files)
         fname = files(ii).name;
         [~,name,ext] = fileparts(fname);
-        if(~isempty(strfind(name,'postProcessed')))
-            delete(fname);
+        if(contains(name,'postProcessed'))
+            delete(fullfile(files(ii).folder,files(ii).name));
         end
     end
     % now post-process again with the chosen depThresh
@@ -194,7 +198,7 @@ for zz=1:length(depThreshVec)
         % postProcessing again here
         if(strcmpi(ext,'.mat'))
             fnameWithPath = fullfile(rootDir, 'results', fname);
-            %fprintf('Processing file=%s\n', fnameWithPath);
+            fprintf('Processing file=%s\n', fnameWithPath);
             load(fnameWithPath);
 
             % Find all the pairwise dependencies that were flagged as
@@ -206,7 +210,7 @@ for zz=1:length(depThreshVec)
                 [iIdx,jIdx] = ind2sub(size(monotonicityMat), idx);
                 % get the CIM value
                 cimVal = R(iIdx,jIdx);
-                tauklVal = abs(taukl(data(:,iIdx),data(:,jIdx)));
+                tauklVal = abs(taukl(dataToProcess(:,iIdx),dataToProcess(:,jIdx)));
                 percentageDiff = abs(cimVal-tauklVal)/tauklVal;
                 if(percentageDiff<=depThresh)
                     % means we overfit, and we correct for that here
@@ -215,12 +219,13 @@ for zz=1:length(depThreshVec)
                 end
             end
             
-            numDataPoints = size(data,1);
+            numDataPoints = size(dataToProcess,1);
             validDepMat = zeros(size(monotonicityMat));
             for jj=1:size(R,1)
                 for kk=jj+1:size(R,1)
-                    pval = cimpval(R(jj,kk), numDataPoints);
-                    if(pval<alpha)
+                    cimVal = R(jj,kk);
+                    pval = cimpval(cimVal, numDataPoints);
+                    if(pval<=alpha && cimVal>=cimValThresh)
                         validDepMat(jj,kk) = 1; % we flag this as non-independent, and
                                                 % thus we will process it
                         validDepMat(kk,jj) = 1;
@@ -237,7 +242,7 @@ for zz=1:length(depThreshVec)
             numDepsAnalyzed = length(intersectI);
 
             outFile = fullfile(rootDir, 'results', [name '_postProcessed.mat']);
-            save(outFile, 'depThresh', 'R', 'RectanglesCell', 'monotonicityVec', 'uniques', 'numUniques', 'data', 'validDepMat', 'numDepsAnalyzed');
+            save(outFile, 'depThresh', 'R', 'RectanglesCell', 'monotonicityVec', 'uniques', 'numUniques', 'dataToProcess', 'validDepMat', 'numDepsAnalyzed');
         end
     end
 
@@ -251,14 +256,14 @@ for zz=1:length(depThreshVec)
     for ii=1:length(files)
         fname = files(ii).name;
         [~,name,ext] = fileparts(fname);
-        if(~isempty(strfind(name,'postProcessed')) && strcmpi(ext,'.mat'))
+        if(contains(name,'postProcessed') && strcmpi(ext,'.mat'))
             fnameWithPath = fullfile(rootDir, 'results', fname);
-            %fprintf('Processing file=%s\n', fnameWithPath);
+            fprintf('Processing file=%s\n', fnameWithPath);
             load(fnameWithPath);
 
             % if we have processed > minNumSamples samples at minimum, 
             % aggregate the results
-            if(size(data,1)>minNumSamples)
+            if(size(dataToProcess,1)>minNumSamples)
                 numFilesAnalyzed = numFilesAnalyzed + 1;
                 numTotalDepsAnalyzed = numTotalDepsAnalyzed + numDepsAnalyzed;
                 lenUniques = length(uniques);
@@ -272,6 +277,7 @@ for zz=1:length(depThreshVec)
             end
         end
     end
+    zz
     numTotalDepsAnalyzed
     keys(monotonicityResults)
     values(monotonicityResults)
@@ -280,6 +286,17 @@ end
 
 % save off the results
 save(fullfile(rootDir,'results', 'finalMonotonicityResults.mat'), 'finalMonotonicityResults', 'depThreshVec', 'numTotalDepsAnalyzed');
+
+% clean up the directory
+files = dir(fullfile(rootDir,'results'));
+% first delete any postProcessed files we may already have
+for ii=1:length(files)
+    fname = files(ii).name;
+    [~,name,ext] = fileparts(fname);
+    if(contains(name,'postProcessed'))
+        delete(fullfile(files(ii).folder,files(ii).name));
+    end
+end
 
 %% plot the final monotonicityResults
 
