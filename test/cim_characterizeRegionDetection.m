@@ -79,7 +79,7 @@ clc;
 
 MVecOfInterest = [100 200 300 400 500];
 noiseOfInterest = [0 10 20];
-cornerPtsOfInterest = [0.4 0.5 0.6];
+cornerPtsOfInterest = [0.2 0.5 0.7];
 fontSizeVal = 20;
 
 M_complete = 700;  % change this tot he latest run that is complete ...

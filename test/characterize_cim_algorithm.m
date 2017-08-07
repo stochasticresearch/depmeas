@@ -381,7 +381,7 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotAlgoSensitivity) )
     num_noise_test_max = 20;
 
     plotAlgoSensitivity_withinM(cimVersion,MVecToPlot,num_noise_test_min,num_noise_test_max);
-    figtitle(sprintf('Algorithm Sensitivity (M=%d - %d)',min(MVecToPlot),max(MVecToPlot)),'FontSize',20);
+%     figtitle(sprintf('Algorithm Sensitivity (M=%d - %d)',min(MVecToPlot),max(MVecToPlot)),'FontSize',20);
 end
 %% simulate the difference between computing monotonic, detecting the region, and theoretical CIM value
 if(~exist('masterCfgRun'))  % means we are running the cell independently
@@ -536,13 +536,13 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotConvergence) )
     for depTestValIdx=1:length(depTestVec)
         if(depTestVec(depTestValIdx)==1)
             M = max(MVecDataAvailable);
-            if(ispc)
-                load(sprintf('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\cim_fourier_convergence_%s_M_%d.mat', fnameStr, M));
-            elseif(ismac)
-                load(sprintf('/Users/Kiran/ownCloud/PhD/sim_results/independence/cim_fourier_convergence_%s_M_%d.mat', fnameStr, M));
-            else
-                load(sprintf('/home/kiran/ownCloud/PhD/sim_results/independence/cim_fourier_convergence_%s_M_%d.mat', fnameStr, M));
-            end
+%             if(ispc)
+%                 load(sprintf('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\cim_fourier_convergence_%s_M_%d.mat', fnameStr, M));
+%             elseif(ismac)
+%                 load(sprintf('/Users/Kiran/ownCloud/PhD/sim_results/independence/cim_fourier_convergence_%s_M_%d.mat', fnameStr, M));
+%             else
+%                 load(sprintf('/home/kiran/ownCloud/PhD/sim_results/independence/cim_fourier_convergence_%s_M_%d.mat', fnameStr, M));
+%             end
 %             if(ispc)
 %                 load(sprintf('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\cim_convergence_%s_M_%d.mat', fnameStr, M));
 %             elseif(ismac)
@@ -550,6 +550,13 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotConvergence) )
 %             else
 %                 load(sprintf('/home/kiran/ownCloud/PhD/sim_results/independence/cim_convergence_%s_M_%d.mat', fnameStr, M));
 %             end
+            if(ispc)
+                load(sprintf('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\cim_convergence_M_%d.mat', M));
+            elseif(ismac)
+                load(sprintf('/Users/Kiran/ownCloud/PhD/sim_results/independence/cim_convergence_M_%d.mat', M));
+            else
+                load(sprintf('/home/kiran/ownCloud/PhD/sim_results/independence/cim_convergence_M_%d.mat', M));
+            end
             
             MVecResults(depTestValIdx) = M;
             switch depTestValIdx
@@ -575,8 +582,24 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotConvergence) )
         end
     end
 
-    noiseVecPlot = noiseVecToAnalyze-1;
+    M_inlet = 200;
+    inletX = linspace(0,1,M_inlet);
+    inletT = linspace(0,2*pi,M_inlet);
+    inletData = zeros(8,M_inlet);
+    inletData(1,:) = inletX;
+    inletData(2,:) = 4*(inletX-.5).^2;
+    inletData(3,:) = 128*(inletX-1/3).^3-48*(inletX-1/3).^3-12*(inletX-1/3);
+    inletData(4,:) = sin(4*pi*inletX);
+    inletData(5,:) = sin(16*pi*inletX);
+    inletData(6,:) = inletX.^(1/4);
+    inletData(8,:) = (inletX > 0.5);
+    inset_bufX = .097; inset_bufY = 0.28;
+    inset_width = 0.06; inset_height = 0.06;
 
+    noiseVecPlot = noiseVecToAnalyze-1;
+    lineWidthVal = 3;
+
+    figure;
     h = subplot(2,4,1);
     % hh1 = plot(noiseToTest,linearDepToPlot(1,noiseToTest),'o-.', ...
     %      noiseToTest,linearDepToPlot(2,noiseToTest),'+-.', ...
@@ -586,92 +609,149 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotConvergence) )
     grid on;
 %     xlabel('Noise','FontSize',20);
     hLegend = legend('CIM','$$\widehat{CIM}$$');
-    set(hLegend,'Interpreter','latex')
-    title({'Linear', sprintf('min(M)=%d',MVecResults(1))},'FontSize',20);
-    hh1(1).LineWidth = 1.5; 
-    hh1(2).LineWidth = 1.5; 
-    % hh1(3).LineWidth = 1.5; 
+    set(hLegend,'Interpreter','latex','Location','SouthWest')
+    title(sprintf('min(M)=%d',MVecResults(1)),'FontSize',20);
+    hh1(1).LineWidth = lineWidthVal; 
+    hh1(2).LineWidth = lineWidthVal; 
     h.FontSize = 20;
+    inletIdx = 1;
+    loc_inset = [h.Position(1)+inset_bufX h.Position(2)+inset_bufY inset_width inset_height];
+    ax = axes('Position',loc_inset);
+    plot(inletX,inletData(inletIdx,:), 'k', 'LineWidth', 2);
+    ax.XLim = [min(inletX) max(inletX)];
+    ax.YLim = [min(inletData(inletIdx,:)) max(inletData(inletIdx,:))];
+    ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
 
     h = subplot(2,4,2);
     hh1 = plot(noiseVecPlot/10,quadraticDepToPlot(2,noiseVecToAnalyze),'+-.', ...
          noiseVecPlot/10,quadraticDepToPlot(3,noiseVecToAnalyze),'d-.');
     grid on;
 %     xlabel('Noise','FontSize',20);
-    title({'Quadratic', sprintf('min(M)=%d',MVecResults(2))},'FontSize',20);
-    hh1(1).LineWidth = 1.5; 
-    hh1(2).LineWidth = 1.5; 
+    title(sprintf('min(M)=%d',MVecResults(2)),'FontSize',20);
+    hh1(1).LineWidth = lineWidthVal; 
+    hh1(2).LineWidth = lineWidthVal; 
     % hh1(3).LineWidth = 1.5; 
     h.FontSize = 20;
+    inletIdx = 2;
+    loc_inset = [h.Position(1)+inset_bufX h.Position(2)+inset_bufY inset_width inset_height];
+    ax = axes('Position',loc_inset);
+    plot(inletX,inletData(inletIdx,:), 'k', 'LineWidth', 2);
+    ax.XLim = [min(inletX) max(inletX)];
+    ax.YLim = [min(inletData(inletIdx,:)) max(inletData(inletIdx,:))];
+    ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
 
     h = subplot(2,4,3);
     hh1 = plot(noiseVecPlot/10,cubicDepToPlot(2,noiseVecToAnalyze),'+-.', ...
          noiseVecPlot/10,cubicDepToPlot(3,noiseVecToAnalyze),'d-.');
     grid on;
 %     xlabel('Noise','FontSize',20);
-    title({'Cubic', sprintf('min(M)=%d',MVecResults(3))},'FontSize',20);
-    hh1(1).LineWidth = 1.5; 
-    hh1(2).LineWidth = 1.5; 
+    title(sprintf('min(M)=%d',MVecResults(3)),'FontSize',20);
+    hh1(1).LineWidth = lineWidthVal; 
+    hh1(2).LineWidth = lineWidthVal; 
     % hh1(3).LineWidth = 1.5; 
     h.FontSize = 20;
+    inletIdx = 3;
+    loc_inset = [h.Position(1)+inset_bufX h.Position(2)+inset_bufY inset_width inset_height];
+    ax = axes('Position',loc_inset);
+    plot(inletX,inletData(inletIdx,:), 'k', 'LineWidth', 2);
+    ax.XLim = [min(inletX) max(inletX)];
+    ax.YLim = [min(inletData(inletIdx,:)) max(inletData(inletIdx,:))];
+    ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
 
     h = subplot(2,4,4);
     hh1 = plot(noiseVecPlot/10,sinusoidalDepToPlot(2,noiseVecToAnalyze),'+-.', ...
          noiseVecPlot/10,sinusoidalDepToPlot(3,noiseVecToAnalyze),'d-.');
     grid on;
 %     xlabel('Noise','FontSize',20);
-    title({'LF-Sin', sprintf('min(M)=%d',MVecResults(4))},'FontSize',20);
-    hh1(1).LineWidth = 1.5; 
-    hh1(2).LineWidth = 1.5; 
+    title(sprintf('min(M)=%d',MVecResults(4)),'FontSize',20);
+    hh1(1).LineWidth = lineWidthVal; 
+    hh1(2).LineWidth = lineWidthVal; 
     % hh1(3).LineWidth = 1.5; 
     h.FontSize = 20;
+    inletIdx = 4;
+    loc_inset = [h.Position(1)+inset_bufX h.Position(2)+inset_bufY inset_width inset_height];
+    ax = axes('Position',loc_inset);
+    plot(inletX,inletData(inletIdx,:), 'k', 'LineWidth', 2);
+    ax.XLim = [min(inletX) max(inletX)];
+    ax.YLim = [min(inletData(inletIdx,:)) max(inletData(inletIdx,:))];
+    ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
 
     h = subplot(2,4,5);
     hh1 = plot(noiseVecPlot/10,hiFreqSinDepToPlot(2,noiseVecToAnalyze),'+-.', ...
          noiseVecPlot/10,hiFreqSinDepToPlot(3,noiseVecToAnalyze),'d-.');
     grid on;
 %     xlabel('Noise','FontSize',20);
-    title({'HF-Sin', sprintf('min(M)=%d',MVecResults(5))},'FontSize',20);
-    hh1(1).LineWidth = 1.5; 
-    hh1(2).LineWidth = 1.5; 
+    title(sprintf('min(M)=%d',MVecResults(5)),'FontSize',20);
+    hh1(1).LineWidth = lineWidthVal; 
+    hh1(2).LineWidth = lineWidthVal; 
     % hh1(3).LineWidth = 1.5; 
     h.FontSize = 20;
+    inletIdx = 5;
+    loc_inset = [h.Position(1)+inset_bufX h.Position(2)+inset_bufY inset_width inset_height];
+    ax = axes('Position',loc_inset);
+    plot(inletX,inletData(inletIdx,:), 'k', 'LineWidth', 2);
+    ax.XLim = [min(inletX) max(inletX)];
+    ax.YLim = [min(inletData(inletIdx,:)) max(inletData(inletIdx,:))];
+    ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
 
     h = subplot(2,4,6);
     hh1 = plot(noiseVecPlot/10,fourthRootDepToPlot(2,noiseVecToAnalyze),'+-.', ...
          noiseVecPlot/10,fourthRootDepToPlot(3,noiseVecToAnalyze),'d-.');
     grid on;
 %     xlabel('Noise','FontSize',20);
-    title({'Fourth-Root', sprintf('min(M)=%d',MVecResults(6))},'FontSize',20);
-    hh1(1).LineWidth = 1.5; 
-    hh1(2).LineWidth = 1.5; 
+    title(sprintf('min(M)=%d',MVecResults(6)),'FontSize',20);
+    hh1(1).LineWidth = lineWidthVal; 
+    hh1(2).LineWidth = lineWidthVal; 
     % hh1(3).LineWidth = 1.5; 
     h.FontSize = 20;
+    inletIdx = 6;
+    loc_inset = [h.Position(1)+inset_bufX h.Position(2)+inset_bufY inset_width inset_height];
+    ax = axes('Position',loc_inset);
+    plot(inletX,inletData(inletIdx,:), 'k', 'LineWidth', 2);
+    ax.XLim = [min(inletX) max(inletX)];
+    ax.YLim = [min(inletData(inletIdx,:)) max(inletData(inletIdx,:))];
+    ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
 
     h = subplot(2,4,7);
     hh1 = plot(noiseVecPlot/10,circleDepToPlot(2,noiseVecToAnalyze),'+-.', ...
          noiseVecPlot/10,circleDepToPlot(3,noiseVecToAnalyze),'d-.');
     grid on;
 %     xlabel('Noise','FontSize',20);
-    title({'Circular', sprintf('min(M)=%d',MVecResults(7))},'FontSize',20);
-    hh1(1).LineWidth = 1.5; 
-    hh1(2).LineWidth = 1.5; 
+    title(sprintf('min(M)=%d',MVecResults(7)),'FontSize',20);
+    hh1(1).LineWidth = lineWidthVal; 
+    hh1(2).LineWidth = lineWidthVal; 
     % hh1(3).LineWidth = 1.5; 
     h.FontSize = 20;
+    loc_inset = [h.Position(1)+inset_bufX h.Position(2)+inset_bufY inset_width inset_height];
+    ax = axes('Position',loc_inset);
+    plot(cos(inletT),sin(inletT), 'k', 'LineWidth', 2);
+    ax.XLim = [min(cos(inletT)) max(cos(inletT))];
+    ax.YLim = [min(sin(inletT)) max(sin(inletT))];
+    ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
 
     h = subplot(2,4,8);
     hh1 = plot(noiseVecPlot/10,stepDepToPlot(2,noiseVecToAnalyze),'+-.', ...
          noiseVecPlot/10,stepDepToPlot(3,noiseVecToAnalyze),'d-.');
     grid on;
 %     xlabel('Noise','FontSize',20);
-    title({'Step-Function', sprintf('min(M)=%d',MVecResults(8))},'FontSize',20);
-    hh1(1).LineWidth = 1.5; 
-    hh1(2).LineWidth = 1.5; 
+    title(sprintf('min(M)=%d',MVecResults(8)),'FontSize',20);
+    hh1(1).LineWidth = lineWidthVal; 
+    hh1(2).LineWidth = lineWidthVal; 
     % hh1(3).LineWidth = 1.5; 
     h.FontSize = 20;
+    inletIdx = 8;
+    loc_inset = [h.Position(1)+inset_bufX h.Position(2)+inset_bufY inset_width inset_height];
+    ax = axes('Position',loc_inset);
+    plot(inletX,inletData(inletIdx,:), 'k', 'LineWidth', 2);
+    ax.XLim = [min(inletX) max(inletX)];
+    ax.YLim = [min(inletData(inletIdx,:)) max(inletData(inletIdx,:))];
+    ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
     
-    [~,h] = suplabel('Noise','x');
-    set(h,'FontSize',20);
+    [~,hL] = suplabel('Noise','x');
+    set(hL,'FontSize',20);
+    [~,hL] = suplabel('','y');
+    hL.FontSize = 20;
+    hL.Interpreter = 'Latex';
 
     % subplot(3,3,9);
     % hh1 = plot(noiseVec,indep(1,:),'o-.', ...
