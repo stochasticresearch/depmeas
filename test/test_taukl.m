@@ -1249,4 +1249,5 @@ for ii=1:length(numLevels)
         tauVal, tauKLval),'FontSize',20);
     xlabel('x','FontSize',20);
     ylabel('y','FontSize',20);
+    yticks([1:level])
 end
