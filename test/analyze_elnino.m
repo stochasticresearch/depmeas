@@ -36,7 +36,7 @@ buoys = who('-file',fname);
 numBuoys = length(buoys);
 load(fname);        % load the data
 
-minSamps = 100;
+minSamps = 120;
 
 % matlab automatically grows the cell array size as needed, although this
 % is slower
@@ -125,7 +125,7 @@ else
     rootDir = '/home/kiran/ownCloud/PhD/sim_results/climate';
 end
 fname = fullfile(rootDir,'normalized_files', 'elnino_pairwise.mat');
-minSamps = 100;
+minSamps = 120;
 load(fname);
 
 alpha = 0.05;
@@ -330,11 +330,11 @@ for ii=1:length(pairwiseTimeAlignedData)
             [~,pvalX] = augdf(dataX,adfTestType,lags);
             [~,pvalY] = augdf(dataY,adfTestType,lags);
 
-            if(pvalX<alpha && pvalY<alpha)
+            if(pvalX<=alpha && pvalY<=alpha)
                 [metric, rectangleCellOut] = cim(dataX,dataY);
                 tauklval = taukl(dataX,dataY);
                 pval = cimpval(metric, length(dataX));
-                if(pval<alpha)
+                if(pval<=alpha)
                     res.R(jj) = metric;
                     res.RectanglesCell{jj} = rectangleCellOut;
                     res.tauklVec(jj) = tauklval;
