@@ -1223,3 +1223,31 @@ p4(3).LineWidth = 3; p4(3).Marker = '*'; p4(3).MarkerSize = 16;
 p4(4).LineWidth = 3; p4(4).Marker = 'x'; p4(4).MarkerSize = 16;
 
 legend({'Continuous', 'Hybrid-1', 'Hybrid-2', 'Discrete'});
+
+%% Show the usefulness of tau_{KL} through the step-function
+clear;
+clc;
+
+numLevels = [2 4 8];
+
+M = 500;
+x = rand(M,1);
+
+% yVec = zeros(M,length(numLevels));
+
+for ii=1:length(numLevels)
+    level = numLevels(ii);
+%     yVec(:,ii) = discretize(x,level);
+    y = discretize(x,level);
+    figure;
+    scatter(x,y);
+    grid on;
+    
+    tauVal = corr(x,y,'type','kendall');
+    tauKLval = taukl(x,y);
+    title(sprintf('\\tau=%0.02f, \\tau_{KL}=%0.02f', ...
+        tauVal, tauKLval),'FontSize',20);
+    xlabel('x','FontSize',20);
+    ylabel('y','FontSize',20);
+    yticks([1:level])
+end

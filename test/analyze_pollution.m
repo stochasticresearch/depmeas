@@ -135,7 +135,7 @@ else
     rootDir = '/home/kiran/ownCloud/PhD/sim_results/climate';
 end
 fname = fullfile(rootDir,'normalized_files', 'pollution_pairwise.mat');
-minSamps = 100;
+minSamps = 120;  % ~4 months of data
 load(fname);
 
 alpha = 0.05;
@@ -257,11 +257,11 @@ for ii=1:length(pairwiseTimeAlignedData)
         % check stationarity of the data
         [~,pvalX] = augdf(dataX,adfTestType,lags);
         [~,pvalY] = augdf(dataY,adfTestType,lags);
-        if(pvalX<alpha && pvalY<alpha)
+        if(pvalX<=alpha && pvalY<=alpha)
             [metric, rectangleCellOut] = cim(dataX,dataY);
-            tauklval = taukl_cc(dataX,dataY);
+            tauklval = taukl(dataX,dataY);
             pval = cimpval(metric, length(dataX));
-            if(pval<alpha)
+            if(pval<=alpha)
                 res.R(jj) = metric;
                 res.RectanglesCell{jj} = rectangleCellOut;
                 res.tauklVec(jj) = tauklval;

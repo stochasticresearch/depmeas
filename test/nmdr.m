@@ -186,6 +186,8 @@ end
 fname = 'nmdr_data.mat';
 load(fullfile(dataFolder,fname));
 
+rng(12345);
+
 % plot settings
 titleFontSize = 20;
 fontSize = 16;
@@ -221,7 +223,7 @@ figure;
 scatter(pobs(xq),pobs(vq)); grid on; 
 xlabel('u = F(mol/L)', 'FontSize', fontSize); 
 ylabel('v = F(Inhibition Rate of RLU [%])', 'FontSize', fontSize); 
-title({'Actual OMIM', 'Pseudo-Observations'}, 'FontSize', titleFontSize);
+% title({'Actual OMIM', 'Pseudo-Observations'}, 'FontSize', titleFontSize);
 
 % subplot(1,3,2);
 figure;
@@ -232,11 +234,11 @@ hold on;
 cutPt = 0.2;
 plot([cutPt cutPt], [0 1], '--','LineWidth',3,'Color','Red');
 jbfill([0 cutPt], [1 1], [0 0],'r','k',1,0.2);
-title({'Gaussian Model', 'Pseudo-Observations'}, 'FontSize', titleFontSize);
+% title({'Gaussian Model', 'Pseudo-Observations'}, 'FontSize', titleFontSize);
 
 % subplot(1,3,3);
 figure;
 scatter(UU(:,1),UU(:,2)); grid on; 
 xlabel('u = F(mol/L)', 'FontSize', fontSize); 
 ylabel('v = F(Inhibition Rate of RLU [%])', 'FontSize', fontSize); 
-title({'Empirical Copula Model', 'Pseudo-Observations'}, 'FontSize', titleFontSize);
+% title({'Empirical Copula Model', 'Pseudo-Observations'}, 'FontSize', titleFontSize);
