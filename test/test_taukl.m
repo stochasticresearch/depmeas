@@ -1251,3 +1251,21 @@ for ii=1:length(numLevels)
     ylabel('y','FontSize',20);
     yticks([1:level])
 end
+
+%% generate figure 1
+
+clear;
+clc;
+
+x = 1:10;
+y = [ones(1,5) 2*ones(1,5)];
+scatter(x,y,'filled');
+axis([0 11 0 3])
+yticks([0 1 2 3]);
+
+for ii=1:length(x)
+    xx = x(ii);
+    yy = y(ii);
+    txtStr = sprintf('p_{%d}',ii);
+    text(xx,yy,txtStr,'Color','red','FontSize',18,'VerticalAlignment','top')
+end
