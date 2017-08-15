@@ -369,7 +369,7 @@ load(fname);
 
 depThreshVec = [0.01 0.05 0.1 0.15 0.2 0.25];
 finalMonotonicityResults = cell(1,length(depThreshVec));
-
+cimValThresh = 0.4;
 
 for zz=1:length(depThreshVec)
     depThresh = depThreshVec(zz);
@@ -378,9 +378,9 @@ for zz=1:length(depThreshVec)
     for ii=1:length(pairwiseAnalysis)
         res = pairwiseAnalysis{ii};
         for jj=1:45
-            if(res.validVec(jj))
+            cimVal = res.R(jj);
+            if(res.validVec(jj) && cimVal>=cimValThresh)
                 % count the monotonicity after ensuring we didn't overfit
-                cimVal = res.R(jj);
                 tauklVal = res.tauklVec(jj);
                 percentageDiff = abs(cimVal-tauklVal)/tauklVal;
                 if(percentageDiff<=depThresh)

@@ -128,6 +128,7 @@ load(fname);
 
 numCountries = size(R,1);
 depThreshVec = [0.01 0.05 0.1 0.15 0.2 0.25];
+cimValThresh = 0.4;
 finalMonotonicityResults = cell(1,length(depThreshVec));
 
 for zz=1:length(depThreshVec)
@@ -136,12 +137,12 @@ for zz=1:length(depThreshVec)
     monotonicityResults = containers.Map('KeyType', 'int32', 'ValueType', 'int32');
     for ii=1:numCountries
         for jj=ii+1:numCountries
-            if(validMat(ii,jj))
-                % means both stocks are stationary, and this dependnecy is
+            cimVal = R(ii,jj);
+            if(validMat(ii,jj) && cimVal>=cimValThresh)
+                % means both data are stationary, and this dependnecy is
                 % significant
                 
                 % ensure we didn't overfit and compute the monotonicity
-                cimVal = R(ii,jj);
                 tauklVal = tauklMat(ii,jj);
                 percentageDiff = abs(cimVal-tauklVal)/tauklVal;
                 if(percentageDiff<=depThresh)

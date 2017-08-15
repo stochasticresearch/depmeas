@@ -77,7 +77,7 @@ subplot(1,3,2);
 p2 = pie(stocksMonotonicityResults, explode);
 p2(2).FontSize = fontSize;
 p2(4).FontSize = fontSize;
-p2(6).String = '';
+%p2(6).String = '';
 fprintf('Num Stocks Dependencies Analyzed = %d\n', sum(stocksMonotonicityResults));
 
 %>>>>>>>>>>>>>>>>>>>>>>>> PROCESS CLIMATE DATA <<<<<<<<<<<<<<<<<<<<<<<<<<<<
