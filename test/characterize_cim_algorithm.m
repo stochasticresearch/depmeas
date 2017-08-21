@@ -422,6 +422,9 @@ if(~exist('masterCfgRun'))  % means we are running the cell independently
     dispstat('','init'); % One time only initialization
 end
 if(~exist('masterCfgRun') || (masterCfgRun==1 && plotConvergence) )
+    
+    plotValues = 0;  % if 1, we plot the values, if 0, we plot the bias
+    
     MVecDataAvailable = [100:100:1000 2000 5000];  % add 5000 and 10000 to this as they come online
     tol = 0.015;
     noiseMinToAnalyze = 0; noiseMaxToAnalyze = 20;
@@ -604,15 +607,22 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotConvergence) )
     % hh1 = plot(noiseToTest,linearDepToPlot(1,noiseToTest),'o-.', ...
     %      noiseToTest,linearDepToPlot(2,noiseToTest),'+-.', ...
     %      noiseToTest,linearDepToPlot(3,noiseToTest),'d-.');
-    hh1 = plot(noiseVecPlot/10,linearDepToPlot(2,noiseVecToAnalyze),'+-.', ...
-         noiseVecPlot/10,linearDepToPlot(3,noiseVecToAnalyze),'d-.');
+    if(plotValues)
+        hh1 = plot(noiseVecPlot/10,linearDepToPlot(2,noiseVecToAnalyze),'+-.', ...
+                   noiseVecPlot/10,linearDepToPlot(3,noiseVecToAnalyze),'d-.');
+        hLegend = legend('CIM','$$\widehat{CIM}$$');
+        set(hLegend,'Interpreter','latex','Location','SouthWest')
+    else
+        hh1 = plot(noiseVecPlot/10,abs(linearDepToPlot(2,noiseVecToAnalyze)-...
+                                       linearDepToPlot(3,noiseVecToAnalyze)),'+-.');
+    end
     grid on;
 %     xlabel('Noise','FontSize',20);
-    hLegend = legend('CIM','$$\widehat{CIM}$$');
-    set(hLegend,'Interpreter','latex','Location','SouthWest')
     title(sprintf('min(M)=%d',MVecResults(1)),'FontSize',20);
     hh1(1).LineWidth = lineWidthVal; 
-    hh1(2).LineWidth = lineWidthVal; 
+    if(plotValues)
+        hh1(2).LineWidth = lineWidthVal; 
+    end
     h.FontSize = 20;
     inletIdx = 1;
     loc_inset = [h.Position(1)+inset_bufX h.Position(2)+inset_bufY inset_width inset_height];
@@ -623,13 +633,20 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotConvergence) )
     ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
 
     h = subplot(2,4,2);
-    hh1 = plot(noiseVecPlot/10,quadraticDepToPlot(2,noiseVecToAnalyze),'+-.', ...
-         noiseVecPlot/10,quadraticDepToPlot(3,noiseVecToAnalyze),'d-.');
+    if(plotValues)
+        hh1 = plot(noiseVecPlot/10,quadraticDepToPlot(2,noiseVecToAnalyze),'+-.', ...
+                   noiseVecPlot/10,quadraticDepToPlot(3,noiseVecToAnalyze),'d-.');
+    else
+        hh1 = plot(noiseVecPlot/10,abs(quadraticDepToPlot(2,noiseVecToAnalyze)-...
+                                       quadraticDepToPlot(3,noiseVecToAnalyze)),'+-.');
+    end
     grid on;
 %     xlabel('Noise','FontSize',20);
     title(sprintf('min(M)=%d',MVecResults(2)),'FontSize',20);
     hh1(1).LineWidth = lineWidthVal; 
-    hh1(2).LineWidth = lineWidthVal; 
+    if(plotValues)
+        hh1(2).LineWidth = lineWidthVal; 
+    end
     % hh1(3).LineWidth = 1.5; 
     h.FontSize = 20;
     inletIdx = 2;
@@ -641,13 +658,20 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotConvergence) )
     ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
 
     h = subplot(2,4,3);
-    hh1 = plot(noiseVecPlot/10,cubicDepToPlot(2,noiseVecToAnalyze),'+-.', ...
-         noiseVecPlot/10,cubicDepToPlot(3,noiseVecToAnalyze),'d-.');
+    if(plotValues)
+        hh1 = plot(noiseVecPlot/10,cubicDepToPlot(2,noiseVecToAnalyze),'+-.', ...
+                   noiseVecPlot/10,cubicDepToPlot(3,noiseVecToAnalyze),'d-.');
+    else
+        hh1 = plot(noiseVecPlot/10,abs(cubicDepToPlot(2,noiseVecToAnalyze)-...
+                                       cubicDepToPlot(3,noiseVecToAnalyze)),'+-.');
+    end
     grid on;
 %     xlabel('Noise','FontSize',20);
     title(sprintf('min(M)=%d',MVecResults(3)),'FontSize',20);
     hh1(1).LineWidth = lineWidthVal; 
-    hh1(2).LineWidth = lineWidthVal; 
+    if(plotValues)
+        hh1(2).LineWidth = lineWidthVal; 
+    end
     % hh1(3).LineWidth = 1.5; 
     h.FontSize = 20;
     inletIdx = 3;
@@ -659,13 +683,20 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotConvergence) )
     ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
 
     h = subplot(2,4,4);
-    hh1 = plot(noiseVecPlot/10,sinusoidalDepToPlot(2,noiseVecToAnalyze),'+-.', ...
-         noiseVecPlot/10,sinusoidalDepToPlot(3,noiseVecToAnalyze),'d-.');
+    if(plotValues)
+        hh1 = plot(noiseVecPlot/10,sinusoidalDepToPlot(2,noiseVecToAnalyze),'+-.', ...
+                   noiseVecPlot/10,sinusoidalDepToPlot(3,noiseVecToAnalyze),'d-.');
+    else
+        hh1 = plot(noiseVecPlot/10,abs(sinusoidalDepToPlot(2,noiseVecToAnalyze)-...
+                                       sinusoidalDepToPlot(3,noiseVecToAnalyze)),'+-.');
+    end
     grid on;
 %     xlabel('Noise','FontSize',20);
     title(sprintf('min(M)=%d',MVecResults(4)),'FontSize',20);
     hh1(1).LineWidth = lineWidthVal; 
-    hh1(2).LineWidth = lineWidthVal; 
+    if(plotValues)
+        hh1(2).LineWidth = lineWidthVal; 
+    end
     % hh1(3).LineWidth = 1.5; 
     h.FontSize = 20;
     inletIdx = 4;
@@ -677,13 +708,20 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotConvergence) )
     ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
 
     h = subplot(2,4,5);
-    hh1 = plot(noiseVecPlot/10,hiFreqSinDepToPlot(2,noiseVecToAnalyze),'+-.', ...
-         noiseVecPlot/10,hiFreqSinDepToPlot(3,noiseVecToAnalyze),'d-.');
+    if(plotValues)
+        hh1 = plot(noiseVecPlot/10,hiFreqSinDepToPlot(2,noiseVecToAnalyze),'+-.', ...
+                   noiseVecPlot/10,hiFreqSinDepToPlot(3,noiseVecToAnalyze),'d-.');
+    else
+        hh1 = plot(noiseVecPlot/10,abs(hiFreqSinDepToPlot(2,noiseVecToAnalyze)-...
+                                       hiFreqSinDepToPlot(3,noiseVecToAnalyze)),'+-.');
+    end
     grid on;
 %     xlabel('Noise','FontSize',20);
     title(sprintf('min(M)=%d',MVecResults(5)),'FontSize',20);
     hh1(1).LineWidth = lineWidthVal; 
-    hh1(2).LineWidth = lineWidthVal; 
+    if(plotValues)
+        hh1(2).LineWidth = lineWidthVal; 
+    end
     % hh1(3).LineWidth = 1.5; 
     h.FontSize = 20;
     inletIdx = 5;
@@ -695,13 +733,20 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotConvergence) )
     ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
 
     h = subplot(2,4,6);
-    hh1 = plot(noiseVecPlot/10,fourthRootDepToPlot(2,noiseVecToAnalyze),'+-.', ...
-         noiseVecPlot/10,fourthRootDepToPlot(3,noiseVecToAnalyze),'d-.');
+    if(plotValues)
+        hh1 = plot(noiseVecPlot/10,fourthRootDepToPlot(2,noiseVecToAnalyze),'+-.', ...
+                   noiseVecPlot/10,fourthRootDepToPlot(3,noiseVecToAnalyze),'d-.');
+    else
+        hh1 = plot(noiseVecPlot/10,abs(fourthRootDepToPlot(2,noiseVecToAnalyze)-...
+                                       fourthRootDepToPlot(3,noiseVecToAnalyze)),'+-.');
+    end
     grid on;
 %     xlabel('Noise','FontSize',20);
     title(sprintf('min(M)=%d',MVecResults(6)),'FontSize',20);
     hh1(1).LineWidth = lineWidthVal; 
-    hh1(2).LineWidth = lineWidthVal; 
+    if(plotValues)
+        hh1(2).LineWidth = lineWidthVal; 
+    end
     % hh1(3).LineWidth = 1.5; 
     h.FontSize = 20;
     inletIdx = 6;
@@ -713,13 +758,20 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotConvergence) )
     ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
 
     h = subplot(2,4,7);
-    hh1 = plot(noiseVecPlot/10,circleDepToPlot(2,noiseVecToAnalyze),'+-.', ...
-         noiseVecPlot/10,circleDepToPlot(3,noiseVecToAnalyze),'d-.');
+    if(plotValues)
+        hh1 = plot(noiseVecPlot/10,circleDepToPlot(2,noiseVecToAnalyze),'+-.', ...
+                   noiseVecPlot/10,circleDepToPlot(3,noiseVecToAnalyze),'d-.');
+    else
+        hh1 = plot(noiseVecPlot/10,abs(circleDepToPlot(2,noiseVecToAnalyze)-...
+                                       circleDepToPlot(3,noiseVecToAnalyze)),'+-.');
+    end
     grid on;
 %     xlabel('Noise','FontSize',20);
     title(sprintf('min(M)=%d',MVecResults(7)),'FontSize',20);
     hh1(1).LineWidth = lineWidthVal; 
-    hh1(2).LineWidth = lineWidthVal; 
+    if(plotValues)
+        hh1(2).LineWidth = lineWidthVal; 
+    end
     % hh1(3).LineWidth = 1.5; 
     h.FontSize = 20;
     loc_inset = [h.Position(1)+inset_bufX h.Position(2)+inset_bufY inset_width inset_height];
@@ -730,13 +782,20 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotConvergence) )
     ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
 
     h = subplot(2,4,8);
-    hh1 = plot(noiseVecPlot/10,stepDepToPlot(2,noiseVecToAnalyze),'+-.', ...
-         noiseVecPlot/10,stepDepToPlot(3,noiseVecToAnalyze),'d-.');
+    if(plotValues)
+        hh1 = plot(noiseVecPlot/10,stepDepToPlot(2,noiseVecToAnalyze),'+-.', ...
+                   noiseVecPlot/10,stepDepToPlot(3,noiseVecToAnalyze),'d-.');
+    else
+        hh1 = plot(noiseVecPlot/10,abs(stepDepToPlot(2,noiseVecToAnalyze)-...
+                                       stepDepToPlot(3,noiseVecToAnalyze)),'+-.');
+    end
     grid on;
 %     xlabel('Noise','FontSize',20);
     title(sprintf('min(M)=%d',MVecResults(8)),'FontSize',20);
     hh1(1).LineWidth = lineWidthVal; 
-    hh1(2).LineWidth = lineWidthVal; 
+    if(plotValues)
+        hh1(2).LineWidth = lineWidthVal; 
+    end
     % hh1(3).LineWidth = 1.5; 
     h.FontSize = 20;
     inletIdx = 8;
@@ -749,9 +808,14 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotConvergence) )
     
     [~,hL] = suplabel('Noise','x');
     set(hL,'FontSize',20);
-    [~,hL] = suplabel('','y');
-    hL.FontSize = 20;
-    hL.Interpreter = 'Latex';
+    if(plotValues)
+        [~,hL] = suplabel('','y');
+        hL.FontSize = 20;
+        hL.Interpreter = 'Latex';
+    else
+        [~,hL] = suplabel('Bias','y');
+        hL.FontSize = 20;
+    end
 
     % subplot(3,3,9);
     % hh1 = plot(noiseVec,indep(1,:),'o-.', ...
