@@ -565,7 +565,8 @@ boundedline(M_vec,yBiasCountermonotonic(3,:),(yVarCountermonotonic(3,:).^(0.5))/
 xlabel('M', 'FontSize', 20); ylabel('Bias', 'FontSize', 20);  
 title('Countermonotonic Dependency', 'FontSize', 20); grid on;
 
-h_legend = legend('\tau_b', '\tau_{N}', '\tau_{KL}');
+h_legend = legend({'$\hat{\tau}_b$', '$\hat{\tau}_{N}$', '$\hat{\tau}_{KL}$'},...
+                  'Interpreter','Latex');
 set(h_legend,'FontSize',20);
 
 %% A continuiation of the above section (plot for M=500) (old Fig. 2)
@@ -1243,10 +1244,11 @@ for ii=1:length(numLevels)
     scatter(x,y);
     grid on;
     
+    tauBVal = ktaub([x y], 0.05, 0);
     tauVal = corr(x,y,'type','kendall');
     tauKLval = taukl(x,y);
-    title(sprintf('\\tau=%0.02f, \\tau_{KL}=%0.02f', ...
-        tauVal, tauKLval),'FontSize',20);
+    title(sprintf('$\\hat{\\tau}_b=%0.02f, \\hat{\\tau}_N=%0.02f, \\hat{\\tau}_{KL}=%0.02f$', ...
+        tauBVal, tauVal, tauKLval),'FontSize',20,'Interpreter','Latex');
     xlabel('x','FontSize',20);
     ylabel('y','FontSize',20);
     yticks([1:level])
