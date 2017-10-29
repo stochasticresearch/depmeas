@@ -12,7 +12,7 @@ runPower_M500              = 0;
 runPower_All               = 0;
 plotPower_M500_depMeasures = 0;
 plotPower_M500_miMeasures  = 0;
-plotPower_ss_depMeasures   = 1;
+plotPower_ss_depMeasures   = 0;
 plotPower_ss_miMeasures    = 0;
 runPowerSensitivity        = 0;
 plotPowerSensitivity       = 0;
@@ -20,6 +20,7 @@ runAlgoSensitivity         = 0;
 plotAlgoSensitivity        = 0;
 runConvergence             = 0;
 plotConvergence            = 0;
+runPower_test_M500         = 1;
 
 dispstat('','init'); % One time only initialization
 dispstat(sprintf('Running Notebook from Master Configuration...\n'),'keepthis','timestamp');
@@ -216,7 +217,7 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotPower_M500_miMeasures) )
     else
         load('/home/kiran/ownCloud/PhD/sim_results/independence/power_all.mat');
     end
-    M = 500;
+    M = 100;
     MIdx = find(MVec==M);
 
     labels = {'CIM', 'KNN-1', 'KNN-6', 'KNN-20', 'AP', 'vME'};
@@ -827,4 +828,45 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotConvergence) )
     % hh1(1).LineWidth = 1.5; 
     % hh1(2).LineWidth = 1.5; 
     % hh1(3).LineWidth = 1.5; 
+end
+
+%% Test CIM heuristic vs CIM 
+if(~exist('masterCfgRun'))  % means we are running the cell independently
+    clear;
+    clc;
+    close all;
+    dbstop if error;
+    dispstat('','init'); % One time only initialization
+end
+
+if(~exist('masterCfgRun') || (masterCfgRun==1 && runPower_test_M500) )
+    dispstat(sprintf('Running Power for M=500'),'keepthis','timestamp');
+    
+    rng(1230);
+    
+    M = 500;
+    minScanIncr = 0.015625;
+    nsim_null = 300;
+    nsim_alt = 300;
+    num_noise_test_min = 0;
+    num_noise_test_max = 20;
+    
+    nameIdxCorrelationCell = {'CIM', 'CIMv2'};
+    functionHandlesCell = {@cim;
+                           @cim_v2_cc_mex;};
+    functionArgsCell    = {{minScanIncr};
+                           {minScanIncr};
+                          };
+    powerCurve = compute_power_curves(M,functionHandlesCell, functionArgsCell,...
+                                      nsim_null,nsim_alt,...
+                                      num_noise_test_min,num_noise_test_max);
+
+    % save the data
+    if(ispc)
+        save(sprintf('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\cim_comparison_power_M_%d.mat',M));
+    elseif(ismac)
+        save(sprintf('/Users/Kiran/ownCloud/PhD/sim_results/independence/cim_comparison_power_M_%d.mat',M));
+    else
+        save(sprintf('/home/kiran/ownCloud/PhD/sim_results/independence/cim_comparison_power_M_%d.mat',M));
+    end
 end

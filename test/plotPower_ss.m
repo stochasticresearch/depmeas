@@ -7,7 +7,7 @@ if(style==1)
     captionText = {'(a)', '(b)', '(c)', '(d)', '(e)', '(f)', '(g)', '(h)'};
     % inlet plot configuration
     M_inlet = 200;
-    inset_bufX = 0.21; inset_bufY = 0.002;
+    inset_bufX = 0.0; inset_bufY = 0.26;
     inset_width = 0.1; inset_height = 0.08;
     
     % generate the inlet data

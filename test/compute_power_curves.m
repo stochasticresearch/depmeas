@@ -1,16 +1,23 @@
 function [powerCurve] = compute_power_curves(M,functionHandlesCell, functionArgsCell, ...
-                        nsim_null,nsim_alt)
+                        nsim_null,nsim_alt,num_noise_test_min,num_noise_test_max)
 
 % standard test configurations
 if(nargin<4)
     nsim_null = 500;
     nsim_alt  = 500;
+    num_noise_test_min = 0;
+    num_noise_test_max = 30;
 elseif(nargin<5)
     nsim_alt = 500;
+    num_noise_test_min = 0;
+    num_noise_test_max = 30;
+elseif(nargin<6)
+    num_noise_test_min = 0;
+    num_noise_test_max = 30;
+elseif(nargin<7)
+    num_noise_test_max = 30;
 end
 
-num_noise_test_min = 0;
-num_noise_test_max = 30;
 noiseVec = num_noise_test_min:num_noise_test_max;
 num_noise = 30;
 noise = 3;
