@@ -195,7 +195,7 @@ rectanglesIdx = 1;
 
 metricRectanglePrev = -999;
 numPtsPrev = 1;  % should get overwritten
-alpha = 0.1;
+alpha = 0.3;
 while ax1max<=1
     % find all the points which are contained within this cover rectangle
     matchPts = getPointsWithinBounds(ax1pts, ax2pts, ax1min, ax1max, ax2min, ax2max);
@@ -203,7 +203,7 @@ while ax1max<=1
     numPts = size(matchPts,1);
     if(numPts>=2)   % make sure we have enough points to compute the metric
         % compute the concordance
-        metricRectangle = abs(taukl_cc( matchPts(:,1),matchPts(:,2)));
+        metricRectangle = min(abs(taukl_cc( matchPts(:,1),matchPts(:,2))),1);  % investigate why we need max
         stdTau = sqrt(4*(1-metricRectangle^2))/sqrt(numPts) * norminv(1-alpha/2);
         if(newRectangle)
             newRectangle = 0;
