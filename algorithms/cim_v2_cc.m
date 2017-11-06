@@ -1,4 +1,4 @@
-function [metric,regionRectangle] = cim_v2_cc(x, y, minScanIncr)
+function [metric,regionRectangle] = cim_v2_cc(x, y, minScanIncr, alpha)
 %CIM - Copula Index for Detecting Dependence and Monotonicity between
 %Stochastic Signals.  See associated paper... to be published and preprint
 %located here: https://arxiv.org/abs/1703.06686
@@ -87,7 +87,7 @@ for axisCfg=axisCfgs
                 end
 
                 [metricVecTmp, numPtsVecTmp, rectangles, numRectanglesCreated] = ...
-                    scanForDep(ax1pts,ax2pts,ax2min,ax2max,scanincr,MAX_NUM_RECT);
+                    scanForDep(alpha,ax1pts,ax2pts,ax2min,ax2max,scanincr,MAX_NUM_RECT);
                 
                 metricCell(zz,:) = metricVecTmp;
                 numPtsCell(zz,:) = numPtsVecTmp;
@@ -179,7 +179,7 @@ metric = sum( metrics(2,:)/sum(metrics(2,:)).*metrics(1,:) );
 
 end
 
-function [metricVec, numPtsVec, rectangles, rectanglesIdx] = scanForDep(ax1pts, ax2pts, ax2min, ax2max, scanincr, maxNumRect)
+function [metricVec, numPtsVec, rectangles, rectanglesIdx] = scanForDep(alpha, ax1pts, ax2pts, ax2min, ax2max, scanincr, maxNumRect)
 %scanForDep - scans for dependencies across the first axis (if you would
 %like to scan across the second axis, simply swap the input arguments to 
 %this function).
@@ -195,7 +195,6 @@ rectanglesIdx = 1;
 
 metricRectanglePrev = -999;
 numPtsPrev = 1;  % should get overwritten
-alpha = 0.3;
 while ax1max<=1
     % find all the points which are contained within this cover rectangle
     matchPts = getPointsWithinBounds(ax1pts, ax2pts, ax1min, ax1max, ax2min, ax2max);

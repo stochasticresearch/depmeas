@@ -15,8 +15,10 @@ plotPower_M500_miMeasures  = 0;
 plotPower_ss_depMeasures   = 0;
 plotPower_ss_miMeasures    = 0;
 runPowerSensitivity        = 0;
+runPowerAlphaSensitivity   = 0;
 plotPowerSensitivity       = 0;
 runAlgoSensitivity         = 0;
+runAlgoAlphaSensitivity    = 0;
 plotAlgoSensitivity        = 0;
 runConvergence             = 0;
 plotConvergence            = 0;
@@ -294,7 +296,7 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotPower_ss_depMeasures) )
     plotPower_ss(sampleSizeAnalysisVec, labels, noiseVecToPlot, plotStyle)
 end
 
-%% test the power sensitivity of the CIM algorithm
+%% test the power sensitivity of the CIM algorithm to the min-scan-incr
 if(~exist('masterCfgRun'))  % means we are running the cell independently
     clear;
     clc;
@@ -320,6 +322,35 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && runPowerSensitivity) )
         end
     end
 end
+
+%% test the power sensitivity of the CIM algorithm to alpha
+if(~exist('masterCfgRun'))  % means we are running the cell independently
+    clear;
+    clc;
+    close all;
+    dbstop if error;
+    dispstat('','init'); % One time only initialization
+end
+if(~exist('masterCfgRun') || (masterCfgRun==1 && runPowerAlphaSensitivity) )
+    dispstat(sprintf('Testing Power Sensitivity ...'),'keepthis','timestamp');
+    rng(1234);
+    cimfunc = @cim_v2_cc_mex;
+    alphasToTest = [0.05 0.1 0.15 0.2 0.25 0.3];
+    msiValue = 0.015625;
+    MVecToTest = 100:100:1000;
+    for M=MVecToTest
+        powerCurve = cim_powerAlpha_sensitivity(cimfunc,M,msiValue,alphasToTest);
+        % save the results
+        if(ispc)
+            save(sprintf('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\%s_powerAlphaSensitivity_M_%d.mat', fnameStr, M));
+        elseif(ismac)
+            save(sprintf('/Users/Kiran/ownCloud/PhD/sim_results/independence/%s_powerAlphaSensitivity_M_%d.mat', fnameStr, M));
+        else
+            save(sprintf('/home/kiran/ownCloud/PhD/sim_results/independence/%s_powerAlphaSensitivity_M_%d.mat', fnameStr, M));
+        end
+    end
+end
+
 
 %% Plot the power-sensitivity
 if(~exist('masterCfgRun'))  % means we are running the cell independently
@@ -365,6 +396,35 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && runAlgoSensitivity) )
         end
     end
 end
+
+%% Run the algorithm sensitivity analysis for cim-v2 parametrizing alpha
+if(~exist('masterCfgRun'))  % means we are running the cell independently
+    clear;
+    clc;
+    close all;
+    dbstop if error;
+    dispstat('','init'); % One time only initialization
+end
+if(~exist('masterCfgRun') || (masterCfgRun==1 && runAlgoAlphaSensitivity) )
+    dispstat(sprintf('Testing Algorithm Sensitivity ...'),'keepthis','timestamp');
+    rng(1234);
+    alphasToTest = [0.05 0.1 0.15 0.2 0.25 0.3];
+    msiValue = 0.015625;
+    cimfunc = @cim_v2_cc_mex;
+    MVecToTest = 100:100:1000;
+    for M=MVecToTest
+        algoSensitivityData = cim_algoAlpha_sensitivity(cimfunc,M,msiValue,alphasToTest);    
+        % save the results
+        if(ispc)
+            save(sprintf('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\%s_algoSensitivityAlpha_M_%d.mat', fnameStr, M));
+        elseif(ismac)
+            save(sprintf('/Users/Kiran/ownCloud/PhD/sim_results/independence/%s_algoSensitivityAlpha_M_%d.mat', fnameStr, M));
+        else
+            save(sprintf('/home/kiran/ownCloud/PhD/sim_results/independence/%s_algoSensitivityAlpha_M_%d.mat', fnameStr, M));
+        end
+    end
+end
+
 
 %% Plot the Algorithm sensitivity analysis including M
 if(~exist('masterCfgRun'))  % means we are running the cell independently
@@ -845,6 +905,7 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && runPower_test_M500) )
     rng(1230);
     
     M = 500;
+    alpha = 0.2;
     minScanIncr = 0.015625;
     nsim_null = 300;
     nsim_alt = 300;
@@ -855,7 +916,7 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && runPower_test_M500) )
     functionHandlesCell = {@cim;
                            @cim_v2_cc_mex;};
     functionArgsCell    = {{minScanIncr};
-                           {minScanIncr};
+                           {minScanIncr, alpha};
                           };
     powerCurve = compute_power_curves(M,functionHandlesCell, functionArgsCell,...
                                       nsim_null,nsim_alt,...

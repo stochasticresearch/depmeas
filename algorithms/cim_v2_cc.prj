@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.coder" plugin-version="R2016a">
-  <configuration build-checksum="3770374910" file="/home/kiran/stochasticresearch/depmeas/algorithms/cim_v2_cc.prj" location="/home/kiran/stochasticresearch/depmeas/algorithms" name="cim_v2_cc" target="target.unifiedcoder" target-name="MATLAB Coder">
+  <configuration build-checksum="174466055" file="/home/kiran/stochasticresearch/depmeas/algorithms/cim_v2_cc.prj" location="/home/kiran/stochasticresearch/depmeas/algorithms" name="cim_v2_cc" target="target.unifiedcoder" target-name="MATLAB Coder">
     <profile key="profile.mex">
       <param.BuiltInstrumentedMex>false</param.BuiltInstrumentedMex>
       <param.RanInstrumentedMex>false</param.RanInstrumentedMex>
@@ -24,7 +24,7 @@
       <param.EnableDebugging>false</param.EnableDebugging>
       <param.GenerateReport>true</param.GenerateReport>
       <param.LaunchReport>false</param.LaunchReport>
-      <param.ReportPotentialDifferences>true</param.ReportPotentialDifferences>
+      <param.ReportPotentialDifferences>false</param.ReportPotentialDifferences>
       <param.DefaultTestFile />
       <param.MergeInstrumentationResults>false</param.MergeInstrumentationResults>
       <param.VerificationMode>option.VerificationMode.None</param.VerificationMode>
@@ -156,7 +156,7 @@
       <param.GenerateCodeReplacementReport>false</param.GenerateCodeReplacementReport>
       <param.HighlightPotentialDataTypeIssues>false</param.HighlightPotentialDataTypeIssues>
       <param.LaunchReport>false</param.LaunchReport>
-      <param.ReportPotentialDifferences>true</param.ReportPotentialDifferences>
+      <param.ReportPotentialDifferences>false</param.ReportPotentialDifferences>
       <param.SILDebugging>false</param.SILDebugging>
       <param.CodeExecutionProfiling>false</param.CodeExecutionProfiling>
       <param.DefaultTestFile />
@@ -723,9 +723,9 @@
       </unset>
     </profile>
     <param.objective>option.objective.c</param.objective>
-    <param.WorkflowStep>verifyCompatibility</param.WorkflowStep>
+    <param.WorkflowStep>generateCode</param.WorkflowStep>
     <param.TestSnippets>
-      <item>x = rand(500,1); y = x; cim_v2_cc(x,y,0.015625)</item>
+      <item>x = rand(500,1); y = x; cim_v2_cc(x,y,0.015625,0.2)</item>
     </param.TestSnippets>
     <param.DefaultImportExportVariable>config</param.DefaultImportExportVariable>
     <param.RowMajor>false</param.RowMajor>
@@ -746,7 +746,7 @@
     <param.AutoInferUnboundedSizeThreshold>2048</param.AutoInferUnboundedSizeThreshold>
     <param.EnableFixedPointStep>false</param.EnableFixedPointStep>
     <param.EnableScreener>true</param.EnableScreener>
-    <param.AnnotationChecksum>1792128172</param.AnnotationChecksum>
+    <param.AnnotationChecksum>922853174</param.AnnotationChecksum>
     <var.LegacyTarget />
     <var.MirrorOnOpen>false</var.MirrorOnOpen>
     <param.FixedPointEnabled>false</param.FixedPointEnabled>
@@ -757,8 +757,8 @@
     <var.gc.lastOutputType />
     <var.gc.preBuildChecksum />
     <var.cfi.lastOutputRoot>codegen/mex/cim_v2_cc</var.cfi.lastOutputRoot>
-    <var.cfi.preBuildChecksum>1029264663</var.cfi.preBuildChecksum>
-    <var.lastCfiTestSnippet>x = rand(500,1); y = x; cim_v2_cc(x,y,0.015625)</var.lastCfiTestSnippet>
+    <var.cfi.preBuildChecksum>3615763438</var.cfi.preBuildChecksum>
+    <var.lastCfiTestSnippet>x = rand(500,1); y = x; cim_v2_cc(x,y,0.015625,0.2)</var.lastCfiTestSnippet>
     <var.outdatedOnRestore>false</var.outdatedOnRestore>
     <var.lastUserSourceChecksum />
     <var.sourceSetState>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;sourceModel&gt;&lt;primarySourceFiles&gt;&lt;file&gt;/home/kiran/stochasticresearch/copula/algorithms/pobs_sorted_cc.m&lt;/file&gt;&lt;file&gt;/home/kiran/stochasticresearch/depmeas/algorithms/cim_v2_cc.m&lt;/file&gt;&lt;file&gt;/home/kiran/stochasticresearch/depmeas/algorithms/kendallsTauNumer1.m&lt;/file&gt;&lt;file&gt;/home/kiran/stochasticresearch/depmeas/algorithms/taukl_cc.m&lt;/file&gt;&lt;file&gt;/home/kiran/stochasticresearch/depmeas/algorithms/uniqueSorted.m&lt;/file&gt;&lt;/primarySourceFiles&gt;&lt;fixedPointSourceFiles/&gt;&lt;fixedPointSourceRegistered&gt;false&lt;/fixedPointSourceRegistered&gt;&lt;fixedPointSourceSelected&gt;false&lt;/fixedPointSourceSelected&gt;&lt;/sourceModel&gt;</var.sourceSetState>
@@ -898,7 +898,7 @@
     </unset>
     <fileset.entrypoints>
       <file custom-data-expanded="false" value="${PROJECT_ROOT}/cim_v2_cc.m">
-        <Marker>1509331421895</Marker>
+        <Marker>1509990950591</Marker>
       </file>
     </fileset.entrypoints>
     <fileset.testbench />
@@ -908,6 +908,7 @@
           <Input Name="x" typeId="0" />
           <Input Name="y" typeId="0" />
           <Input Name="minScanIncr" typeId="1" />
+          <Input Name="alpha" typeId="1" />
           <idpTable>
             <type typeId="0">
               <Class>double</Class>
@@ -971,7 +972,7 @@
       <vista>false</vista>
       <linux>true</linux>
       <solaris>false</solaris>
-      <osver>4.10.0-37-generic</osver>
+      <osver>4.10.0-38-generic</osver>
       <os32>false</os32>
       <os64>true</os64>
       <arch>glnxa64</arch>
