@@ -1,22 +1,6 @@
-function [] = plotAlgoSensitivity_withinM(cimVersion,MVecToPlot,num_noise_test_min,num_noise_test_max)
+function [] = plotAlgoAlphaSensitivity_withinM(MVecToPlot,num_noise_test_min,num_noise_test_max)
 
-switch cimVersion
-    case 1
-        fnameStr = 'cim';
-    case 3
-        fnameStr = 'cimv3';
-    case 4
-        fnameStr = 'cimv4';
-    case 5
-        fnameStr = 'cimv5';
-    case 6
-        fnameStr = 'cimv6';
-    case 7
-        fnameStr = 'cimv7';
-    case 8
-        fnameStr = 'cimv8';
-    otherwise
-end
+fnameStr = 'cim_v2_cc';
 CIMVECIDX = 3;
 noiseVec = num_noise_test_min:num_noise_test_max;
 
@@ -38,11 +22,11 @@ for MIdx=1:length(MVecToPlot)
     M = MVecToPlot(MIdx);
     % load the data
     if(ispc)
-        load(sprintf('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\%s_algoSensitivity_M_%d.mat', fnameStr, M));
+        load(sprintf('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\%s_algoSensitivityAlpha_M_%d.mat', fnameStr, M));
     elseif(ismac)
-        load(sprintf('/Users/Kiran/ownCloud/PhD/sim_results/independence/%s_algoSensitivity_M_%d.mat', fnameStr, M));
+        load(sprintf('/Users/Kiran/ownCloud/PhD/sim_results/independence/%s_algoSensitivityAlpha_M_%d.mat', fnameStr, M));
     else
-        load(sprintf('/home/kiran/ownCloud/PhD/sim_results/independence/%s_algoSensitivity_M_%d.mat', fnameStr, M));
+        load(sprintf('/home/kiran/ownCloud/PhD/sim_results/independence/%s_algoSensitivityAlpha_M_%d.mat', fnameStr, M));
     end
     
     linearDep = zeros(2,length(noiseVec));      % 1 - min
@@ -61,12 +45,12 @@ for MIdx=1:length(MVecToPlot)
     hiFreqSinDep_noCorrection = zeros(2,length(noiseVec));
     
     noiseVecIdx = 1:length(noiseVec);
-    
+   
     % collect all the data for each of the scanincrs we tested and store in
     % a matrix, for each dependency type, we plot the difference between
     % the minimum and the maximum
-    for ii=1:length(scanincrsToTest)
-        scanincrVal = scanincrsToTest(ii);
+    for ii=1:length(alphasToTest)
+%         alphaVal = scanincrsToTest(ii);
         rawData = algoSensitivityData{ii};  % algoSensitivityData is loaded from the file above
         linearData = rawData.linearDep(CIMVECIDX,noiseVecIdx);
         quadraticData = rawData.quadraticDep(CIMVECIDX,noiseVecIdx);
@@ -98,22 +82,7 @@ for MIdx=1:length(MVecToPlot)
                 hiFreqSinDep_noCorrection(jj,noiseVecIdx) = hiFreqSinDataNoCorrection;
             end
         end
-        if(scanincrVal<0.25)
-            for jj=1:2
-                cubicDep(jj,noiseVecIdx) = cubicData;
-            end
-        end
-        if(scanincrVal<0.1138)
-            for jj=1:2
-                sinusoidalDep(jj,noiseVecIdx) = sinusoidalData;
-            end
-        end
-        if(scanincrVal<0.029)
-            for jj=1:2
-                hiFreqSinDep(jj,noiseVecIdx) = hiFreqSinData;
-            end
-        end
-
+        
         for jj=1:length(noiseVec)
             % process linear
             if(linearData(jj)<linearDep(1,jj))
@@ -132,53 +101,29 @@ for MIdx=1:length(MVecToPlot)
             end
 
             % process cubic
-            if(scanincrVal<0.25)
-                if(cubicData(jj)<cubicDep(1,jj))
-                    cubicDep(1,jj) = cubicData(jj);
-                end
-                if(cubicData(jj)>cubicDep(2,jj))
-                    cubicDep(2,jj) = cubicData(jj);
-                end
+            if(cubicData(jj)<cubicDep(1,jj))
+                cubicDep_noCorrection(1,jj) = cubicData(jj);
             end
-            if(cubicDataNoCorrection(jj)<cubicDep_noCorrection(1,jj))
-                cubicDep_noCorrection(1,jj) = cubicDataNoCorrection(jj);
-            end
-            if(cubicDataNoCorrection(jj)>cubicDep_noCorrection(2,jj))
-                cubicDep_noCorrection(2,jj) = cubicDataNoCorrection(jj);
+            if(cubicData(jj)>cubicDep(2,jj))
+                cubicDep(2,jj) = cubicData(jj);
             end
 
             % process sinusoidal
-            if(scanincrVal<0.1138)
-                if(sinusoidalData(jj)<sinusoidalDep(1,jj))
-                    sinusoidalDep(1,jj) = sinusoidalData(jj);
-                end
-                if(sinusoidalData(jj)>sinusoidalDep(2,jj))
-                    sinusoidalDep(2,jj) = sinusoidalData(jj);
-                end
+            if(sinusoidalData(jj)<sinusoidalDep(1,jj))
+                sinusoidalDep(1,jj) = sinusoidalData(jj);
             end
-            if(sinusoidalDataNoCorrection(jj)<sinusoidalDep_noCorrection(1,jj))
-                sinusoidalDep_noCorrection(1,jj) = sinusoidalDataNoCorrection(jj);
-            end
-            if(sinusoidalDataNoCorrection(jj)>sinusoidalDep_noCorrection(2,jj))
-                sinusoidalDep_noCorrection(2,jj) = sinusoidalDataNoCorrection(jj);
+            if(sinusoidalData(jj)>sinusoidalDep(2,jj))
+                sinusoidalDep(2,jj) = sinusoidalData(jj);
             end
 
             % process hi-freq sine
-            if(scanincrVal<0.029)
-                if(hiFreqSinData(jj)<hiFreqSinDep(1,jj))
-                    hiFreqSinDep(1,jj) = hiFreqSinData(jj);
-                end
-                if(hiFreqSinData(jj)>hiFreqSinDep(2,jj))
-                    hiFreqSinDep(2,jj) = hiFreqSinData(jj);
-                end
+            if(hiFreqSinData(jj)<hiFreqSinDep(1,jj))
+                hiFreqSinDep(1,jj) = hiFreqSinData(jj);
             end
-            if(hiFreqSinDataNoCorrection(jj)<hiFreqSinDep_noCorrection(1,jj))
-                hiFreqSinDep_noCorrection(1,jj) = hiFreqSinDataNoCorrection(jj);
+            if(hiFreqSinData(jj)>hiFreqSinDep(2,jj))
+                hiFreqSinDep(2,jj) = hiFreqSinData(jj);
             end
-            if(hiFreqSinDataNoCorrection(jj)>hiFreqSinDep_noCorrection(2,jj))
-                hiFreqSinDep_noCorrection(2,jj) = hiFreqSinDataNoCorrection(jj);
-            end
-
+            
             % process fourth-root
             if(fourthRootData(jj)<fourthRootDep(1,jj))
                 fourthRootDep(1,jj) = fourthRootData(jj);
@@ -231,11 +176,8 @@ end
 linearDepToPlot = zeros(2,length(noiseVec));
 quadraticDepToPlot = zeros(2,length(noiseVec));
 cubicDepToPlot = zeros(2,length(noiseVec));
-cubicDepNoCorrectionToPlot = zeros(2,length(noiseVec));
 sinusoidalDepToPlot = zeros(2,length(noiseVec));
-sinusoidalDepNoCorrectionToPlot = zeros(2,length(noiseVec));
 hiFreqSinDepToPlot = zeros(2,length(noiseVec));
-hiFreqSinDepNoCorrectionToPlot = zeros(2,length(noiseVec));
 fourthRootDepToPlot = zeros(2,length(noiseVec));
 circleDepToPlot = zeros(2,length(noiseVec));
 stepDepToPlot = zeros(2,length(noiseVec));
@@ -248,16 +190,10 @@ for ii=1:length(noiseVec)
     quadraticDepToPlot(2,ii) = quadraticDepCell{1}(2,ii);
     cubicDepToPlot(1,ii) = cubicDepCell{1}(1,ii);
     cubicDepToPlot(2,ii) = cubicDepCell{1}(2,ii);
-    cubicDepNoCorrectionToPlot(1,ii) = cubicDepNoCorrectionCell{1}(1,ii);
-    cubicDepNoCorrectionToPlot(2,ii) = cubicDepNoCorrectionCell{1}(2,ii);
     sinusoidalDepToPlot(1,ii) = sinusoidalDepCell{1}(1,ii);
     sinusoidalDepToPlot(2,ii) = sinusoidalDepCell{1}(2,ii);
-    sinusoidalDepNoCorrectionToPlot(1,ii) = sinusoidalDepNoCorrectionCell{1}(1,ii);
-    sinusoidalDepNoCorrectionToPlot(2,ii) = sinusoidalDepNoCorrectionCell{1}(2,ii);
     hiFreqSinDepToPlot(1,ii) = hiFreqSinDepCell{1}(1,ii);
     hiFreqSinDepToPlot(2,ii) = hiFreqSinDepCell{1}(2,ii);
-    hiFreqSinDepNoCorrectionToPlot(1,ii) = hiFreqSinDepNoCorrectionCell{1}(1,ii);
-    hiFreqSinDepNoCorrectionToPlot(2,ii) = hiFreqSinDepNoCorrectionCell{1}(2,ii);
     fourthRootDepToPlot(1,ii) = fourthRootDepCell{1}(1,ii);
     fourthRootDepToPlot(2,ii) = fourthRootDepCell{1}(2,ii);
     circleDepToPlot(1,ii) = circleDepCell{1}(1,ii);
@@ -289,13 +225,6 @@ for ii=1:length(noiseVec)
             cubicDepToPlot(2,ii) = cubicDepCell{jj}(2,ii);
         end
         
-        rangeCur  = cubicDepNoCorrectionToPlot(2,ii)-cubicDepNoCorrectionToPlot(1,ii);
-        rangePrev = cubicDepNoCorrectionCell{jj-1}(2,ii)-cubicDepNoCorrectionCell{jj-1}(1,ii);
-        if(rangeCur>rangePrev)
-            cubicDepNoCorrectionToPlot(1,ii) = cubicDepNoCorrectionCell{jj}(1,ii);
-            cubicDepNoCorrectionToPlot(2,ii) = cubicDepNoCorrectionCell{jj}(2,ii);
-        end
-        
         rangeCur  = sinusoidalDepToPlot(2,ii)-sinusoidalDepToPlot(1,ii);
         rangePrev = sinusoidalDepCell{jj-1}(2,ii)-sinusoidalDepCell{jj-1}(1,ii);
         if(rangeCur>rangePrev)
@@ -303,25 +232,11 @@ for ii=1:length(noiseVec)
             sinusoidalDepToPlot(2,ii) = sinusoidalDepCell{jj}(2,ii);
         end
         
-        rangeCur  = sinusoidalDepNoCorrectionToPlot(2,ii)-sinusoidalDepNoCorrectionToPlot(1,ii);
-        rangePrev = sinusoidalDepNoCorrectionCell{jj-1}(2,ii)-sinusoidalDepNoCorrectionCell{jj-1}(1,ii);
-        if(rangeCur>rangePrev)
-            sinusoidalDepNoCorrectionToPlot(1,ii) = sinusoidalDepNoCorrectionCell{jj}(1,ii);
-            sinusoidalDepNoCorrectionToPlot(2,ii) = sinusoidalDepNoCorrectionCell{jj}(2,ii);
-        end
-        
         rangeCur  = hiFreqSinDepToPlot(2,ii)-hiFreqSinDepToPlot(1,ii);
         rangePrev = hiFreqSinDepCell{jj-1}(2,ii)-hiFreqSinDepCell{jj-1}(1,ii);
         if(rangeCur>rangePrev)
             hiFreqSinDepToPlot(1,ii) = hiFreqSinDepCell{jj}(1,ii);
             hiFreqSinDepToPlot(2,ii) = hiFreqSinDepCell{jj}(2,ii);
-        end
-        
-        rangeCur  = hiFreqSinDepNoCorrectionToPlot(2,ii)-hiFreqSinDepNoCorrectionToPlot(1,ii);
-        rangePrev = hiFreqSinDepNoCorrectionCell{jj-1}(2,ii)-hiFreqSinDepNoCorrectionCell{jj-1}(1,ii);
-        if(rangeCur>rangePrev)
-            hiFreqSinDepNoCorrectionToPlot(1,ii) = hiFreqSinDepNoCorrectionCell{jj}(1,ii);
-            hiFreqSinDepNoCorrectionToPlot(2,ii) = hiFreqSinDepNoCorrectionCell{jj}(2,ii);
         end
         
         rangeCur  = fourthRootDepToPlot(2,ii)-fourthRootDepToPlot(1,ii);
@@ -373,11 +288,8 @@ lineWidthVal = 2.5;
 y1 = linearDepToPlot(2,:)-linearDepToPlot(1,:);
 y2 = quadraticDepToPlot(2,:)-quadraticDepToPlot(1,:);
 y3 = cubicDepToPlot(2,:)-cubicDepToPlot(1,:);
-% y33 = cubicDepNoCorrectionToPlot(2,:)-cubicDepNoCorrectionToPlot(1,:);
 y4 = sinusoidalDepToPlot(2,:)-sinusoidalDepToPlot(1,:);
-% y44 = sinusoidalDepNoCorrectionToPlot(2,:)-sinusoidalDepNoCorrectionToPlot(1,:);
 y5 = hiFreqSinDepToPlot(2,:)-hiFreqSinDepToPlot(1,:);
-% y55 = hiFreqSinDepNoCorrectionToPlot(2,:)-hiFreqSinDepNoCorrectionToPlot(1,:);
 y6 = fourthRootDepToPlot(2,:)-fourthRootDepToPlot(1,:);
 y7 = circleDepToPlot(2,:)-circleDepToPlot(1,:);
 y8 = stepDepToPlot(2,:)-stepDepToPlot(1,:);
@@ -418,9 +330,7 @@ ax.YLim = [min(inletData(inletIdx,:)) max(inletData(inletIdx,:))];
 ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
 
 h = subplot(2,4,3);
-plot(noiseVecToPlot,cubicDepNoCorrectionToPlot(2,:)-cubicDepNoCorrectionToPlot(1,:),'LineWidth',lineWidthVal);
-hold on;
-plot(noiseVecToPlot,y3,'LineWidth',lineWidthVal); %axis([minX maxX minY maxY]);
+plot(noiseVecToPlot,y3,'LineWidth',lineWidthVal); axis([minX maxX minY maxY]);
 grid on; 
 % title('Cubic','FontSize',20);
 % legend({'Correction','No Correction'});
@@ -434,9 +344,7 @@ ax.YLim = [min(inletData(inletIdx,:)) max(inletData(inletIdx,:))];
 ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
 
 h = subplot(2,4,4);
-plot(noiseVecToPlot,sinusoidalDepNoCorrectionToPlot(2,:)-sinusoidalDepNoCorrectionToPlot(1,:),'LineWidth',lineWidthVal);
-hold on;
-plot(noiseVecToPlot,y4,'LineWidth',lineWidthVal); %axis([minX maxX minY maxY]);
+plot(noiseVecToPlot,y4,'LineWidth',lineWidthVal); axis([minX maxX minY maxY]);
 grid on; 
 % title('Sinusoidal','FontSize',20); 
 % legend({'Correction','No Correction'});
@@ -450,9 +358,7 @@ ax.YLim = [min(inletData(inletIdx,:)) max(inletData(inletIdx,:))];
 ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
 
 h = subplot(2,4,5);
-plot(noiseVecToPlot,hiFreqSinDepNoCorrectionToPlot(2,:)-hiFreqSinDepNoCorrectionToPlot(1,:),'LineWidth',lineWidthVal);
-hold on;
-plot(noiseVecToPlot,y5,'LineWidth',lineWidthVal); %axis([minX maxX minY maxY]);
+plot(noiseVecToPlot,y5,'LineWidth',lineWidthVal); axis([minX maxX minY maxY]);
 grid on; 
 % title('Hi-Freq Sin','FontSize',20); 
 % legend({'Correction','No Correction'});

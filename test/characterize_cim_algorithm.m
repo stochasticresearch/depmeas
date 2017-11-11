@@ -259,7 +259,7 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotPower_ss_depMeasures) )
         load('/home/kiran/ownCloud/PhD/sim_results/independence/power_all.mat');
     end
     
-    labels = {'CIM', 'CoS', 'RDC', 'TICe', 'dCor', 'cCor'};
+    labels = {'CIM', 'KNN-1', 'KNN-6', 'KNN-20', 'AP', 'vME'};
     cellfind = @(string)(@(cell_contents)(strcmp(string,cell_contents)));
 
     num_noise_test_min = 0;
@@ -449,6 +449,22 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotAlgoSensitivity) )
 
     plotAlgoSensitivity_withinM(cimVersion,MVecToPlot,num_noise_test_min,num_noise_test_max);
 %     figtitle(sprintf('Algorithm Sensitivity (M=%d - %d)',min(MVecToPlot),max(MVecToPlot)),'FontSize',20);
+end
+
+%% Plot the Algorithm Alpha sensitivity analysis including M
+if(~exist('masterCfgRun'))  % means we are running the cell independently
+    clear;
+    clc;
+    close all;
+    dbstop if error;
+    dispstat('','init'); % One time only initialization
+end
+if(~exist('masterCfgRun') || (masterCfgRun==1 && plotAlgoAlphaSensitivity) )
+    MVecToPlot = 100:100:700;
+    num_noise_test_min = 0;
+    num_noise_test_max = 20;
+
+    plotAlgoAlphaSensitivity_withinM(MVecToPlot,num_noise_test_min,num_noise_test_max);
 end
 %% simulate the difference between computing monotonic, detecting the region, and theoretical CIM value
 if(~exist('masterCfgRun'))  % means we are running the cell independently
