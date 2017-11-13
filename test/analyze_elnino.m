@@ -494,7 +494,7 @@ load(fname);
 
 cimValThresh = 0.4;
 
-depThresh = 0.25;
+depThresh = 0.01;
 monotonicityResults = containers.Map('KeyType', 'int32', 'ValueType', 'int32');
 for ii=1:length(pairwiseAnalysis)
     res = pairwiseAnalysis{ii};
@@ -511,12 +511,7 @@ for ii=1:length(pairwiseAnalysis)
                 if(numMonotonicRegions>1)
                     xxData = res.xData{jj};
                     yyData = res.yData{jj};
-                    xIdxBad = find(xxData==-999)';
-                    yIdxBad = find(yyData==-999)';
-                    xIdxGood = setdiff(1:length(xxData),xIdxBad);
-                    yIdxGood = setdiff(1:length(yyData),yIdxBad);
-                    II = intersect(xIdxGood,yIdxGood);
-                    scatter(xxData(II),yyData(II));
+                    scatter(xxData,yyData);
                     pause;
                 end
             end
