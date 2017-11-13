@@ -259,6 +259,10 @@ depThreshVec = [0.01 0.05 0.1 0.15 0.2 0.25];
 cimValThresh = 0.4;
 finalMonotonicityResults = cell(1,length(depThreshVec));
 
+numTaps = 10;
+maFilt = ones(1, numTaps)/numTaps;
+fDelay = (length(maFilt)-1)/2;
+
 depThresh = depThreshVec(4);
 for ii=1:numCountries
     for jj=ii+1:numCountries
@@ -291,11 +295,43 @@ for ii=1:numCountries
                 countryIData = countryIData(end-numSampsToProc+1:end);
                 countryJData = countryJData(end-numSampsToProc+1:end);
                 [metric, rectangleCellOut] = cim(countryIData,countryJData);
-                rectangleCellOut
-                scatter(pobs(countryIData),pobs(countryJData));
-                xlabel(countries{ii}); ylabel(countries{jj});
-                pause;
+                xToPlot = countryIData(2:end); yToPlot = countryJData(2:end);
                 
+                rectangleCellOut
+                figure;
+                scatter(xToPlot,yToPlot); grid on;
+                xlabel(strcat(countries{ii}, sprintf(' %cC', char(176))), 'FontSize', 20); 
+                ylabel(strcat(countries{jj}, sprintf(' %cC', char(176))), 'FontSize', 20); 
+                
+%                 subplot(2,2,2);
+%                 scatter(pobs(xToPlot),pobs(yToPlot)); grid on;
+%                 xlabel(strcat(countries{ii}, sprintf(' %cC', char(176))), 'FontSize', 20); 
+%                 ylabel(strcat(countries{jj}, sprintf(' %cC', char(176))), 'FontSize', 20); 
+                
+%                 subplot(2,2,3);  
+%                 subplot(1,3,2);
+                figure;
+                plot(xToPlot); %hold on;
+                grid on;
+                xlabel('Time', 'FontSize', 20);
+                ylabel(sprintf('%cC',char(176)),'FontSize',20);
+%                 filteredSigY = filter(maFilt, 1, xToPlot);
+%                 plot(filteredSigY(fDelay*2:end), 'LineWidth', 1.5);
+                title(countries{ii}, 'FontSize', 20);
+                
+%                 subplot(2,2,4);
+%                 subplot(1,3,3);
+                figure;
+                plot(yToPlot); %hold on; 
+                grid on;
+%                 filteredSigY = filter(maFilt, 1, yToPlot);
+%                 plot(filteredSigY(fDelay*2:end), 'LineWidth', 1.5);
+                title(countries{jj}, 'FontSize', 20);
+                xlabel('Time', 'FontSize', 20);
+                ylabel(sprintf('%cC',char(176)), 'FontSize', 20);
+                
+                pause;
+                close all;
             end
 
         end
