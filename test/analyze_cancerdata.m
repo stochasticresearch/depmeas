@@ -363,3 +363,108 @@ set(gca, 'XTick', barX);
 set(gca, 'YTick', [20 40 60 80 95]);
 ylim([0 100])
 set(gca, 'FontSize', 28)
+
+%% Try to identify and plot non-monotonic dependencies as a sanity check
+% analyze the results of monotonicity
+
+clear;
+clc;
+
+if(ispc)
+    rootDir = 'C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\cancer';
+elseif(ismac)
+    rootDir = '/Users/Kiran/ownCloud/PhD/sim_results/cancer';
+else
+    rootDir = '/home/kiran/ownCloud/PhD/sim_results/cancer';
+end
+
+alpha = 0.05;       % for p-value comparison
+cimValThresh = 0.4;
+depThresh = 0.25;   % vary the percentage difference tolerated
+
+files = dir(fullfile(rootDir,'results'));
+% first delete any postProcessed files we may already have
+for ii=1:length(files)
+    fname = files(ii).name;
+    [~,name,ext] = fileparts(fname);
+    if(contains(name,'postProcessed'))
+        delete(fullfile(files(ii).folder,files(ii).name));
+    end
+end
+% now post-process again with the chosen depThresh
+files = dir(fullfile(rootDir,'results'));
+for ii=1:length(files)
+    fname = files(ii).name;
+    [~,name,ext] = fileparts(fname);
+
+    % delete any old 'postProcessed files', since we will do the
+    % postProcessing again here
+    if(strcmpi(ext,'.mat'))
+        fnameWithPath = fullfile(rootDir, 'results', fname);
+        fprintf('Processing file=%s\n', fnameWithPath);
+        load(fnameWithPath);
+
+        % Find all the pairwise dependencies that were flagged as
+        % nonmonotonic, and compare the value of CIM to taukl, if they are
+        % sufficiently close, it means that we have overfit, so we can
+        % conclude that the dependency is indeed actually monotonic
+        nonMonotonicIdx = find(monotonicityMat>1); nonMonotonicIdx = nonMonotonicIdx';
+        for idx=nonMonotonicIdx
+            [iIdx,jIdx] = ind2sub(size(monotonicityMat), idx);
+            % get the CIM value
+            cimVal = R(iIdx,jIdx);
+            tauklVal = abs(taukl(dataToProcess(:,iIdx),dataToProcess(:,jIdx)));
+            percentageDiff = abs(cimVal-tauklVal)/tauklVal;
+            if(percentageDiff<=depThresh)
+                % means we overfit, and we correct for that here
+                monotonicityMat(iIdx,jIdx) = 1;
+                monotonicityMat(jIdx,iIdx) = 1;
+            end
+        end
+
+        numDataPoints = size(dataToProcess,1);
+        validDepMat = zeros(size(monotonicityMat));
+        for jj=1:size(R,1)
+            for kk=jj+1:size(R,1)
+                cimVal = R(jj,kk);
+                pval = cimpval(cimVal, numDataPoints);
+                if(pval<=alpha && cimVal>=cimValThresh)
+                    validDepMat(jj,kk) = 1; % we flag this as non-independent, and
+                                            % thus we will process it
+                    validDepMat(kk,jj) = 1;
+                end
+            end
+        end
+
+        % again, count the # of unique monotonicity levels we have
+        I1 = find(triu(monotonicityMat,1)~=0);
+        I2 = find(validDepMat~=0);
+        intersectI = intersect(I1,I2);
+        monotonicityVec = monotonicityMat(intersectI);
+        [uniques, numUniques] = count_unique(monotonicityVec);
+        numDepsAnalyzed = length(intersectI);
+
+        nonmono_depIdx = 1;
+        for jj=1:size(R,1)
+            for kk=1:size(R,1)
+                if(monotonicityMat(jj,kk)>1 && validDepMat(jj,kk))
+                    nonMonoIdxs(:,nonmono_depIdx) = [jj;kk];
+                    nonmono_depIdx = nonmono_depIdx + 1;
+                end
+            end
+        end
+        
+        for ll=1:size(nonMonoIdxs,2)
+            jj = nonMonoIdxs(1,ll);
+            kk = nonMonoIdxs(2,ll);
+            xx = dataToProcess(:,jj); yy = dataToProcess(:,kk);
+            scatter(pobs(xx),pobs(yy));
+            [cimval,rco] = cim(xx,yy);
+            rco
+            title(sprintf('%0.02f/%0.02f -- %d',R(jj,kk),cimval,size(rco,2)));
+            pause;
+        end
+        
+    end
+end
+

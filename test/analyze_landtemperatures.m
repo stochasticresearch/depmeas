@@ -234,3 +234,70 @@ set(gca, 'XTick', barX);
 set(gca, 'YTick', [20 40 60 80 95]);
 ylim([0 100])
 set(gca, 'FontSize', 28)
+
+%% Manually consider the monotonicity results
+
+clear;
+clc;
+dbstop if error;
+
+if(ispc)
+    rootDir = 'C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\climate';
+elseif(ismac)
+    rootDir = '/Users/Kiran/ownCloud/PhD/sim_results/climate';
+else
+    rootDir = '/home/kiran/ownCloud/PhD/sim_results/climate';
+end
+fname = fullfile(rootDir,'results', 'landTemperaturesResults.mat');
+load(fname);
+fname = fullfile(rootDir,'normalized_files', 'landTemperatures.mat');
+countries = who('-file', fname);
+load(fname);
+
+numCountries = size(R,1);
+depThreshVec = [0.01 0.05 0.1 0.15 0.2 0.25];
+cimValThresh = 0.4;
+finalMonotonicityResults = cell(1,length(depThreshVec));
+
+depThresh = depThreshVec(4);
+for ii=1:numCountries
+    for jj=ii+1:numCountries
+        cimVal = R(ii,jj);
+        if(validMat(ii,jj) && cimVal>=cimValThresh)
+            % means both data are stationary, and this dependnecy is
+            % significant
+
+            % ensure we didn't overfit and compute the monotonicity
+            tauklVal = tauklMat(ii,jj);
+            percentageDiff = abs(cimVal-tauklVal)/tauklVal;
+            if(percentageDiff<=depThresh)
+                numMonotonicRegions = 1;
+            else
+                numMonotonicRegions = size(RectanglesCell{ii,jj},2);
+                
+                countryIData = eval(countries{ii});
+                countryJData = eval(countries{jj});
+                countryIData = countryIData(:);
+                countryJData = countryJData(:);
+                Ii = find(countryIData==-999.0, 1, 'last' );
+                if(~isempty(Ii))
+                    countryIData = countryIData(Ii:end);
+                end
+                Ij = find(countryJData==-999.0, 1, 'last' );
+                if(~isempty(Ij))
+                    countryJData = countryJData(Ij:end);
+                end
+                numSampsToProc = min(length(countryIData),length(countryJData));
+                countryIData = countryIData(end-numSampsToProc+1:end);
+                countryJData = countryJData(end-numSampsToProc+1:end);
+                [metric, rectangleCellOut] = cim(countryIData,countryJData);
+                rectangleCellOut
+                scatter(pobs(countryIData),pobs(countryJData));
+                xlabel(countries{ii}); ylabel(countries{jj});
+                pause;
+                
+            end
+
+        end
+    end
+end

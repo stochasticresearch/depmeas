@@ -238,7 +238,8 @@ load(fullfile(rootDir,'stocks_results.mat'));
 numStocksProcessed = size(monotonicityMat,1);
 alpha = 0.05;       % significance level for Dickey-Fuller tests & dependency confirmation
 
-depThreshVec = [0.01 0.05 0.1 0.15 0.2 0.25];
+% depThreshVec = [0.01 0.05 0.1 0.15 0.2 0.25];
+depThreshVec = 0.05;
 finalMonotonicityResults = cell(1,length(depThreshVec));
 cimValThresh = 0.4;
 
