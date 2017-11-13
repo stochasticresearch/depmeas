@@ -18,11 +18,11 @@ runPowerSensitivity        = 0;
 runPowerAlphaSensitivity   = 0;
 plotPowerSensitivity       = 0;
 runAlgoSensitivity         = 0;
-runAlgoAlphaSensitivity    = 0;
+runAlgoAlphaSensitivity    = 1;
 plotAlgoSensitivity        = 0;
 runConvergence             = 0;
 plotConvergence            = 0;
-runPower_test_M500         = 1;
+runPower_test_M500         = 0;
 
 dispstat('','init'); % One time only initialization
 dispstat(sprintf('Running Notebook from Master Configuration...\n'),'keepthis','timestamp');
@@ -259,7 +259,7 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotPower_ss_depMeasures) )
         load('/home/kiran/ownCloud/PhD/sim_results/independence/power_all.mat');
     end
     
-    labels = {'CIM', 'CoS', 'RDC', 'TICe', 'dCor', 'cCor'};
+    labels = {'CIM', 'KNN-1', 'KNN-6', 'KNN-20', 'AP', 'vME'};
     cellfind = @(string)(@(cell_contents)(strcmp(string,cell_contents)));
 
     num_noise_test_min = 0;
@@ -406,21 +406,27 @@ if(~exist('masterCfgRun'))  % means we are running the cell independently
     dispstat('','init'); % One time only initialization
 end
 if(~exist('masterCfgRun') || (masterCfgRun==1 && runAlgoAlphaSensitivity) )
+    if(ispc)
+        folder = 'C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence';
+    elseif(ismac)
+        folder = '/Users/Kiran/ownCloud/PhD/sim_results/independence/';
+    else
+        folder = '/home/kiran/ownCloud/PhD/sim_results/independence/';
+    end
+    
     dispstat(sprintf('Testing Algorithm Sensitivity ...'),'keepthis','timestamp');
     rng(1234);
     alphasToTest = [0.05 0.1 0.15 0.2 0.25 0.3];
     msiValue = 0.015625;
     cimfunc = @cim_v2_cc_mex;
+    fnameStr = 'cim_v2_cc';
     MVecToTest = 100:100:1000;
     for M=MVecToTest
-        algoSensitivityData = cim_algoAlpha_sensitivity(cimfunc,M,msiValue,alphasToTest);    
-        % save the results
-        if(ispc)
-            save(sprintf('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\%s_algoSensitivityAlpha_M_%d.mat', fnameStr, M));
-        elseif(ismac)
-            save(sprintf('/Users/Kiran/ownCloud/PhD/sim_results/independence/%s_algoSensitivityAlpha_M_%d.mat', fnameStr, M));
-        else
-            save(sprintf('/home/kiran/ownCloud/PhD/sim_results/independence/%s_algoSensitivityAlpha_M_%d.mat', fnameStr, M));
+        fnameFull = fullfile(folder,sprintf('%s_algoSensitivityAlpha_M_%d.mat',fnameStr, M));
+        if(~exist(fnameFull,'file'))
+            algoSensitivityData = cim_algoAlpha_sensitivity(cimfunc,M,msiValue,alphasToTest);    
+            % save the results
+            save(fnameFull);
         end
     end
 end
@@ -443,6 +449,22 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotAlgoSensitivity) )
 
     plotAlgoSensitivity_withinM(cimVersion,MVecToPlot,num_noise_test_min,num_noise_test_max);
 %     figtitle(sprintf('Algorithm Sensitivity (M=%d - %d)',min(MVecToPlot),max(MVecToPlot)),'FontSize',20);
+end
+
+%% Plot the Algorithm Alpha sensitivity analysis including M
+if(~exist('masterCfgRun'))  % means we are running the cell independently
+    clear;
+    clc;
+    close all;
+    dbstop if error;
+    dispstat('','init'); % One time only initialization
+end
+if(~exist('masterCfgRun') || (masterCfgRun==1 && plotAlgoAlphaSensitivity) )
+    MVecToPlot = 100:100:700;
+    num_noise_test_min = 0;
+    num_noise_test_max = 20;
+
+    plotAlgoAlphaSensitivity_withinM(MVecToPlot,num_noise_test_min,num_noise_test_max);
 end
 %% simulate the difference between computing monotonic, detecting the region, and theoretical CIM value
 if(~exist('masterCfgRun'))  % means we are running the cell independently
