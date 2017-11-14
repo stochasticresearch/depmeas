@@ -152,6 +152,8 @@ for ii=1:length(pairwiseTimeAlignedData)
     res.validVec = zeros(1,45);
     res.startDates = zeros(1,45);
     res.stopDates = zeros(1,45);
+    res.xData = cell(1,45);
+    res.yData = cell(1,45);
     for jj=1:45
         switch(jj)
             case 1
@@ -325,22 +327,25 @@ for ii=1:length(pairwiseTimeAlignedData)
         if(maxRun>minSamps)
             dataX = dataX(maxStartIdx:maxEndIdx);
             dataY = dataY(maxStartIdx:maxEndIdx);
-            
-            % check stationarity of the data!
-            [~,pvalX] = augdf(dataX,adfTestType,lags);
-            [~,pvalY] = augdf(dataY,adfTestType,lags);
+            if(isempty(find(dataX==-999, 1)) && isempty(find(dataY==-999, 1)))
+                % check stationarity of the data!
+                [~,pvalX] = augdf(dataX,adfTestType,lags);
+                [~,pvalY] = augdf(dataY,adfTestType,lags);
 
-            if(pvalX<=alpha && pvalY<=alpha)
-                [metric, rectangleCellOut] = cim(dataX,dataY);
-                tauklval = taukl(dataX,dataY);
-                pval = cimpval(metric, length(dataX));
-                if(pval<=alpha)
-                    res.R(jj) = metric;
-                    res.RectanglesCell{jj} = rectangleCellOut;
-                    res.tauklVec(jj) = tauklval;
-                    res.startDates(jj) = datesX(maxStartIdx);
-                    res.stopDates(jj) = datesX(maxEndIdx);
-                    res.validVec(jj) = 1;
+                if(pvalX<=alpha && pvalY<=alpha)
+                    [metric, rectangleCellOut] = cim(dataX,dataY);
+                    tauklval = taukl(dataX,dataY);
+                    pval = cimpval(metric, length(dataX));
+                    if(pval<=alpha)
+                        res.R(jj) = metric;
+                        res.RectanglesCell{jj} = rectangleCellOut;
+                        res.tauklVec(jj) = tauklval;
+                        res.startDates(jj) = datesX(maxStartIdx);
+                        res.stopDates(jj) = datesX(maxEndIdx);
+                        res.xData{jj} = dataX;
+                        res.yData{jj} = dataY;
+                        res.validVec(jj) = 1;
+                    end
                 end
             end
         end
@@ -471,3 +476,51 @@ set(gca, 'XTick', barX);
 set(gca, 'YTick', [20 40 60 80 95]);
 ylim([0 100])
 set(gca, 'FontSize', 28)
+
+%% Plot the monotonicity results individually to find some interesting dependence structures
+clear;
+clc;
+dbstop if error;
+
+if(ispc)
+    rootDir = 'C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\climate';
+elseif(ismac)
+    rootDir = '/Users/Kiran/ownCloud/PhD/sim_results/climate';
+else
+    rootDir = '/home/kiran/ownCloud/PhD/sim_results/climate';
+end
+fname = fullfile(rootDir,'results', 'elnino.mat');
+load(fname);
+
+cimValThresh = 0.4;
+
+depThresh = 0.01;
+monotonicityResults = containers.Map('KeyType', 'int32', 'ValueType', 'int32');
+for ii=1:length(pairwiseAnalysis)
+    res = pairwiseAnalysis{ii};
+    for jj=1:45
+        cimVal = res.R(jj);
+        if(res.validVec(jj) && cimVal>=cimValThresh)
+            % count the monotonicity after ensuring we didn't overfit
+            tauklVal = res.tauklVec(jj);
+            percentageDiff = abs(cimVal-tauklVal)/tauklVal;
+            if(percentageDiff<=depThresh)
+                numMonotonicRegions = 1;
+            else
+                numMonotonicRegions = size(res.RectanglesCell{jj},2);
+                if(numMonotonicRegions>1)
+                    xxData = res.xData{jj};
+                    yyData = res.yData{jj};
+                    scatter(xxData,yyData);
+                    pause;
+                end
+            end
+            % store into the map
+            if(isKey(monotonicityResults,numMonotonicRegions))
+                monotonicityResults(numMonotonicRegions) = monotonicityResults(numMonotonicRegions) + 1;
+            else
+                monotonicityResults(numMonotonicRegions) = 1;
+            end
+        end
+    end
+end

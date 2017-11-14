@@ -160,6 +160,8 @@ for ii=1:length(pairwiseTimeAlignedData)
     res.validVec = zeros(1,28);
     res.startDates = zeros(1,28);
     res.stopDates = zeros(1,28);
+    res.xData = cell(1,28);
+    res.yData = cell(1,28);
     for jj=1:28
         switch(jj)
             case 1
@@ -253,21 +255,24 @@ for ii=1:length(pairwiseTimeAlignedData)
         % the vectors dataX and dataY below...
         dataX = dataX(:);
         dataY = dataY(:);
-        
-        % check stationarity of the data
-        [~,pvalX] = augdf(dataX,adfTestType,lags);
-        [~,pvalY] = augdf(dataY,adfTestType,lags);
-        if(pvalX<=alpha && pvalY<=alpha)
-            [metric, rectangleCellOut] = cim(dataX,dataY);
-            tauklval = taukl(dataX,dataY);
-            pval = cimpval(metric, length(dataX));
-            if(pval<=alpha)
-                res.R(jj) = metric;
-                res.RectanglesCell{jj} = rectangleCellOut;
-                res.tauklVec(jj) = tauklval;
-                res.startDates(jj) = pairwiseTimeAlignedData{ii}.datecode(1);
-                res.stopDates(jj) = pairwiseTimeAlignedData{ii}.datecode(end);
-                res.validVec(jj) = 1;
+        if(isempty(find(dataX==-999, 1)) && isempty(find(dataY==-999, 1)))
+            % check stationarity of the data
+            [~,pvalX] = augdf(dataX,adfTestType,lags);
+            [~,pvalY] = augdf(dataY,adfTestType,lags);
+            if(pvalX<=alpha && pvalY<=alpha)
+                [metric, rectangleCellOut] = cim(dataX,dataY);
+                tauklval = taukl(dataX,dataY);
+                pval = cimpval(metric, length(dataX));
+                if(pval<=alpha)
+                    res.R(jj) = metric;
+                    res.RectanglesCell{jj} = rectangleCellOut;
+                    res.tauklVec(jj) = tauklval;
+                    res.startDates(jj) = pairwiseTimeAlignedData{ii}.datecode(1);
+                    res.stopDates(jj) = pairwiseTimeAlignedData{ii}.datecode(end);
+                    res.validVec(jj) = 1;
+                    res.xData{jj} = dataX;
+                    res.yData{jj} = dataY;
+                end
             end
         end
     end
