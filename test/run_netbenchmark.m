@@ -8,9 +8,15 @@ myCluster.NumWorkers = 6;
 saveProfile(myCluster);
 p = gcp
 
-dataRepo = '/data/netbenchmark/inputs/';
+if(ispc)
+    dataRepo = 'C:\\Users\\Kiran\\Documents\\data\\netbenchmark\\inputs';
+    dataOutputFolder = 'C:\\Users\\Kiran\\Documents\\data\\netbenchmark\\matlab_outputs';
+else
+    dataRepo = '/data/netbenchmark/inputs/';
+    dataOutputFolder = '/data/netbenchmark/matlab_outputs';
+end
+
 dataSourcesToProcess = {'syntren300'};
-dataOutputFolder = '/data/netbenchmark/matlab_outputs';
 numDatasets = 150;
 
 globalNoiseVec = [0,10,20,30,40,50];
