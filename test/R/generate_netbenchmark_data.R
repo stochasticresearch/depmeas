@@ -79,10 +79,22 @@ datasets is bigger than the orginal number of experiments in the datasource:
     }
 }
 
-availableDataSources = c("rogers1000","syntren300","syntren1000","gnw1565","gnw2000")
+#availableDataSources = c("rogers1000","syntren300","syntren1000","gnw1565","gnw2000")
+availableDataSources = c("syntren300")
+localNoiseVec = c(0,10,20,30,40,50)
+globalNoiseVec = c(0,10,20,30,40,50)
 for(ds in availableDataSources) {
-  netbenchmark_data_gen(datasources.names=ds,
-                        datasets.num=150,
-                        seed=1234,
-                        outputFolder="/home/kiran/data/netbenchmark/inputs")
+    for(gn in globalNoiseVec) {
+        for(ln in localNoiseVec) {
+            # make the output folder if necessary first
+            dir.create(file.path("/data/netbenchmark/inputs",sprintf('gn_%d_ln_%d',gn,ln)), showWarnings = FALSE)
+            netbenchmark_data_gen(datasources.names=ds,
+                                  datasets.num=200,
+                                  local.noise=ln,
+                                  global.noise=gn,
+                                  seed=1234,
+                                  outputFolder=sprintf('%s/gn_%d_ln_%d','/data/netbenchmark/inputs',gn,ln))
+        }
+    }
+  
 }

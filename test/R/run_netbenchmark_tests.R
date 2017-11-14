@@ -36,26 +36,36 @@ Pearson <- function(data){
   net <- mrnet(mim)
 } 
 
-#for(ds in c("syntren300","rogers1000","syntren1000","gnw1565","gnw2000")) {
-##### Need to still run gnw1565 for datasets (116-150)
-##### Need to still run gnw2000 for datasets (106-150)
-for(ds in c("gnw2000")) {
-  inputFname = sprintf("%s.Rdata", ds)
-  fullPathIn = file.path("/home/kiran/data/netbenchmark/inputs",inputFname)
-  load(file=fullPathIn)
-  
-  for(i in seq_along(data.list)){
-    message('Processing ', ds, '[', i, '/',  length(data.list), ']')
-    inputData <- as.data.frame(data.list[[i]])
-    top20.aupr <- netbenchmark.data(methods=c("MIEmpirical", "MImm", "MIshrink", "MIsg", "Kendall", "Pearson"),
-                                    data = inputData,
-                                    true.net=true.net,plot=FALSE,
-                                    verbose=FALSE)
-    # save the output
-    outputFname = sprintf("%s_%d.Rdata", ds, i)
-    fullPathOut = file.path("/home/kiran/data/netbenchmark/r_outputs",outputFname)
-    save(list=c("top20.aupr"), file = fullPathOut)
-  }
+localNoiseVec = c(0,10,20,30,40,50)
+globalNoiseVec = c(0,10,20,30,40,50)
+
+for(ds in c("syntren300")) {
+    for(gn in globalNoiseVec) {
+        for(ln in localNoiseVec) {
+            inputFname = sprintf("%s.Rdata", ds)
+            subFolder = sprintf('gn_%d_ln_%d',gn,ln)
+            fullPathIn = file.path("/data/netbenchmark/inputs",subFolder,inputFname)
+            load(file=fullPathIn)
+            
+            for(i in seq_along(data.list)){
+              message('Processing ', ds, '[', i, '/',  length(data.list), ']')
+              inputData <- as.data.frame(data.list[[i]])
+              #top20.aupr <- netbenchmark.data(methods=c("MIEmpirical", "MImm", "MIshrink", "MIsg", "Kendall", "Pearson"),
+              #                                data = inputData,
+              #                                true.net=true.net,plot=FALSE,
+              #                                verbose=FALSE)
+              top20.aupr <- netbenchmark.data(methods=c("Kendall"),
+                                              data = inputData,
+                                              true.net=true.net,plot=FALSE,
+                                              verbose=FALSE)
+              # save the output
+              outputFname = sprintf("%s_%d.Rdata", ds, i)
+              dir.create(file.path("/home/kiran/data/netbenchmark/r_outputs",subFolder), showWarnings = FALSE)
+              fullPathOut = file.path("/home/kiran/data/netbenchmark/r_outputs",subFolder,outputFname)
+              save(list=c("top20.aupr"), file = fullPathOut)
+            }
+        }
+    }
 }
 
 ###############################################################################

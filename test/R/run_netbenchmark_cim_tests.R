@@ -161,16 +161,17 @@ MatlabMI <- function(ds, true.net) {
   net <- mrnet(mim)
 }
 
-availableDataSources = c("syntren300","rogers1000","syntren1000","gnw1565","gnw2000")
-
+#availableDataSources = c("syntren300","rogers1000","syntren1000","gnw1565","gnw2000")
+availableDataSources = c("syntren300")
+                         
 if(Sys.info()["sysname"]=="Darwin") {  # mac
-  inputRepo    = "/Users/kiran/data/netbenchmark/inputs"
-  rResultsRepo = "/Users/kiran/data/netbenchmark/r_outputs"
-  matlabResultsRepo = "/Users/kiran/data/netbenchmark/matlab_outputs"
+  inputRepo    = "/data/netbenchmark/inputs"
+  rResultsRepo = "/data/netbenchmark/r_outputs"
+  matlabResultsRepo = "/data/netbenchmark/matlab_outputs"
 } else {  # unix
-  inputRepo    = "/home/kiran/data/netbenchmark/inputs"
-  rResultsRepo = "/home/kiran/data/netbenchmark/r_outputs"
-  matlabResultsRepo = "/home/kiran/data/netbenchmark/matlab_outputs"
+  inputRepo    = "/data/netbenchmark/inputs"
+  rResultsRepo = "/data/netbenchmark/r_outputs"
+  matlabResultsRepo = "/data/netbenchmark/matlab_outputs"
 }
 
 for(ds in availableDataSources) {

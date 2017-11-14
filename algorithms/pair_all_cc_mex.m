@@ -41,7 +41,7 @@ for ii=1:n
     parfor (jj=ii+1:n, getParforArg())
         y = X(:,jj);        
         
-        cimVal = cim_v8a_cc_mex(x,y,minScanIncr);
+        cimVal = cim(x,y,minScanIncr);
         knn1Val = KraskovMI_cc_mex(x,y,1);
         knn6Val = KraskovMI_cc_mex(x,y,6);
         knn20Val = KraskovMI_cc_mex(x,y,20);

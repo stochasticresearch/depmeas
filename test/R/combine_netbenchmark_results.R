@@ -42,7 +42,6 @@ if(Sys.info()["sysname"]=="Darwin") {  # mac
 }
 
 numDatasetsToProcess = 150
-# numDatasetsToProcess = 3
 
 # for(ds in c("syntren300","rogers1000","syntren1000","gnw1565","gnw2000")) {
 for(ds in c("syntren300")) {
