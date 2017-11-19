@@ -12,7 +12,8 @@ else
     combinedDataRepo = '/home/kiran/ownCloud/PhD/sim_results/netbenchmark';
 end
 
-estimatorsToPlot = {'"CIM"', '"Kendall"', '"KNN1"', '"KNN6"', '"KNN20"', '"vME"', '"AP"', '"rand"'};
+%estimatorsToPlot = {'"CIM"', '"Kendall"', '"KNN1"', '"KNN6"', '"KNN20"', '"vME"', '"AP"', '"rand"'};
+estimatorsToPlot = {'"CIM"', '"KNN1"', '"KNN6"', '"KNN20"', '"vME"', '"AP"'};
 cellfind = @(string)(@(cell_contents)(strcmp(string,cell_contents)));
 fontSizeVal = 20;
 for datasetIdx=1:length(datasetsToPlot)
