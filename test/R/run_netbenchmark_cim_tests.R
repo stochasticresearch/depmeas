@@ -163,7 +163,9 @@ MatlabMI <- function(ds, true.net) {
 
 #availableDataSources = c("syntren300","rogers1000","syntren1000","gnw1565","gnw2000")
 availableDataSources = c("syntren300")
-                         
+globalNoiseVec = c(0,10,20,30,40,50)
+localNoiseVec = c(10,20,30,40,50)
+
 if(Sys.info()["sysname"]=="Darwin") {  # mac
   inputRepo    = "/data/netbenchmark/inputs"
   rResultsRepo = "/data/netbenchmark/r_outputs"
@@ -175,40 +177,46 @@ if(Sys.info()["sysname"]=="Darwin") {  # mac
 }
 
 for(ds in availableDataSources) {
-  # load the datasource to get the true network
-  inputFname = file.path(inputRepo,sprintf("%s.Rdata",ds))
-  load(inputFname)
-  for(i in seq_along(data.list)){
-    cimInputFname   = sprintf("%s_%d_cim_output.mat", ds, i)
-    knn1InputFname  = sprintf("%s_%d_knn1_output.mat", ds, i)
-    knn6InputFname  = sprintf("%s_%d_knn6_output.mat", ds, i)
-    knn20InputFname = sprintf("%s_%d_knn20_output.mat", ds, i)
-    vmeInputFname   = sprintf("%s_%d_vme_output.mat", ds, i)
-    apInputFname    = sprintf("%s_%d_ap_output.mat", ds, i)
-    # TODO: do TAU if you see any anomalous results ...
-
-    cim_top20.aupr   <- netbenchmark_custom.data(methods=c("CIM"),data = file.path(matlabResultsRepo,cimInputFname),
-                                    true.net=true.net,plot=FALSE,verbose=FALSE)
-    knn1_top20.aupr  <- netbenchmark_custom.data(methods=c("MatlabMI"),data = file.path(matlabResultsRepo,knn1InputFname),
-                                    true.net=true.net,plot=FALSE,verbose=FALSE)
-    knn6_top20.aupr  <- netbenchmark_custom.data(methods=c("MatlabMI"),data = file.path(matlabResultsRepo,knn6InputFname),
-                                    true.net=true.net,plot=FALSE,verbose=FALSE)
-    knn20_top20.aupr <- netbenchmark_custom.data(methods=c("MatlabMI"),data = file.path(matlabResultsRepo,knn20InputFname),
-                                    true.net=true.net,plot=FALSE,verbose=FALSE)
-    vme_top20.aupr   <- netbenchmark_custom.data(methods=c("MatlabMI"),data = file.path(matlabResultsRepo,vmeInputFname),
-                                    true.net=true.net,plot=FALSE,verbose=FALSE)
-    ap_top20.aupr    <- netbenchmark_custom.data(methods=c("MatlabMI"),data = file.path(matlabResultsRepo,apInputFname),
-                                    true.net=true.net,plot=FALSE,verbose=FALSE)
-    
-    print(cim_top20.aupr$`AUPRtop20%`)
-    #print(knn1_top20.aupr$`AUPRtop20%`)
-
-    # save the output
-    outputFname = sprintf("%s_%d_matlab.Rdata", ds, i)
-    fullPathOut = file.path(rResultsRepo,outputFname)
-    save(list=c("cim_top20.aupr","knn1_top20.aupr","knn6_top20.aupr","knn20_top20.aupr",
-                "vme_top20.aupr","ap_top20.aupr"),file = fullPathOut)
-    #save(list=c("cim_top20.aupr"),file = fullPathOut)
+  for(global_noise in globalNoiseVec) {
+    for(local_noise in localNoiseVec) {
+      subfolder = sprintf("gn_%d_ln_%d",global_noise,local_noise)
+      if(dir.exists(file.path(inputRepo,subfolder))) {
+        print(sprintf('Processing ds=%s [%d/%d]',ds,global_noise,local_noise))
+        # load the datasource to get the true network
+        inputFname = file.path(inputRepo,subfolder,sprintf("%s.Rdata",ds))
+        load(inputFname)
+        for(i in seq_along(data.list)){
+          cimInputFname   = file.path(matlabResultsRepo,subfolder,sprintf("%s_%d_cim_output.mat", ds, i))
+          knn1InputFname  = file.path(matlabResultsRepo,subfolder,sprintf("%s_%d_knn1_output.mat", ds, i))
+          knn6InputFname  = file.path(matlabResultsRepo,subfolder,sprintf("%s_%d_knn6_output.mat", ds, i))
+          knn20InputFname = file.path(matlabResultsRepo,subfolder,sprintf("%s_%d_knn20_output.mat", ds, i))
+          vmeInputFname   = file.path(matlabResultsRepo,subfolder,sprintf("%s_%d_vme_output.mat", ds, i))
+          apInputFname    = file.path(matlabResultsRepo,subfolder,sprintf("%s_%d_ap_output.mat", ds, i))
+          
+          outputFname = sprintf("%s_%d_matlab.Rdata", ds, i)
+          fullPathOut = file.path(rResultsRepo,subfolder,outputFname)
+          if(!file.exists(fullPathOut) && file.exists(cimInputFname) && file.exists(knn1InputFname) && 
+                                          file.exists(knn6InputFname) && file.exists(knn20InputFname) && 
+                                          file.exists(vmeInputFname) && file.exists(apInputFname)) {
+            cim_top20.aupr   <- netbenchmark_custom.data(methods=c("CIM"),data = cimInputFname,
+                                                         true.net=true.net,plot=FALSE,verbose=FALSE)
+            knn1_top20.aupr  <- netbenchmark_custom.data(methods=c("MatlabMI"),data = knn1InputFname,
+                                                         true.net=true.net,plot=FALSE,verbose=FALSE)
+            knn6_top20.aupr  <- netbenchmark_custom.data(methods=c("MatlabMI"),data = knn6InputFname,
+                                                         true.net=true.net,plot=FALSE,verbose=FALSE)
+            knn20_top20.aupr <- netbenchmark_custom.data(methods=c("MatlabMI"),data = knn20InputFname,
+                                                         true.net=true.net,plot=FALSE,verbose=FALSE)
+            vme_top20.aupr   <- netbenchmark_custom.data(methods=c("MatlabMI"),data = vmeInputFname,
+                                                         true.net=true.net,plot=FALSE,verbose=FALSE)
+            ap_top20.aupr    <- netbenchmark_custom.data(methods=c("MatlabMI"),data = apInputFname,
+                                                         true.net=true.net,plot=FALSE,verbose=FALSE)
+            # save the output
+            save(list=c("cim_top20.aupr","knn1_top20.aupr","knn6_top20.aupr","knn20_top20.aupr",
+                        "vme_top20.aupr","ap_top20.aupr"),file = fullPathOut)
+          }
+        }
+      }
+    }
   }
 }
 

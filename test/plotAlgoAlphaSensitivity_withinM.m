@@ -7,11 +7,8 @@ noiseVec = num_noise_test_min:num_noise_test_max;
 linearDepCell = cell(1,length(MVecToPlot));
 quadraticDepCell = cell(1,length(MVecToPlot));
 cubicDepCell = cell(1,length(MVecToPlot));
-cubicDepNoCorrectionCell = cell(1,length(MVecToPlot));
 sinusoidalDepCell = cell(1,length(MVecToPlot));
-sinusoidalDepNoCorrectionCell = cell(1,length(MVecToPlot));
 hiFreqSinDepCell = cell(1,length(MVecToPlot));
-hiFreqSinDepNoCorrectionCell = cell(1,length(MVecToPlot));
 fourthRootDepCell = cell(1,length(MVecToPlot));
 circleDepCell = cell(1,length(MVecToPlot));
 stepDepCell = cell(1,length(MVecToPlot));
@@ -40,17 +37,14 @@ for MIdx=1:length(MVecToPlot)
     stepDep = zeros(2,length(noiseVec));
     indep = zeros(2,length(noiseVec));
     
-    cubicDep_noCorrection = zeros(2,length(noiseVec));
-    sinusoidalDep_noCorrection = zeros(2,length(noiseVec));
-    hiFreqSinDep_noCorrection = zeros(2,length(noiseVec));
-    
     noiseVecIdx = 1:length(noiseVec);
    
+%     alphasToTest = [0.2];
+    
     % collect all the data for each of the scanincrs we tested and store in
     % a matrix, for each dependency type, we plot the difference between
     % the minimum and the maximum
     for ii=1:length(alphasToTest)
-%         alphaVal = scanincrsToTest(ii);
         rawData = algoSensitivityData{ii};  % algoSensitivityData is loaded from the file above
         linearData = rawData.linearDep(CIMVECIDX,noiseVecIdx);
         quadraticData = rawData.quadraticDep(CIMVECIDX,noiseVecIdx);
@@ -61,25 +55,20 @@ for MIdx=1:length(MVecToPlot)
         circleData = rawData.circleDep(CIMVECIDX,noiseVecIdx);
         stepData = rawData.stepDep(CIMVECIDX,noiseVecIdx);
         indepData = rawData.indep(CIMVECIDX,noiseVecIdx);
-        
-        cubicDataNoCorrection = rawData.cubicDep(CIMVECIDX,noiseVecIdx);
-        sinusoidalDataNoCorrection = rawData.sinusoidalDep(CIMVECIDX,noiseVecIdx);
-        hiFreqSinDataNoCorrection = rawData.hiFreqSinDep(CIMVECIDX,noiseVecIdx);
-        
+
         % seed the data
         if(ii==1)
             for jj=1:2
                 linearDep(jj,noiseVecIdx) = linearData;
                 quadraticDep(jj,noiseVecIdx) = quadraticData;
+                cubicDep(jj,noiseVecIdx) = cubicData;
+                sinusoidalDep(jj,noiseVecIdx) = sinusoidalData;
+                hiFreqSinDep(jj,noiseVecIdx) = hiFreqSinData;
                 fourthRootDep(jj,noiseVecIdx) = fourthRootData;
                 circleDep(jj,noiseVecIdx) = circleData;
                 cubicDep(jj,noiseVecIdx) = cubicData;
                 stepDep(jj,noiseVecIdx) = stepData;
-                indep(jj,noiseVecIdx) = indepData;
-                
-                cubicDep_noCorrection(jj,noiseVecIdx) = cubicDataNoCorrection;
-                sinusoidalDep_noCorrection(jj,noiseVecIdx) = sinusoidalDataNoCorrection;
-                hiFreqSinDep_noCorrection(jj,noiseVecIdx) = hiFreqSinDataNoCorrection;
+                indep(jj,noiseVecIdx) = indepData;                
             end
         end
         
@@ -102,7 +91,7 @@ for MIdx=1:length(MVecToPlot)
 
             % process cubic
             if(cubicData(jj)<cubicDep(1,jj))
-                cubicDep_noCorrection(1,jj) = cubicData(jj);
+                cubicDep(1,jj) = cubicData(jj);
             end
             if(cubicData(jj)>cubicDep(2,jj))
                 cubicDep(2,jj) = cubicData(jj);
@@ -162,11 +151,8 @@ for MIdx=1:length(MVecToPlot)
     linearDepCell{MIdx}     = linearDep;
     quadraticDepCell{MIdx}  = quadraticDep;
     cubicDepCell{MIdx}      = cubicDep;
-    cubicDepNoCorrectionCell{MIdx}      = cubicDep_noCorrection;
     sinusoidalDepCell{MIdx} = sinusoidalDep;
-    sinusoidalDepNoCorrectionCell{MIdx} = sinusoidalDep_noCorrection;
     hiFreqSinDepCell{MIdx}  = hiFreqSinDep;
-    hiFreqSinDepNoCorrectionCell{MIdx}  = hiFreqSinDep_noCorrection;
     fourthRootDepCell{MIdx} = fourthRootDep;
     circleDepCell{MIdx}     = circleDep;
     stepDepCell{MIdx}       = stepDep;
@@ -298,6 +284,10 @@ minX = min(noiseVecToPlot);
 maxX = max(noiseVecToPlot);
 minY = min([y1 y2 y3 y4 y5 y6 y7 y8]);
 maxY = max([y1 y2 y3 y4 y5 y6 y7 y8]);
+
+if(minY==maxY)
+    maxY = minY + eps;
+end
 
 inset_bufX = 0; inset_bufY = 0.28;
 inset_width = 0.06; inset_height = 0.06;

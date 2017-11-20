@@ -18,8 +18,9 @@ runPowerSensitivity        = 0;
 runPowerAlphaSensitivity   = 0;
 plotPowerSensitivity       = 0;
 runAlgoSensitivity         = 0;
-runAlgoAlphaSensitivity    = 1;
+runAlgoAlphaSensitivity    = 0;
 plotAlgoSensitivity        = 0;
+plotAlgoAlphaSensitivity   = 1;
 runConvergence             = 0;
 plotConvergence            = 0;
 runPower_test_M500         = 0;
@@ -460,7 +461,7 @@ if(~exist('masterCfgRun'))  % means we are running the cell independently
     dispstat('','init'); % One time only initialization
 end
 if(~exist('masterCfgRun') || (masterCfgRun==1 && plotAlgoAlphaSensitivity) )
-    MVecToPlot = 100:100:700;
+    MVecToPlot = 100:100:1000;
     num_noise_test_min = 0;
     num_noise_test_max = 20;
 
