@@ -34,28 +34,32 @@ for dataSourceIdx=1:length(dataSourcesToProcess)
                 subfolder = sprintf('gn_%d_ln_%d',gn,ln);
                 fIn = fullfile(dataRepo,subfolder,sprintf('%s_%d.mat',dataSource,ii));
                 load(fIn);
-
-                X = data;
-                [R_cim,R_knn1,R_knn6,R_knn20,R_vmeMI,R_apMI,R_tau] = pair_all_cc_mex( X );
                 
-                if ~exist(fullfile(dataOutputFolder,subfolder), 'dir')
-                    mkdir(fullfile(dataOutputFolder,subfolder));
-                end
+                cimfOut = fullfile(dataOutputFolder,subfolder,sprintf('%s_%d_cim_output.mat',dataSource,ii));
+                knn1fOut = fullfile(dataOutputFolder,subfolder,sprintf('%s_%d_knn1_output.mat',dataSource,ii));
+                knn6fOut = fullfile(dataOutputFolder,subfolder,sprintf('%s_%d_knn6_output.mat',dataSource,ii));
+                knn20fOut = fullfile(dataOutputFolder,subfolder,sprintf('%s_%d_knn20_output.mat',dataSource,ii));
+                vmefOut = fullfile(dataOutputFolder,subfolder,sprintf('%s_%d_vme_output.mat',dataSource,ii));
+                apfOut = fullfile(dataOutputFolder,subfolder,sprintf('%s_%d_ap_output.mat',dataSource,ii));
+                taufOut = fullfile(dataOutputFolder,subfolder,sprintf('%s_%d_tau_output.mat',dataSource,ii));
+                
+                if(~exist(cimFout,'file') || ~exist(knn1Fout,'file') || ~exist(knn6Fout,'file') || ...
+                   ~exist(knn20Fout,'file') || ~exist(vmefOut,'file') || ~exist(apfOut,'file') || ~exist(taufOut,'file'))
+                    X = data;
+                    [R_cim,R_knn1,R_knn6,R_knn20,R_vmeMI,R_apMI,R_tau] = pair_all_cc_mex( X );
 
-                fOut = fullfile(dataOutputFolder,subfolder,sprintf('%s_%d_cim_output.mat',dataSource,ii));
-                save(fOut,'R_cim');
-                fOut = fullfile(dataOutputFolder,subfolder,sprintf('%s_%d_knn1_output.mat',dataSource,ii));
-                save(fOut,'R_knn1');
-                fOut = fullfile(dataOutputFolder,subfolder,sprintf('%s_%d_knn6_output.mat',dataSource,ii));
-                save(fOut,'R_knn6');
-                fOut = fullfile(dataOutputFolder,subfolder,sprintf('%s_%d_knn20_output.mat',dataSource,ii));
-                save(fOut,'R_knn20');
-                fOut = fullfile(dataOutputFolder,subfolder,sprintf('%s_%d_vme_output.mat',dataSource,ii));
-                save(fOut,'R_vmeMI');
-                fOut = fullfile(dataOutputFolder,subfolder,sprintf('%s_%d_ap_output.mat',dataSource,ii));
-                save(fOut,'R_apMI');
-                fOut = fullfile(dataOutputFolder,subfolder,sprintf('%s_%d_tau_output.mat',dataSource,ii));
-                save(fOut,'R_tau');
+                    if ~exist(fullfile(dataOutputFolder,subfolder), 'dir')
+                        mkdir(fullfile(dataOutputFolder,subfolder));
+                    end
+
+                    save(cimfOut,'R_cim');
+                    save(knn1fOut,'R_knn1');
+                    save(knn6fOut,'R_knn6');
+                    save(knn20fOut,'R_knn20');
+                    save(vmefOut,'R_vmeMI');
+                    save(apfOut,'R_apMI');
+                    save(taufOut,'R_tau');
+                end
             end
         end
     end
