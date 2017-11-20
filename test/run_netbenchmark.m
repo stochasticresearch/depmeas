@@ -43,8 +43,8 @@ for dataSourceIdx=1:length(dataSourcesToProcess)
                 apfOut = fullfile(dataOutputFolder,subfolder,sprintf('%s_%d_ap_output.mat',dataSource,ii));
                 taufOut = fullfile(dataOutputFolder,subfolder,sprintf('%s_%d_tau_output.mat',dataSource,ii));
                 
-                if(~exist(cimFout,'file') || ~exist(knn1Fout,'file') || ~exist(knn6Fout,'file') || ...
-                   ~exist(knn20Fout,'file') || ~exist(vmefOut,'file') || ~exist(apfOut,'file') || ~exist(taufOut,'file'))
+                if(~exist(cimfOut,'file') || ~exist(knn1fOut,'file') || ~exist(knn6fOut,'file') || ...
+                   ~exist(knn20fOut,'file') || ~exist(vmefOut,'file') || ~exist(apfOut,'file') || ~exist(taufOut,'file'))
                     X = data;
                     [R_cim,R_knn1,R_knn6,R_knn20,R_vmeMI,R_apMI,R_tau] = pair_all_cc_mex( X );
 
