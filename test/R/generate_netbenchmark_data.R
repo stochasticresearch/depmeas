@@ -81,7 +81,7 @@ datasets is bigger than the orginal number of experiments in the datasource:
 
 #availableDataSources = c("rogers1000","syntren300","syntren1000","gnw1565","gnw2000")
 availableDataSources = c("syntren300")
-localNoiseVec = c(0,10,20,30,40,50)
+localNoiseVec = c(0,10,20,3,40,50)
 globalNoiseVec = c(0,10,20,30,40,50)
 for(ds in availableDataSources) {
     for(gn in globalNoiseVec) {

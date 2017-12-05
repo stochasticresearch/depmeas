@@ -3,6 +3,9 @@
 rm(list = ls())
 cat("\014")
 
+library(foreach)
+library(doParallel)
+
 writeMat <- R.matlab::writeMat
 readMat <- R.matlab::readMat
 
@@ -12,6 +15,10 @@ localNoiseVec = c(0,10,20,30,40,50)
 globalNoiseVec = c(0,10,20,30,40,50)
 dataRepo = "/data/netbenchmark/inputs/"
 
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
 for(ds in availableDataSources) {
     for(gn in globalNoiseVec) {
         for(ln in localNoiseVec) {
@@ -20,7 +27,8 @@ for(ds in availableDataSources) {
             fullPathIn = file.path(dataRepo,subFolder,inputFname)
             load(file=fullPathIn)
             
-            for(i in seq_along(data.list)){
+            #for(i in seq_along(data.list)){
+            foreach(i=1:length(seq_along(data.list))) %dopar% {
                 outputFname = sprintf("%s_%d.mat",ds,i)
                 dir.create(file.path(dataRepo,subFolder), showWarnings = FALSE)
                 fullPathOut = file.path(dataRepo,subFolder,outputFname)
@@ -31,3 +39,5 @@ for(ds in availableDataSources) {
         }
     }
 }
+
+stopCluster(cl)
