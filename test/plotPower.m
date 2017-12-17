@@ -118,6 +118,11 @@ elseif(style==2)
             else
                 set(ax1, 'ytick', 1:length(labels), 'yticklabel', [], 'FontSize', font_size)
             end
+            xtLabelVec = zeros(1,length(ax1.XTick));
+            for zz=1:length(ax1.XTick)
+                xtLabelVec(zz) = noiseVec(ax1.XTick(zz)+1);
+            end
+            set(ax1,'xticklabel',xtLabelVec);
 %             set(ax2, 'ytick', 1:length(labels), 'yticklabel', [], 'FontSize', font_size)
 %             set(ax2, 'xtick', [0.25,0.75], 'xticklabel', [500,1500], 'FontSize', font_size);
             

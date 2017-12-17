@@ -107,11 +107,18 @@ elseif(style==2)
             pm(pm==0)=inf;
             imagesc(pm,'AlphaData',pm);
             
+            ax1 = gca;
+            
             if(subplotNum==1)
                 set(gca, 'ytick', 1:length(labels), 'yticklabel', labels, 'FontSize', font_size)
             else
                 set(gca, 'ytick', 1:length(labels), 'yticklabel', [], 'FontSize', font_size)
             end
+            xtLabelVec = zeros(1,length(ax1.XTick));
+            for zz=1:length(ax1.XTick)
+                xtLabelVec(zz) = noiseVec(ax1.XTick(zz)+1);
+            end
+            set(ax1,'xticklabel',xtLabelVec);
             
             if(subplotNum==numRelationshipsPerFig && figNum==2)
                 h = colorbar();
