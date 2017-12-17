@@ -12,6 +12,7 @@ runPower_M500              = 0;
 runPower_All               = 0;
 plotPower_M500_depMeasures = 0;
 plotPower_M500_miMeasures  = 0;
+plotPower_M500_allMeasures = 0;
 plotPower_ss_depMeasures   = 0;
 plotPower_ss_miMeasures    = 0;
 runPowerSensitivity        = 0;
@@ -20,7 +21,7 @@ plotPowerSensitivity       = 0;
 runAlgoSensitivity         = 0;
 runAlgoAlphaSensitivity    = 0;
 plotAlgoSensitivity        = 0;
-plotAlgoAlphaSensitivity   = 1;
+plotAlgoAlphaSensitivity   = 0;
 runConvergence             = 0;
 plotConvergence            = 0;
 runPower_test_M500         = 0;
@@ -200,7 +201,7 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotPower_M500_depMeasures) )
 
     noiseVecToPlot = noiseVec/10;
 
-    plotStyle = 1;
+    plotStyle = 2;
     plotPower(powerMat, M, labels, noiseVecToPlot, plotStyle)
 end
 %% Plot the CIM Algorithm Power vs. other DPI satisfying measures (i.e. measures of Mutual Information)
@@ -220,7 +221,7 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotPower_M500_miMeasures) )
     else
         load('/home/kiran/ownCloud/PhD/sim_results/independence/power_all.mat');
     end
-    M = 100;
+    M = 500;
     MIdx = find(MVec==M);
 
     labels = {'CIM', 'KNN-1', 'KNN-6', 'KNN-20', 'AP', 'vME'};
@@ -236,10 +237,82 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotPower_M500_miMeasures) )
         fIdx = find(contains(nameIdxCorrelationCell,label));
         powerMat(labelIdx,:,:) = squeeze(powerTensor(MIdx,fIdx,:,1:length(noiseVec)));
     end
+    
+    cellfind = @(string)(@(cell_contents)(strcmp(string,cell_contents)));
+    sampleSizeAnalysisVec = zeros(length(labels),8,length(noiseVec));
+    powerThreshold = 0.7;
+    for labelIdx=1:length(labels)
+        label = labels{labelIdx};
+        % find which index this corresponds to
+        fIdx = find(cellfun(cellfind(label),nameIdxCorrelationCell));
+        
+        if(strcmpi(label,''))
+            sampleSizeAnalysisVec(labelIdx,:,:) = 0;
+        else
+            for typ=1:numDepTests
+                for l=1:length(noiseVec)
+                    for m=1:length(MVec)
+                        M = MVec(m);
+                        if(powerTensor(m,fIdx,typ,l)>powerThreshold)
+                            % TODO: we can do some interpolation here, so that we
+                            % are not restricted to the boundaries of which tests
+                            % were run ...
+                            sampleSizeAnalysisVec(labelIdx,typ,l) = M;
+                            break;
+                        end
+                    end
+                end
+            end
+        end
+    end
 
     noiseVecToPlot = noiseVec/10;
 
-    plotStyle = 1;
+    plotStyle = 2;
+    plotPower(powerMat, M, labels, noiseVecToPlot, plotStyle)
+end
+
+%% Plot the CIM Algorithm Power vs. other DPI satisfying measures (i.e. measures of Mutual Information)
+if(~exist('masterCfgRun'))  % means we are running the cell independently
+    clear;
+    clc;
+    close all;
+    dbstop if error;
+    dispstat('','init'); % One time only initialization
+end
+if(~exist('masterCfgRun') || (masterCfgRun==1 && plotPower_M500_allMeasures) )
+    % load the data
+    if(ispc)
+        load('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\power_all.mat');
+    elseif(ismac)
+        load('/Users/Kiran/ownCloud/PhD/sim_results/independence/power_all.mat');
+    else
+        load('/home/kiran/ownCloud/PhD/sim_results/independence/power_all.mat');
+    end
+    M = 500;
+    MIdx = find(MVec==M);
+
+    labels = {'CIM', 'KNN-1', 'KNN-6', 'KNN-20', 'AP', 'vME','', 'CoS', 'RDC', 'TICe', 'dCor', 'cCor'};
+
+    num_noise_test_min = 0;
+    num_noise_test_max = 20;
+    noiseVec = num_noise_test_min:num_noise_test_max;
+    powerMat = zeros(length(labels),8,length(noiseVec));
+
+    for labelIdx=1:length(labels)
+        label = labels{labelIdx};
+        % find which index this corresponds to
+        fIdx = find(contains(nameIdxCorrelationCell,label));
+        if(strcmpi(label,''))
+            powerMat(labelIdx,:,:) = 0.5;
+        else
+            powerMat(labelIdx,:,:) = squeeze(powerTensor(MIdx,fIdx,:,1:length(noiseVec)));
+        end
+    end
+
+    noiseVecToPlot = noiseVec/10;
+
+    plotStyle = 2;
     plotPower(powerMat, M, labels, noiseVecToPlot, plotStyle)
 end
 %% Plot the small-sample results for CIM vs. other leading measures of dependence
@@ -250,7 +323,7 @@ if(~exist('masterCfgRun'))  % means we are running the cell independently
     dbstop if error;
     dispstat('','init'); % One time only initialization
 end
-if(~exist('masterCfgRun') || (masterCfgRun==1 && plotPower_ss_depMeasures) )
+if(~exist('masterCfgRun') || (masterCfgRun==1 && plotPower_ss_miMeasures) )
     % load the data
     if(ispc)
         load('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\power_all.mat');
@@ -274,26 +347,29 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotPower_ss_depMeasures) )
         % find which index this corresponds to
         fIdx = find(cellfun(cellfind(label),nameIdxCorrelationCell));
         
-        for typ=1:numDepTests
-            for l=1:length(noiseVec)
-                for m=1:length(MVec)
-                    M = MVec(m);
-                    if(powerTensor(m,fIdx,typ,l)>powerThreshold)
-                        % TODO: we can do some interpolation here, so that we
-                        % are not restricted to the boundaries of which tests
-                        % were run ...
-                        sampleSizeAnalysisVec(labelIdx,typ,l) = M;
-                        break;
+        if(strcmpi(label,''))
+            sampleSizeAnalysisVec(labelIdx,:,:) = 0;
+        else
+            for typ=1:numDepTests
+                for l=1:length(noiseVec)
+                    for m=1:length(MVec)
+                        M = MVec(m);
+                        if(powerTensor(m,fIdx,typ,l)>powerThreshold)
+                            % TODO: we can do some interpolation here, so that we
+                            % are not restricted to the boundaries of which tests
+                            % were run ...
+                            sampleSizeAnalysisVec(labelIdx,typ,l) = M;
+                            break;
+                        end
                     end
                 end
             end
         end
-        
     end
 
     noiseVecToPlot = noiseVec/10;
 
-    plotStyle = 1;
+    plotStyle = 2;
     plotPower_ss(sampleSizeAnalysisVec, labels, noiseVecToPlot, plotStyle)
 end
 
