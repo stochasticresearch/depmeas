@@ -185,7 +185,6 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotPower_M500_depMeasures) )
     MIdx = find(MVec==M);
 
     labels = {'CIM', 'CoS', 'RDC', 'TICe', 'dCor', 'cCor'};
-    cellfind = @(string)(@(cell_contents)(strcmp(string,cell_contents)));
 
     num_noise_test_min = 0;
     num_noise_test_max = 20;
@@ -195,14 +194,42 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotPower_M500_depMeasures) )
     for labelIdx=1:length(labels)
         label = labels{labelIdx};
         % find which index this corresponds to
-        fIdx = find(cellfun(cellfind(label),nameIdxCorrelationCell));
+        fIdx = find(contains(nameIdxCorrelationCell,label));
         powerMat(labelIdx,:,:) = squeeze(powerTensor(MIdx,fIdx,:,1:length(noiseVec)));
+    end
+    
+    cellfind = @(string)(@(cell_contents)(strcmp(string,cell_contents)));
+    sampleSizeAnalysisVec = nan(length(labels),8);
+    powerThreshold = 0.8;
+    noiseLevel = 10; % we will plot stars for this noise level
+    noiseIdx = find(noiseVec==noiseLevel);
+    for labelIdx=1:length(labels)
+        label = labels{labelIdx};
+        % find which index this corresponds to
+        fIdx = find(cellfun(cellfind(label),nameIdxCorrelationCell));
+        
+        if(strcmpi(label,''))
+            sampleSizeAnalysisVec(labelIdx,:,:) = 0;
+        else
+            for typ=1:numDepTests
+                for m=1:length(MVec)
+                    M = MVec(m);
+                    if(powerTensor(m,fIdx,typ,noiseIdx)>powerThreshold)
+                        % TODO: we can do some interpolation here, so that we
+                        % are not restricted to the boundaries of which tests
+                        % were run ...
+                        sampleSizeAnalysisVec(labelIdx,typ) = M;
+                        break;
+                    end
+                end
+            end
+        end
     end
 
     noiseVecToPlot = noiseVec/10;
-
+    
     plotStyle = 2;
-    plotPower(powerMat, M, labels, noiseVecToPlot, plotStyle)
+    plotPower(powerMat, M, labels, noiseVecToPlot, plotStyle,sampleSizeAnalysisVec)
 end
 %% Plot the CIM Algorithm Power vs. other DPI satisfying measures (i.e. measures of Mutual Information)
 if(~exist('masterCfgRun'))  % means we are running the cell independently
@@ -239,8 +266,10 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotPower_M500_miMeasures) )
     end
     
     cellfind = @(string)(@(cell_contents)(strcmp(string,cell_contents)));
-    sampleSizeAnalysisVec = zeros(length(labels),8,length(noiseVec));
-    powerThreshold = 0.7;
+    sampleSizeAnalysisVec = nan(length(labels),8);
+    powerThreshold = 0.8;
+    noiseLevel = 10; % we will plot stars for this noise level
+    noiseIdx = find(noiseVec==noiseLevel);
     for labelIdx=1:length(labels)
         label = labels{labelIdx};
         % find which index this corresponds to
@@ -250,16 +279,14 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotPower_M500_miMeasures) )
             sampleSizeAnalysisVec(labelIdx,:,:) = 0;
         else
             for typ=1:numDepTests
-                for l=1:length(noiseVec)
-                    for m=1:length(MVec)
-                        M = MVec(m);
-                        if(powerTensor(m,fIdx,typ,l)>powerThreshold)
-                            % TODO: we can do some interpolation here, so that we
-                            % are not restricted to the boundaries of which tests
-                            % were run ...
-                            sampleSizeAnalysisVec(labelIdx,typ,l) = M;
-                            break;
-                        end
+                for m=1:length(MVec)
+                    M = MVec(m);
+                    if(powerTensor(m,fIdx,typ,noiseIdx)>powerThreshold)
+                        % TODO: we can do some interpolation here, so that we
+                        % are not restricted to the boundaries of which tests
+                        % were run ...
+                        sampleSizeAnalysisVec(labelIdx,typ) = M;
+                        break;
                     end
                 end
             end
@@ -267,54 +294,11 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotPower_M500_miMeasures) )
     end
 
     noiseVecToPlot = noiseVec/10;
-
+    
     plotStyle = 2;
-    plotPower(powerMat, M, labels, noiseVecToPlot, plotStyle)
+    plotPower(powerMat, M, labels, noiseVecToPlot, plotStyle,sampleSizeAnalysisVec)
 end
 
-%% Plot the CIM Algorithm Power vs. other DPI satisfying measures (i.e. measures of Mutual Information)
-if(~exist('masterCfgRun'))  % means we are running the cell independently
-    clear;
-    clc;
-    close all;
-    dbstop if error;
-    dispstat('','init'); % One time only initialization
-end
-if(~exist('masterCfgRun') || (masterCfgRun==1 && plotPower_M500_allMeasures) )
-    % load the data
-    if(ispc)
-        load('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\power_all.mat');
-    elseif(ismac)
-        load('/Users/Kiran/ownCloud/PhD/sim_results/independence/power_all.mat');
-    else
-        load('/home/kiran/ownCloud/PhD/sim_results/independence/power_all.mat');
-    end
-    M = 500;
-    MIdx = find(MVec==M);
-
-    labels = {'CIM', 'KNN-1', 'KNN-6', 'KNN-20', 'AP', 'vME','', 'CoS', 'RDC', 'TICe', 'dCor', 'cCor'};
-
-    num_noise_test_min = 0;
-    num_noise_test_max = 20;
-    noiseVec = num_noise_test_min:num_noise_test_max;
-    powerMat = zeros(length(labels),8,length(noiseVec));
-
-    for labelIdx=1:length(labels)
-        label = labels{labelIdx};
-        % find which index this corresponds to
-        fIdx = find(contains(nameIdxCorrelationCell,label));
-        if(strcmpi(label,''))
-            powerMat(labelIdx,:,:) = 0.5;
-        else
-            powerMat(labelIdx,:,:) = squeeze(powerTensor(MIdx,fIdx,:,1:length(noiseVec)));
-        end
-    end
-
-    noiseVecToPlot = noiseVec/10;
-
-    plotStyle = 2;
-    plotPower(powerMat, M, labels, noiseVecToPlot, plotStyle)
-end
 %% Plot the small-sample results for CIM vs. other leading measures of dependence
 if(~exist('masterCfgRun'))  % means we are running the cell independently
     clear;
@@ -574,6 +558,8 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && runConvergence) )
     end
 end
 %% Plot the results
+clear;
+clc;
 if(~exist('masterCfgRun'))  % means we are running the cell independently
     clear;
     clc;
@@ -583,7 +569,7 @@ if(~exist('masterCfgRun'))  % means we are running the cell independently
 end
 if(~exist('masterCfgRun') || (masterCfgRun==1 && plotConvergence) )
     
-    plotValues = 0;  % if 1, we plot the values, if 0, we plot the bias
+    plotValues = 1;  % if 1, we plot the values, if 0, we plot the bias
     
     MVecDataAvailable = [100:100:1000 2000 5000];  % add 5000 and 10000 to this as they come online
     tol = 0.015;
@@ -756,20 +742,23 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotConvergence) )
     inletData(5,:) = sin(16*pi*inletX);
     inletData(6,:) = inletX.^(1/4);
     inletData(8,:) = (inletX > 0.5);
-    inset_bufX = .097; inset_bufY = 0.28;
+    inset_bufX = 0.096; inset_bufY = 0.22;
     inset_width = 0.06; inset_height = 0.06;
 
     noiseVecPlot = noiseVecToAnalyze-1;
-    lineWidthVal = 3;
+    lineWidthVal = 2.5;
 
-    figure;
+    width=30;
+    height=width/2.8;
+    figure('paperpositionmode', 'auto', 'units', 'centimeters', 'position', [0 0 width height])
+
     h = subplot(2,4,1);
     % hh1 = plot(noiseToTest,linearDepToPlot(1,noiseToTest),'o-.', ...
     %      noiseToTest,linearDepToPlot(2,noiseToTest),'+-.', ...
     %      noiseToTest,linearDepToPlot(3,noiseToTest),'d-.');
     if(plotValues)
-        hh1 = plot(noiseVecPlot/10,linearDepToPlot(2,noiseVecToAnalyze),'+-.', ...
-                   noiseVecPlot/10,linearDepToPlot(3,noiseVecToAnalyze),'d-.');
+        hh1 = plot(noiseVecPlot/10,linearDepToPlot(2,noiseVecToAnalyze),'+-.'); hold on;
+              scatter(noiseVecPlot/10,linearDepToPlot(3,noiseVecToAnalyze),'d', 'filled');
         hLegend = legend('CIM','$$\widehat{CIM}$$');
         set(hLegend,'Interpreter','latex','Location','SouthWest')
     else
@@ -778,11 +767,13 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotConvergence) )
     end
     grid on;
 %     xlabel('Noise','FontSize',20);
-    title(sprintf('min(M)=%d',MVecResults(1)),'FontSize',20);
+%     title(sprintf('min(M)=%d',MVecResults(1)),'FontSize',20);
+    title(sprintf('%d',MVecResults(1)),'FontSize',20);
     hh1(1).LineWidth = lineWidthVal; 
-    if(plotValues)
-        hh1(2).LineWidth = lineWidthVal; 
-    end
+%     if(plotValues)
+%         hh1(2).LineWidth = lineWidthVal; 
+%     end
+    set(h,'xticklabel',[]);
     h.FontSize = 20;
     inletIdx = 1;
     loc_inset = [h.Position(1)+inset_bufX h.Position(2)+inset_bufY inset_width inset_height];
@@ -794,19 +785,20 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotConvergence) )
 
     h = subplot(2,4,2);
     if(plotValues)
-        hh1 = plot(noiseVecPlot/10,quadraticDepToPlot(2,noiseVecToAnalyze),'+-.', ...
-                   noiseVecPlot/10,quadraticDepToPlot(3,noiseVecToAnalyze),'d-.');
+        hh1 = plot(noiseVecPlot/10,quadraticDepToPlot(2,noiseVecToAnalyze),'+-.'); hold on;
+              scatter(noiseVecPlot/10,quadraticDepToPlot(3,noiseVecToAnalyze),'d', 'filled');
     else
         hh1 = plot(noiseVecPlot/10,abs(quadraticDepToPlot(2,noiseVecToAnalyze)-...
                                        quadraticDepToPlot(3,noiseVecToAnalyze)),'+-.');
     end
     grid on;
 %     xlabel('Noise','FontSize',20);
-    title(sprintf('min(M)=%d',MVecResults(2)),'FontSize',20);
+    title(sprintf('%d',MVecResults(2)),'FontSize',20);
     hh1(1).LineWidth = lineWidthVal; 
-    if(plotValues)
-        hh1(2).LineWidth = lineWidthVal; 
-    end
+%     if(plotValues)
+%         hh1(2).LineWidth = lineWidthVal; 
+%     end
+    set(h,'xticklabel',[],'yticklabel',[])
     % hh1(3).LineWidth = 1.5; 
     h.FontSize = 20;
     inletIdx = 2;
@@ -819,20 +811,21 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotConvergence) )
 
     h = subplot(2,4,3);
     if(plotValues)
-        hh1 = plot(noiseVecPlot/10,cubicDepToPlot(2,noiseVecToAnalyze),'+-.', ...
-                   noiseVecPlot/10,cubicDepToPlot(3,noiseVecToAnalyze),'d-.');
+        hh1 = plot(noiseVecPlot/10,cubicDepToPlot(2,noiseVecToAnalyze),'+-.'); hold on;
+              scatter(noiseVecPlot/10,cubicDepToPlot(3,noiseVecToAnalyze),'d', 'filled');
     else
         hh1 = plot(noiseVecPlot/10,abs(cubicDepToPlot(2,noiseVecToAnalyze)-...
                                        cubicDepToPlot(3,noiseVecToAnalyze)),'+-.');
     end
     grid on;
 %     xlabel('Noise','FontSize',20);
-    title(sprintf('min(M)=%d',MVecResults(3)),'FontSize',20);
+    title(sprintf('%d',MVecResults(3)),'FontSize',20);
     hh1(1).LineWidth = lineWidthVal; 
-    if(plotValues)
-        hh1(2).LineWidth = lineWidthVal; 
-    end
+%     if(plotValues)
+%         hh1(2).LineWidth = lineWidthVal; 
+%     end
     % hh1(3).LineWidth = 1.5; 
+    set(h,'xticklabel',[],'yticklabel',[]);
     h.FontSize = 20;
     inletIdx = 3;
     loc_inset = [h.Position(1)+inset_bufX h.Position(2)+inset_bufY inset_width inset_height];
@@ -844,20 +837,21 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotConvergence) )
 
     h = subplot(2,4,4);
     if(plotValues)
-        hh1 = plot(noiseVecPlot/10,sinusoidalDepToPlot(2,noiseVecToAnalyze),'+-.', ...
-                   noiseVecPlot/10,sinusoidalDepToPlot(3,noiseVecToAnalyze),'d-.');
+        hh1 = plot(noiseVecPlot/10,sinusoidalDepToPlot(2,noiseVecToAnalyze),'+-.'); hold on;
+              scatter(noiseVecPlot/10,sinusoidalDepToPlot(3,noiseVecToAnalyze),'d', 'filled');
     else
         hh1 = plot(noiseVecPlot/10,abs(sinusoidalDepToPlot(2,noiseVecToAnalyze)-...
                                        sinusoidalDepToPlot(3,noiseVecToAnalyze)),'+-.');
     end
     grid on;
 %     xlabel('Noise','FontSize',20);
-    title(sprintf('min(M)=%d',MVecResults(4)),'FontSize',20);
+    title(sprintf('%d',MVecResults(4)),'FontSize',20);
     hh1(1).LineWidth = lineWidthVal; 
-    if(plotValues)
-        hh1(2).LineWidth = lineWidthVal; 
-    end
+%     if(plotValues)
+%         hh1(2).LineWidth = lineWidthVal; 
+%     end
     % hh1(3).LineWidth = 1.5; 
+    set(h,'xticklabel',[],'yticklabel',[]);
     h.FontSize = 20;
     inletIdx = 4;
     loc_inset = [h.Position(1)+inset_bufX h.Position(2)+inset_bufY inset_width inset_height];
@@ -869,20 +863,21 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotConvergence) )
 
     h = subplot(2,4,5);
     if(plotValues)
-        hh1 = plot(noiseVecPlot/10,hiFreqSinDepToPlot(2,noiseVecToAnalyze),'+-.', ...
-                   noiseVecPlot/10,hiFreqSinDepToPlot(3,noiseVecToAnalyze),'d-.');
+        hh1 = plot(noiseVecPlot/10,hiFreqSinDepToPlot(2,noiseVecToAnalyze),'+-.'); hold on;
+              scatter(noiseVecPlot/10,hiFreqSinDepToPlot(3,noiseVecToAnalyze),'d', 'filled');
     else
         hh1 = plot(noiseVecPlot/10,abs(hiFreqSinDepToPlot(2,noiseVecToAnalyze)-...
                                        hiFreqSinDepToPlot(3,noiseVecToAnalyze)),'+-.');
     end
     grid on;
 %     xlabel('Noise','FontSize',20);
-    title(sprintf('min(M)=%d',MVecResults(5)),'FontSize',20);
+    title(sprintf('%d',MVecResults(5)),'FontSize',20);
     hh1(1).LineWidth = lineWidthVal; 
-    if(plotValues)
-        hh1(2).LineWidth = lineWidthVal; 
-    end
+%     if(plotValues)
+%         hh1(2).LineWidth = lineWidthVal; 
+%     end
     % hh1(3).LineWidth = 1.5; 
+%     set(h,'xticklabel',[])
     h.FontSize = 20;
     inletIdx = 5;
     loc_inset = [h.Position(1)+inset_bufX h.Position(2)+inset_bufY inset_width inset_height];
@@ -894,20 +889,21 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotConvergence) )
 
     h = subplot(2,4,6);
     if(plotValues)
-        hh1 = plot(noiseVecPlot/10,fourthRootDepToPlot(2,noiseVecToAnalyze),'+-.', ...
-                   noiseVecPlot/10,fourthRootDepToPlot(3,noiseVecToAnalyze),'d-.');
+        hh1 = plot(noiseVecPlot/10,fourthRootDepToPlot(2,noiseVecToAnalyze),'+-.'); hold on;
+              scatter(noiseVecPlot/10,fourthRootDepToPlot(3,noiseVecToAnalyze),'d', 'filled');
     else
         hh1 = plot(noiseVecPlot/10,abs(fourthRootDepToPlot(2,noiseVecToAnalyze)-...
                                        fourthRootDepToPlot(3,noiseVecToAnalyze)),'+-.');
     end
     grid on;
 %     xlabel('Noise','FontSize',20);
-    title(sprintf('min(M)=%d',MVecResults(6)),'FontSize',20);
+    title(sprintf('%d',MVecResults(6)),'FontSize',20);
     hh1(1).LineWidth = lineWidthVal; 
-    if(plotValues)
-        hh1(2).LineWidth = lineWidthVal; 
-    end
+%     if(plotValues)
+%         hh1(2).LineWidth = lineWidthVal; 
+%     end
     % hh1(3).LineWidth = 1.5; 
+    set(h,'yticklabel',[])
     h.FontSize = 20;
     inletIdx = 6;
     loc_inset = [h.Position(1)+inset_bufX h.Position(2)+inset_bufY inset_width inset_height];
@@ -919,20 +915,21 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotConvergence) )
 
     h = subplot(2,4,7);
     if(plotValues)
-        hh1 = plot(noiseVecPlot/10,circleDepToPlot(2,noiseVecToAnalyze),'+-.', ...
-                   noiseVecPlot/10,circleDepToPlot(3,noiseVecToAnalyze),'d-.');
+        hh1 = plot(noiseVecPlot/10,circleDepToPlot(2,noiseVecToAnalyze),'+-.'); hold on;
+              scatter(noiseVecPlot/10,circleDepToPlot(3,noiseVecToAnalyze),'d', 'filled');
     else
         hh1 = plot(noiseVecPlot/10,abs(circleDepToPlot(2,noiseVecToAnalyze)-...
                                        circleDepToPlot(3,noiseVecToAnalyze)),'+-.');
     end
     grid on;
 %     xlabel('Noise','FontSize',20);
-    title(sprintf('min(M)=%d',MVecResults(7)),'FontSize',20);
+    title(sprintf('%d',MVecResults(7)),'FontSize',20);
     hh1(1).LineWidth = lineWidthVal; 
-    if(plotValues)
-        hh1(2).LineWidth = lineWidthVal; 
-    end
+%     if(plotValues)
+%         hh1(2).LineWidth = lineWidthVal; 
+%     end
     % hh1(3).LineWidth = 1.5; 
+    set(h,'yticklabel',[])
     h.FontSize = 20;
     loc_inset = [h.Position(1)+inset_bufX h.Position(2)+inset_bufY inset_width inset_height];
     ax = axes('Position',loc_inset);
@@ -943,20 +940,21 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotConvergence) )
 
     h = subplot(2,4,8);
     if(plotValues)
-        hh1 = plot(noiseVecPlot/10,stepDepToPlot(2,noiseVecToAnalyze),'+-.', ...
-                   noiseVecPlot/10,stepDepToPlot(3,noiseVecToAnalyze),'d-.');
+        hh1 = plot(noiseVecPlot/10,stepDepToPlot(2,noiseVecToAnalyze),'+-.'); hold on;
+              scatter(noiseVecPlot/10,stepDepToPlot(3,noiseVecToAnalyze),'d', 'filled');
     else
         hh1 = plot(noiseVecPlot/10,abs(stepDepToPlot(2,noiseVecToAnalyze)-...
                                        stepDepToPlot(3,noiseVecToAnalyze)),'+-.');
     end
     grid on;
 %     xlabel('Noise','FontSize',20);
-    title(sprintf('min(M)=%d',MVecResults(8)),'FontSize',20);
+    title(sprintf('%d',MVecResults(8)),'FontSize',20);
     hh1(1).LineWidth = lineWidthVal; 
-    if(plotValues)
-        hh1(2).LineWidth = lineWidthVal; 
-    end
+%     if(plotValues)
+%         hh1(2).LineWidth = lineWidthVal; 
+%     end
     % hh1(3).LineWidth = 1.5; 
+    set(h,'yticklabel',[])
     h.FontSize = 20;
     inletIdx = 8;
     loc_inset = [h.Position(1)+inset_bufX h.Position(2)+inset_bufY inset_width inset_height];
@@ -966,12 +964,12 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && plotConvergence) )
     ax.YLim = [min(inletData(inletIdx,:)) max(inletData(inletIdx,:))];
     ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
     
-    [~,hL] = suplabel('Noise','x');
-    set(hL,'FontSize',20);
+%     [~,hL] = suplabel('Noise','x');
+%     set(hL,'FontSize',20);
     if(plotValues)
-        [~,hL] = suplabel('','y');
-        hL.FontSize = 20;
-        hL.Interpreter = 'Latex';
+%         [~,hL] = suplabel('','y');
+%         hL.FontSize = 20;
+%         hL.Interpreter = 'Latex';
     else
         [~,hL] = suplabel('Bias','y');
         hL.FontSize = 20;

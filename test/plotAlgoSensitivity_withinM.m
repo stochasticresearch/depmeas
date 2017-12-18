@@ -373,28 +373,33 @@ lineWidthVal = 2.5;
 y1 = linearDepToPlot(2,:)-linearDepToPlot(1,:);
 y2 = quadraticDepToPlot(2,:)-quadraticDepToPlot(1,:);
 y3 = cubicDepToPlot(2,:)-cubicDepToPlot(1,:);
-% y33 = cubicDepNoCorrectionToPlot(2,:)-cubicDepNoCorrectionToPlot(1,:);
+y33 = cubicDepNoCorrectionToPlot(2,:)-cubicDepNoCorrectionToPlot(1,:);
 y4 = sinusoidalDepToPlot(2,:)-sinusoidalDepToPlot(1,:);
-% y44 = sinusoidalDepNoCorrectionToPlot(2,:)-sinusoidalDepNoCorrectionToPlot(1,:);
+y44 = sinusoidalDepNoCorrectionToPlot(2,:)-sinusoidalDepNoCorrectionToPlot(1,:);
 y5 = hiFreqSinDepToPlot(2,:)-hiFreqSinDepToPlot(1,:);
-% y55 = hiFreqSinDepNoCorrectionToPlot(2,:)-hiFreqSinDepNoCorrectionToPlot(1,:);
+y55 = hiFreqSinDepNoCorrectionToPlot(2,:)-hiFreqSinDepNoCorrectionToPlot(1,:);
 y6 = fourthRootDepToPlot(2,:)-fourthRootDepToPlot(1,:);
 y7 = circleDepToPlot(2,:)-circleDepToPlot(1,:);
 y8 = stepDepToPlot(2,:)-stepDepToPlot(1,:);
 
 minX = min(noiseVecToPlot);
 maxX = max(noiseVecToPlot);
-minY = min([y1 y2 y3 y4 y5 y6 y7 y8]);
-maxY = max([y1 y2 y3 y4 y5 y6 y7 y8]);
+minY1 = min([y1 y2 y3 y4 y33 y44]);
+maxY1 = max([y1 y2 y3 y4 y33 y44]);
+minY2 = min([y5 y6 y7 y8 y55]);
+maxY2 = max([y5 y6 y7 y8 y55]);
 
 inset_bufX = 0; inset_bufY = 0.28;
 inset_width = 0.06; inset_height = 0.06;
 
-figure;
+width=30;
+height=width/3.2;
+figure('paperpositionmode', 'auto', 'units', 'centimeters', 'position', [0 0 width height])
 h = subplot(2,4,1);
-plot(noiseVecToPlot,y1,'LineWidth',lineWidthVal); axis([minX maxX minY maxY]);
+plot(noiseVecToPlot,y1,'LineWidth',lineWidthVal); axis([minX maxX minY1 maxY1+0.02]);
 grid on; 
 % title('Linear','FontSize',20);
+h.YTick = [0, 0.25, 0.5];
 h.FontSize = 20;
 inletIdx = 1;
 loc_inset = [h.Position(1)+inset_bufX h.Position(2)+inset_bufY inset_width inset_height];
@@ -405,9 +410,11 @@ ax.YLim = [min(inletData(inletIdx,:)) max(inletData(inletIdx,:))];
 ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
 
 h = subplot(2,4,2);
-plot(noiseVecToPlot,y2,'LineWidth',lineWidthVal); axis([minX maxX minY maxY]);
+plot(noiseVecToPlot,y2,'LineWidth',lineWidthVal); axis([minX maxX minY1 maxY1]);
 grid on; 
 % title('Quadratic','FontSize',20); 
+h.YTick = [0, 0.25, 0.5];
+set(h,'yticklabel',[])
 h.FontSize = 20;
 inletIdx = 2;
 loc_inset = [h.Position(1)+inset_bufX h.Position(2)+inset_bufY inset_width inset_height];
@@ -420,10 +427,12 @@ ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
 h = subplot(2,4,3);
 plot(noiseVecToPlot,cubicDepNoCorrectionToPlot(2,:)-cubicDepNoCorrectionToPlot(1,:),'LineWidth',lineWidthVal);
 hold on;
-plot(noiseVecToPlot,y3,'LineWidth',lineWidthVal); %axis([minX maxX minY maxY]);
+plot(noiseVecToPlot,y3,'LineWidth',lineWidthVal); axis([minX maxX minY1 maxY1]);
 grid on; 
 % title('Cubic','FontSize',20);
 % legend({'Correction','No Correction'});
+h.YTick = [0, 0.25, 0.5];
+set(h,'yticklabel',[])
 h.FontSize = 20;
 inletIdx = 3;
 loc_inset = [h.Position(1)+inset_bufX+0.095 h.Position(2)+inset_bufY inset_width inset_height];
@@ -436,7 +445,9 @@ ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
 h = subplot(2,4,4);
 plot(noiseVecToPlot,sinusoidalDepNoCorrectionToPlot(2,:)-sinusoidalDepNoCorrectionToPlot(1,:),'LineWidth',lineWidthVal);
 hold on;
-plot(noiseVecToPlot,y4,'LineWidth',lineWidthVal); %axis([minX maxX minY maxY]);
+h.YTick = [0, 0.25, 0.5];
+set(h,'yticklabel',[])
+plot(noiseVecToPlot,y4,'LineWidth',lineWidthVal); axis([minX maxX minY1 maxY1]);
 grid on; 
 % title('Sinusoidal','FontSize',20); 
 % legend({'Correction','No Correction'});
@@ -452,10 +463,12 @@ ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
 h = subplot(2,4,5);
 plot(noiseVecToPlot,hiFreqSinDepNoCorrectionToPlot(2,:)-hiFreqSinDepNoCorrectionToPlot(1,:),'LineWidth',lineWidthVal);
 hold on;
-plot(noiseVecToPlot,y5,'LineWidth',lineWidthVal); %axis([minX maxX minY maxY]);
+plot(noiseVecToPlot,y5,'LineWidth',lineWidthVal); axis([minX maxX minY2 maxY2+0.001]);
 grid on; 
 % title('Hi-Freq Sin','FontSize',20); 
 % legend({'Correction','No Correction'});
+h.YTick = [0, 0.02, 0.04];
+set(h,'xticklabel',[])
 h.FontSize = 20;
 inletIdx = 5;
 loc_inset = [h.Position(1)+inset_bufX+0.095 h.Position(2)+inset_bufY inset_width inset_height];
@@ -466,9 +479,11 @@ ax.YLim = [min(inletData(inletIdx,:)) max(inletData(inletIdx,:))];
 ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
 
 h = subplot(2,4,6);
-plot(noiseVecToPlot,y6,'LineWidth',lineWidthVal); axis([minX maxX minY maxY]);
+plot(noiseVecToPlot,y6,'LineWidth',lineWidthVal); axis([minX maxX minY2 maxY2]);
 grid on; 
 % title('Fourth-Root','FontSize',20);
+h.YTick = [0, 0.02, 0.04];
+set(h,'xticklabel',[],'yticklabel',[])
 h.FontSize = 20;
 inletIdx = 6;
 loc_inset = [h.Position(1)+inset_bufX h.Position(2)+inset_bufY inset_width inset_height];
@@ -479,9 +494,11 @@ ax.YLim = [min(inletData(inletIdx,:)) max(inletData(inletIdx,:))];
 ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
 
 h = subplot(2,4,7);
-plot(noiseVecToPlot,y7,'LineWidth',lineWidthVal); axis([minX maxX minY maxY]);
+plot(noiseVecToPlot,y7,'LineWidth',lineWidthVal); axis([minX maxX minY2 maxY2]);
 grid on; 
 % title('Circular','FontSize',20);
+h.YTick = [0, 0.02, 0.04];
+set(h,'xticklabel',[],'yticklabel',[])
 h.FontSize = 20;
 inletIdx = 7;
 loc_inset = [h.Position(1)+inset_bufX h.Position(2)+inset_bufY inset_width inset_height];
@@ -492,9 +509,11 @@ ax.YLim = [min(sin(inletT)) max(sin(inletT))];
 ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
 
 h = subplot(2,4,8);
-plot(noiseVecToPlot,y8,'LineWidth',lineWidthVal); axis([minX maxX minY maxY]);
+plot(noiseVecToPlot,y8,'LineWidth',lineWidthVal); axis([minX maxX minY2 maxY2]);
 grid on; 
 % title('Step','FontSize',20);
+h.YTick = [0, 0.02, 0.04];
+set(h,'xticklabel',[],'yticklabel',[])
 h.FontSize = 20;
 inletIdx = 8;
 loc_inset = [h.Position(1)+inset_bufX+0.095 h.Position(2)+inset_bufY inset_width inset_height];
@@ -504,7 +523,7 @@ ax.XLim = [min(inletX) max(inletX)];
 ax.YLim = [min(inletData(inletIdx,:)) max(inletData(inletIdx,:))];
 ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
 
-[~,h] = suplabel('Noise','x');
+[~,h] = suplabel('Noise','x',[.08 .15 .84 .84]);
 set(h,'FontSize',20);
 [~,h] = suplabel('$$max[\Delta \widehat{CIM}]$$','y');
 h.FontSize = 20;

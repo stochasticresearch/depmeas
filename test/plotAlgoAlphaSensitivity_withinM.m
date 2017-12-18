@@ -292,12 +292,16 @@ end
 inset_bufX = 0; inset_bufY = 0.28;
 inset_width = 0.06; inset_height = 0.06;
 
-figure;
+% figure;
+width=30;
+height=width/3.2;
+figure('paperpositionmode', 'auto', 'units', 'centimeters', 'position', [0 0 width height])
 h = subplot(2,4,1);
 plot(noiseVecToPlot,y1,'LineWidth',lineWidthVal); axis([minX maxX minY maxY]);
 grid on; 
 % title('Linear','FontSize',20);
 h.FontSize = 20;
+h.YTick = [0, 0.02, 0.04, 0.06];
 inletIdx = 1;
 loc_inset = [h.Position(1)+inset_bufX h.Position(2)+inset_bufY inset_width inset_height];
 ax = axes('Position',loc_inset);
@@ -310,6 +314,8 @@ h = subplot(2,4,2);
 plot(noiseVecToPlot,y2,'LineWidth',lineWidthVal); axis([minX maxX minY maxY]);
 grid on; 
 % title('Quadratic','FontSize',20); 
+h.YTick = [0, 0.02, 0.04, 0.06];
+set(h,'yticklabel',[])
 h.FontSize = 20;
 inletIdx = 2;
 loc_inset = [h.Position(1)+inset_bufX h.Position(2)+inset_bufY inset_width inset_height];
@@ -324,6 +330,8 @@ plot(noiseVecToPlot,y3,'LineWidth',lineWidthVal); axis([minX maxX minY maxY]);
 grid on; 
 % title('Cubic','FontSize',20);
 % legend({'Correction','No Correction'});
+h.YTick = [0, 0.02, 0.04, 0.06];
+set(h,'yticklabel',[])
 h.FontSize = 20;
 inletIdx = 3;
 loc_inset = [h.Position(1)+inset_bufX+0.095 h.Position(2)+inset_bufY inset_width inset_height];
@@ -338,6 +346,8 @@ plot(noiseVecToPlot,y4,'LineWidth',lineWidthVal); axis([minX maxX minY maxY]);
 grid on; 
 % title('Sinusoidal','FontSize',20); 
 % legend({'Correction','No Correction'});
+h.YTick = [0, 0.02, 0.04, 0.06];
+set(h,'yticklabel',[])
 h.FontSize = 20;
 inletIdx = 4;
 loc_inset = [h.Position(1)+inset_bufX+0.095 h.Position(2)+inset_bufY inset_width inset_height];
@@ -352,6 +362,8 @@ plot(noiseVecToPlot,y5,'LineWidth',lineWidthVal); axis([minX maxX minY maxY]);
 grid on; 
 % title('Hi-Freq Sin','FontSize',20); 
 % legend({'Correction','No Correction'});
+set(h,'xticklabel',[])
+h.YTick = [0, 0.02, 0.04, 0.06];
 h.FontSize = 20;
 inletIdx = 5;
 loc_inset = [h.Position(1)+inset_bufX+0.095 h.Position(2)+inset_bufY inset_width inset_height];
@@ -365,6 +377,8 @@ h = subplot(2,4,6);
 plot(noiseVecToPlot,y6,'LineWidth',lineWidthVal); axis([minX maxX minY maxY]);
 grid on; 
 % title('Fourth-Root','FontSize',20);
+h.YTick = [0, 0.02, 0.04, 0.06];
+set(h,'xticklabel',[],'yticklabel',[])
 h.FontSize = 20;
 inletIdx = 6;
 loc_inset = [h.Position(1)+inset_bufX h.Position(2)+inset_bufY inset_width inset_height];
@@ -378,6 +392,8 @@ h = subplot(2,4,7);
 plot(noiseVecToPlot,y7,'LineWidth',lineWidthVal); axis([minX maxX minY maxY]);
 grid on; 
 % title('Circular','FontSize',20);
+h.YTick = [0, 0.02, 0.04, 0.06];
+set(h,'xticklabel',[],'yticklabel',[])
 h.FontSize = 20;
 inletIdx = 7;
 loc_inset = [h.Position(1)+inset_bufX h.Position(2)+inset_bufY inset_width inset_height];
@@ -391,6 +407,8 @@ h = subplot(2,4,8);
 plot(noiseVecToPlot,y8,'LineWidth',lineWidthVal); axis([minX maxX minY maxY]);
 grid on; 
 % title('Step','FontSize',20);
+h.YTick = [0, 0.02, 0.04, 0.06];
+set(h,'xticklabel',[],'yticklabel',[])
 h.FontSize = 20;
 inletIdx = 8;
 loc_inset = [h.Position(1)+inset_bufX+0.095 h.Position(2)+inset_bufY inset_width inset_height];
@@ -400,7 +418,7 @@ ax.XLim = [min(inletX) max(inletX)];
 ax.YLim = [min(inletData(inletIdx,:)) max(inletData(inletIdx,:))];
 ax.Box = 'on'; ax.XTick = []; ax.YTick = [];
 
-[~,h] = suplabel('Noise','x');
+[~,h] = suplabel('Noise','x',[.08 .15 .84 .84]);
 set(h,'FontSize',20);
 [~,h] = suplabel('$$max[\Delta \widehat{CIM}]$$','y');
 h.FontSize = 20;

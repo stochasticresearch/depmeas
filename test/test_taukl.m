@@ -1178,50 +1178,60 @@ for ii=1:length(M_vec)
     muVecDiscrete(ii) = pdDiscrete.mu; sigmaVecDiscrete(ii) = pdDiscrete.sigma;
 end
 
-fontSize = 20;
+fontSize = 15;
+
+width=30;
+height=width/5;
+figure('paperpositionmode', 'auto', 'units', 'centimeters', 'position', [0 0 width height])
 
 % do the Q-Q plot
 pdContinuous = pdObjsContinuous{1};
-h1 = subplot(2,2,1); qqplot(ktauhatNullDistributionResultsContinuous(:,1), pdContinuous); grid on;
+h1 = subplot(1,3,1); qqplot(ktauhatNullDistributionResultsContinuous(:,1), pdContinuous); grid on;
 xlabel({['\makebox[4in][c]{Quantiles of ' sprintf('$\\mathcal{N}(%0.02f, %0.02f)$', ...
         abs(muVecContinuous(1)), sigmaVecContinuous(1)) '}'], '\makebox[4in][c]{(a)}'}, ...
         'FontSize', 20, 'Interpreter', 'Latex');
-ylabel('Quantiles of Input Samples', 'FontSize', fontSize);
+ylabel({'Input Samples';'Quantiles'}, 'FontSize', fontSize);
 title('M = 100', 'FontSize', fontSize);
 h1.FontSize = fontSize;
 
-pdContinuous = pdObjsContinuous{10};
-h2 = subplot(2,2,2); qqplot(ktauhatNullDistributionResultsContinuous(:,10), pdContinuous); grid on;
-xlabel({['\makebox[4in][c]{Quantiles of ' sprintf('$\\mathcal{N}(%0.02f, %0.02f)$', ...
-        abs(muVecContinuous(10)), sigmaVecContinuous(10)) '}'], '\makebox[4in][c]{(b)}'}, ...
-        'FontSize', 20, 'Interpreter', 'Latex');
-ylabel('Quantiles of Input Samples', 'FontSize', fontSize);
-title('M = 1000', 'FontSize', fontSize);
-h2.FontSize = fontSize;
+% pdContinuous = pdObjsContinuous{10};
+% h2 = subplot(2,2,2); qqplot(ktauhatNullDistributionResultsContinuous(:,10), pdContinuous); grid on;
+% xlabel({['\makebox[4in][c]{Quantiles of ' sprintf('$\\mathcal{N}(%0.02f, %0.02f)$', ...
+%         abs(muVecContinuous(10)), sigmaVecContinuous(10)) '}'], '\makebox[4in][c]{(b)}'}, ...
+%         'FontSize', 20, 'Interpreter', 'Latex');
+% ylabel('Quantiles of Input Samples', 'FontSize', fontSize);
+% title('M = 1000', 'FontSize', fontSize);
+% h2.FontSize = fontSize;
 
-h3 = subplot(2,2,3); 
+lineWidth = 2; markerSize = 7;
+
+h3 = subplot(1,3,2); 
 p3 = plot(M_vec, muVecContinuous, M_vec, muVecHybrid1, ...
      M_vec, muVecHybrid2, M_vec, muVecDiscrete);
-grid on; xlabel({'M', '(c)'}, 'FontSize', fontSize); 
+h4.XLim = [0,1000];
+h4.XTick = [250 500 750];
+grid on; xlabel({'M', '(b)'}, 'FontSize', fontSize); 
 ylabel('\mu', 'FontSize', fontSize);
 % title('(c)', 'FontSize', fontSize);
 h3.FontSize = fontSize;
-p3(1).LineWidth = 3; p3(1).Marker = 'd'; p3(1).MarkerSize = 16;
-p3(2).LineWidth = 3; p3(2).Marker = 'v'; p3(2).MarkerSize = 16;
-p3(3).LineWidth = 3; p3(3).Marker = '*'; p3(3).MarkerSize = 16;
-p3(4).LineWidth = 3; p3(4).Marker = 'x'; p3(4).MarkerSize = 16;
+p3(1).LineWidth = lineWidth; p3(1).Marker = 'd'; p3(1).MarkerSize = markerSize;
+p3(2).LineWidth = lineWidth; p3(2).Marker = 'v'; p3(2).MarkerSize = markerSize;
+p3(3).LineWidth = lineWidth; p3(3).Marker = '*'; p3(3).MarkerSize = markerSize;
+p3(4).LineWidth = lineWidth; p3(4).Marker = 'x'; p3(4).MarkerSize = markerSize;
 
-h4 = subplot(2,2,4); 
+h4 = subplot(1,3,3); 
 p4 = plot(M_vec, sigmaVecContinuous, M_vec, sigmaVecHybrid1, ...
      M_vec, sigmaVecHybrid2, M_vec, sigmaVecDiscrete);
-grid on; xlabel({'M', '(d)'}, 'FontSize', fontSize); 
+h4.XLim = [0,1000];
+h4.XTick = [250 500 750];
+grid on; xlabel({'M', '(c)'}, 'FontSize', fontSize); 
 ylabel('\lambda', 'FontSize', fontSize);
 % title('(d)', 'FontSize', fontSize);
 h4.FontSize = fontSize;
-p4(1).LineWidth = 3; p4(1).Marker = 'd'; p4(1).MarkerSize = 16;
-p4(2).LineWidth = 3; p4(2).Marker = 'v'; p4(2).MarkerSize = 16;
-p4(3).LineWidth = 3; p4(3).Marker = '*'; p4(3).MarkerSize = 16;
-p4(4).LineWidth = 3; p4(4).Marker = 'x'; p4(4).MarkerSize = 16;
+p4(1).LineWidth = lineWidth; p4(1).Marker = 'd'; p4(1).MarkerSize = markerSize;
+p4(2).LineWidth = lineWidth; p4(2).Marker = 'v'; p4(2).MarkerSize = markerSize;
+p4(3).LineWidth = lineWidth; p4(3).Marker = '*'; p4(3).MarkerSize = markerSize;
+p4(4).LineWidth = lineWidth; p4(4).Marker = 'x'; p4(4).MarkerSize = markerSize;
 
 legend({'Continuous', 'Hybrid-1', 'Hybrid-2', 'Discrete'});
 

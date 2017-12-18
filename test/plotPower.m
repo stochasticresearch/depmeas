@@ -1,4 +1,4 @@
-function [] = plotPower(powerMat, M, labels, noiseVec, style)
+function [] = plotPower(powerMat, M, labels, noiseVec, style,sampleSizeAnalysisVec)
 
 % generate the inlet data
 numDepTypes = 8;
@@ -80,7 +80,7 @@ elseif(style==2)
     
     for figNum=[1,2]
         figure('paperpositionmode', 'auto', 'units', 'centimeters', 'position', [0 0 width height])
-        
+
         for subplotNum=1:numRelationshipsPerFig
             depTypeIdx = (figNum-1)*4+subplotNum;
             % plot the relationship type
@@ -108,10 +108,10 @@ elseif(style==2)
             imagesc(pm);
             
             ax1 = gca;
-%             ax1_pos = ax1.Position; % position of first axes
-%             ax2 = axes('Position',ax1_pos,...
-%                 'XAxisLocation','top',...
-%                 'Color','none');            
+            ax1_pos = ax1.Position; % position of first axes
+            ax2 = axes('Position',ax1_pos,...
+                'XAxisLocation','top',...
+                'Color','none');            
             
             if(subplotNum==1)
                 set(ax1, 'ytick', 1:length(labels), 'yticklabel', labels, 'FontSize', font_size)
@@ -123,8 +123,28 @@ elseif(style==2)
                 xtLabelVec(zz) = noiseVec(ax1.XTick(zz)+1);
             end
             set(ax1,'xticklabel',xtLabelVec);
-%             set(ax2, 'ytick', 1:length(labels), 'yticklabel', [], 'FontSize', font_size)
-%             set(ax2, 'xtick', [0.25,0.75], 'xticklabel', [500,1500], 'FontSize', font_size);
+            set(ax2, 'ytick', 1:length(labels), 'yticklabel', [], 'FontSize', font_size)
+            yMax = 2000;
+            ax2.XLim = [0,yMax];
+            ax2.YLim = [0,length(labels)];
+            ax2.YDir = 'reverse';
+            set(ax2, 'xtick', [500,1500], 'xticklabel', {500,1500}, 'FontSize', font_size);
+            % get the current tick labeks
+            ticklabels = get(ax2,'XTickLabel');
+            % prepend a color for each tick label
+            ticklabels_new = cell(size(ticklabels));
+            for i = 1:length(ticklabels)
+                %ticklabels_new{i} = ['\color{darkGreen} ' ticklabels{i}];
+                ticklabels_new{i} = ['\color[rgb]' strrep(strrep(mat2str(rgb('darkgreen')),'[','{'),']','}') ' ' ticklabels{i}];
+            end
+            % set the tick labels
+            set(ax2, 'XTickLabel', ticklabels_new);
+            hold on;
+            xxVec = sampleSizeAnalysisVec(:,depTypeIdx); yyVec = [1:length(labels)]-0.5;
+            plot(xxVec,yyVec,'*', 'markersize', 10, 'color', rgb('darkgreen'), 'Parent',ax2);
+            nanII = isnan(xxVec);
+            xxVec(nanII) = yMax;
+            plot(xxVec(nanII),find(nanII)-0.5,'x','markersize',10,'color', rgb('darkgreen'), 'Parent',ax2);
             
             if(subplotNum==numRelationshipsPerFig && figNum==2)
                 h = colorbar();
@@ -133,14 +153,15 @@ elseif(style==2)
             end
             
         end
+        colormap(cmap)
         if(figNum==2)
             [~,h3]=suplabel('Noise','x',[.0975 .12 .84 .84]);
             set(h3,'FontSize',font_size)
-            
-%             [~,h3]=suplabel('# Samples','x',[.0975 .84 .84 .84]);
-%             set(h3,'FontSize',font_size)
+
+            [~,h3]=suplabel('M','x',[.0975 .84 .84 .84]);
+            set(h3,'FontSize',font_size,'color',rgb('darkgreen'))
         end
-        colormap(cmap)
+
     end
     
 else
