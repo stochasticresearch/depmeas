@@ -1,4 +1,4 @@
-function [ tau ] = taukl_cc( U, V )
+function [ tau ] = taukl_cc( U, V, autoDetectHybrid, isHybrid, continuousRvIndicator )
 %TAUKL - computes a rescaled version of Kendall's tau that preserves
 %         the definition of Kendall's tau, but assures that in the 
 %         scenario of perfect concordance or discordance for discrete
@@ -6,39 +6,30 @@ function [ tau ] = taukl_cc( U, V )
 % Inputs:
 %  U - first variable input.
 %  V - second variable input.
-%  THE CC VERSION REQUIRES U & V to be sorted by U!
+%  autoDetectHybrid - if 1, we attempt to automatically determine if the
+%                     data is hybrid or not, if 0, then we use the value 
+%                     specified by isHybrid
+%  isHybrid - if 1, and autoDetectHybrid=0, then we assume data is hybrid
+%             if 0, and autoDetectHybrid=0, then we assume data is discrete
+%                   and/or continuous
+%             if autoDetectHybrid=1, then this input doesn't matter
+%  continuousRvIndicator - if 1, and autoDetectHybrid=0, then this indicates that U is continuous & V is discrete
+%                        - if 0, and autoDetectHybrid=0, then this indicates that U is continuous & V is discrete
+%             if autoDetectHybrid=1, then this input doesn't matter
 % Outputs:
 %  tau - the rescaled version of Kendall's tau
-%  
-% NOTE: See Theorem 12 of the paper "On Rank Correlation Measures for
-%       Non-Continuous Random Variables" - Neslehova (2007) for more info.
-%**************************************************************************
-%* 
-%* Copyright (C) 2016  Kiran Karra <kiran.karra@gmail.com>
-%*
-%* This program is free software: you can redistribute it and/or modify
-%* it under the terms of the GNU General Public License as published by
-%* the Free Software Foundation, either version 3 of the License, or
-%* (at your option) any later version.
-%*
-%* This program is distributed in the hope that it will be useful,
-%* but WITHOUT ANY WARRANTY; without even the implied warranty of
-%* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-%* GNU General Public License for more details.
-%*
-%* You should have received a copy of the GNU General Public License
-%* along with this program.  If not, see <http://www.gnu.org/licenses/>.
-%* 
-%**************************************************************************
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% NOTE!!
+%  THE CC VERSION REQUIRES U & V to be sorted lexicograpically by U!
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 len = length(U);
 
 % compute the numerator the tau_hat
-% K = 0;
-% for k = 1:len-1
-%     K = K + sum( sign(U(k)-U(k+1:len)) .* sign(V(k)-V(k+1:len)) );
-% end
-K = kendallsTauNumer1(U,V);
-% K = kendallsTauNumer2(U,V);
+K = 0;
+for k = 1:len-1
+    K = K + sum( sign(U(k)-U(k+1:len)) .* sign(V(k)-V(k+1:len)) );
+end
 
 if(K==0)
     tau = 0;
@@ -47,33 +38,19 @@ end
 
 % compute the denominator ... compute the # of unique values of U and V and
 % how many times each of those unique values occur
-% uniqueUValues = unique(U);
-% uniqueVValues = unique(V);
-[uniqueUValues, uniqueUCounts] = uniqueSorted(U);
-[uniqueVValues, uniqueVCounts] = uniqueSorted(V);
+[uniqueU, uniqueUCounts] = uniqueSorted(U);
+[uniqueV, uniqueVCounts] = uniqueSorted(sort(V));
 
-if((length(uniqueUValues) >= len/2) && (length(uniqueVValues) >= len/2))
+if((length(uniqueU) >= len/2) && (length(uniqueV) >= len/2))
     % means we can reasonably assume that we have continuous data
     % for data-sizes >=50
     tau = K/(len*(len-1)/2);
     return;
 end
 
-% % uniqueUCounts = zeros(1,length(uniqueU));
-% % uniqueVCounts = zeros(1,length(uniqueV));
-% % 
-% % % TODO: we can combine the loops below after verification of functionality
-% % for ii=1:length(uniqueU)
-% %     uniqueUCounts(ii) = sum(U==uniqueU(ii));
-% % end
-% % 
-% % for ii=1:length(uniqueV)
-% %     uniqueVCounts(ii) = sum(V==uniqueV(ii));
-% % end
-
 u = 0;
 k = 2;
-for ii=1:length(uniqueUValues)
+for ii=1:length(uniqueU)
     n = uniqueUCounts(ii);
     if(k<=n)
         addVal = nchoosek(n,k);
@@ -83,7 +60,7 @@ for ii=1:length(uniqueUValues)
     u = u + addVal;
 end
 v = 0;
-for ii=1:length(uniqueVValues)
+for ii=1:length(uniqueV)
     n = uniqueVCounts(ii);
     if(k<=n)
         addVal = nchoosek(n,k);
@@ -93,21 +70,24 @@ for ii=1:length(uniqueVValues)
     v = v + addVal;
 end
 
-uuCloseToZero = closeToZero(u, len);
-vvCloseToZero = closeToZero(v, len);
-if( (uuCloseToZero && v>0) || (u>0 && vvCloseToZero) )
-    
-    % special case of hybrid data
-    if(uuCloseToZero)
-        continuousRvIndicator = 0;
-    else
-        continuousRvIndicator = 1;
+if(autoDetectHybrid)
+    uuCloseToZero = closeToZero(u, len);
+    vvCloseToZero = closeToZero(v, len);
+    if( (uuCloseToZero && v>0) || (u>0 && vvCloseToZero) )
+        isHybrid = int32(1);
+        if(uuCloseToZero)
+            continuousRvIndicator = int32(0);  % means U is continuous, V is discrete
+        else
+            continuousRvIndicator = int32(1);  % means V is continuous, U is discrete
+        end
     end
+end
+if( isHybrid )
+    % special case of hybrid data    
     numOverlapPtsVec = countOverlaps(U, V, continuousRvIndicator);
     correctionFactor = correctionFactor4(numOverlapPtsVec);
     t = max(u,v)-correctionFactor;
     tau = K/( sqrt(nchoosek(len,2)-t)*sqrt(nchoosek(len,2)-t) );
-    
 else
     % case of either all continuous or all discrete data
     tau = K/( sqrt(nchoosek(len,2)-u)*sqrt(nchoosek(len,2)-v) );
@@ -180,7 +160,6 @@ for discreteOutcomesIdx=1:length(uniqueDiscreteOutcomes)-1
                                    relevantContinuousOutcomes_nextIdx<=maxCur));
                                
     numOverlapPtsVec(discreteOutcomesIdx) = numOverlapPoints/length(relevantContinuousOutcomes_nextIdx)*(M/length(uniqueDiscreteOutcomes));
-
 end
 
 end

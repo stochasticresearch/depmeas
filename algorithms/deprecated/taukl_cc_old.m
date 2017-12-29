@@ -1,11 +1,12 @@
-function [ tau ] = taukl( X, Y, correctionFlagOpt, dataSortedFlag )
+function [ tau ] = taukl_cc_old( U, V )
 %TAUKL - computes a rescaled version of Kendall's tau that preserves
 %         the definition of Kendall's tau, but assures that in the 
 %         scenario of perfect concordance or discordance for discrete
 %         or hybrid datatypes, taucj achieves +/- 1 respectively
 % Inputs:
-%  X - first variable input.
-%  Y - second variable input.
+%  U - first variable input.
+%  V - second variable input.
+%  THE CC VERSION REQUIRES U & V to be sorted by U!
 % Outputs:
 %  tau - the rescaled version of Kendall's tau
 %  
@@ -29,44 +30,15 @@ function [ tau ] = taukl( X, Y, correctionFlagOpt, dataSortedFlag )
 %* along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %* 
 %**************************************************************************
-
-% TODO: some error checking that X and Y are the same length, NaN, Inf ...
-% etc...
-
-X = X(:);
-Y = Y(:);
-
-if(nargin<3)
-    correctionFlagOpt = 4;       % default correction factor processing
-    dataSortedFlag = 0;
-end
-if(nargin<4)
-    dataSortedFlag = 0;
-end
-
-% TOOD: compare the 2 ways to generate ranks ... wonder if that affects the
-% results?
-% rank the data, do not account for ties
-if(~dataSortedFlag)
-    data_sorted = sort(X);
-    [~, U] = ismember(X,data_sorted);
-
-    data_sorted = sort(Y);
-    [~, V] = ismember(Y,data_sorted);
-    
-    % U = tiedrank(X);
-    % V = tiedrank(Y);
-else
-    U = X; V = Y;
-end
-
+len = length(U);
 
 % compute the numerator the tau_hat
-K = 0;
-len = length(X);
-for k = 1:len-1
-    K = K + sum( sign(U(k)-U(k+1:len)) .* sign(V(k)-V(k+1:len)) );
-end
+% K = 0;
+% for k = 1:len-1
+%     K = K + sum( sign(U(k)-U(k+1:len)) .* sign(V(k)-V(k+1:len)) );
+% end
+K = kendallsTauNumer1(U,V);
+% K = kendallsTauNumer2(U,V);
 
 if(K==0)
     tau = 0;
@@ -75,24 +47,33 @@ end
 
 % compute the denominator ... compute the # of unique values of U and V and
 % how many times each of those unique values occur
-uniqueU = unique(U);
-uniqueV = unique(V);
+% uniqueUValues = unique(U);
+% uniqueVValues = unique(V);
+[uniqueUValues, uniqueUCounts] = uniqueSorted(U);
+[uniqueVValues, uniqueVCounts] = uniqueSorted(V);
 
-uniqueUCounts = zeros(1,length(uniqueU));
-uniqueVCounts = zeros(1,length(uniqueV));
-
-% TODO: we can combine the loops below after verification of functionality
-for ii=1:length(uniqueU)
-    uniqueUCounts(ii) = sum(U==uniqueU(ii));
+if((length(uniqueUValues) >= len/2) && (length(uniqueVValues) >= len/2))
+    % means we can reasonably assume that we have continuous data
+    % for data-sizes >=50
+    tau = K/(len*(len-1)/2);
+    return;
 end
 
-for ii=1:length(uniqueV)
-    uniqueVCounts(ii) = sum(V==uniqueV(ii));
-end
+% % uniqueUCounts = zeros(1,length(uniqueU));
+% % uniqueVCounts = zeros(1,length(uniqueV));
+% % 
+% % % TODO: we can combine the loops below after verification of functionality
+% % for ii=1:length(uniqueU)
+% %     uniqueUCounts(ii) = sum(U==uniqueU(ii));
+% % end
+% % 
+% % for ii=1:length(uniqueV)
+% %     uniqueVCounts(ii) = sum(V==uniqueV(ii));
+% % end
 
 u = 0;
 k = 2;
-for ii=1:length(uniqueU)
+for ii=1:length(uniqueUValues)
     n = uniqueUCounts(ii);
     if(k<=n)
         addVal = nchoosek(n,k);
@@ -102,7 +83,7 @@ for ii=1:length(uniqueU)
     u = u + addVal;
 end
 v = 0;
-for ii=1:length(uniqueV)
+for ii=1:length(uniqueVValues)
     n = uniqueVCounts(ii);
     if(k<=n)
         addVal = nchoosek(n,k);
@@ -123,65 +104,14 @@ if( (uuCloseToZero && v>0) || (u>0 && vvCloseToZero) )
         continuousRvIndicator = 1;
     end
     numOverlapPtsVec = countOverlaps(U, V, continuousRvIndicator);
-    
-    %continuousRvIndicator
-    %numOverlapPtsVec
-    
-    switch(correctionFlagOpt)
-        case 1
-            correctionFactor = correctionFactor1(numOverlapPtsVec);
-        case 2
-            correctionFactor = correctionFactor2(numOverlapPtsVec);
-        case 3
-            correctionFactor = correctionFactor3(numOverlapPtsVec);
-        case 4
-            correctionFactor = correctionFactor4(numOverlapPtsVec);
-        case 5
-            correctionFactor = correctionFactor5(numOverlapPtsVec);
-        otherwise
-            error('Unknown Correction Factor Option!');
-    end
+    correctionFactor = correctionFactor4(numOverlapPtsVec);
     t = max(u,v)-correctionFactor;
     tau = K/( sqrt(nchoosek(len,2)-t)*sqrt(nchoosek(len,2)-t) );
     
-%     fprintf('<<< nck=%d numOvlp=%0.02f cf=%0.02f, tt=%0.02f\n', ...
-%         nchoosek(len,2), numOverlapPtsVec, correctionFactor, t);    
 else
     % case of either all continuous or all discrete data
     tau = K/( sqrt(nchoosek(len,2)-u)*sqrt(nchoosek(len,2)-v) );
 end
-
-% fprintf('<<< K=%d uu=%d vv=%d u(closeToZero)=%d v(closeToZero)=%d\n', ...
-%     K, u, v, closeToZero(u,len), closeToZero(v,len));
-
-end
-
-function [cf] = correctionFactor1(numOverlapPtsVec)
-    if(min(numOverlapPtsVec)<2)
-        cf = 0;
-    else
-        cf = nchoosek(floor(min(numOverlapPtsVec)),2)*length(numOverlapPtsVec);
-    end
-
-end
-
-function [cf] = correctionFactor2(numOverlapPtsVec)
-    if(min(numOverlapPtsVec)<2)
-        cf = 0;
-    else
-        cf = nchoosek(floor(max(numOverlapPtsVec)),2)*length(numOverlapPtsVec);
-    end
-end
-
-function [cf] = correctionFactor3(numOverlapPtsVec)
-
-    cf = 0;
-    for ii=1:length(numOverlapPtsVec)
-        nop = floor(numOverlapPtsVec(ii));
-        if(nop>=2)
-            cf = cf + nchoosek(floor(numOverlapPtsVec(ii)),2);
-        end
-    end
 
 end
 
@@ -192,10 +122,6 @@ function [cf] = correctionFactor4(numOverlapPtsVec)
     else
         cf = nchoosek(meanVal,2)*length(numOverlapPtsVec);
     end
-end
-
-function [cf] = correctionFactor5(numOverlapPtsVec)
-    cf = 0;
 end
 
 function [out] = closeToZero(in, len)
@@ -253,13 +179,8 @@ for discreteOutcomesIdx=1:length(uniqueDiscreteOutcomes)-1
     numOverlapPoints = length(find(relevantContinuousOutcomes_nextIdx>=minCur & ...
                                    relevantContinuousOutcomes_nextIdx<=maxCur));
                                
-%     numOverlapPtsVec(discreteOutcomesIdx) = numOverlapPoints;
     numOverlapPtsVec(discreteOutcomesIdx) = numOverlapPoints/length(relevantContinuousOutcomes_nextIdx)*(M/length(uniqueDiscreteOutcomes));
 
 end
-
-% continuousRvIndicator
-% uniqueDiscreteOutcomes'
-% numOverlapPtsVec
 
 end

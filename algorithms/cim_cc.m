@@ -203,7 +203,7 @@ while ax1max<=1
     numPts = size(matchPts,1);
     if(numPts>=2)   % make sure we have enough points to compute the metric
         % compute the concordance
-        metricRectangle = abs(taukl_cc( matchPts(:,1),matchPts(:,2)));
+        metricRectangle = abs(taukl_cc( matchPts(:,1),matchPts(:,2),1,0,0));
         stdTau = ((1-metricRectangle)*sqrt( (2*(2*numPts+5))/(9*numPts*(numPts-1)) ) )*numStdDev;
         if(newRectangle)
             newRectangle = 0;
@@ -237,7 +237,7 @@ end
 
 % means we never matched with any points, so compute tau for the range
 if(metricRectanglePrev<0)
-    metricVec(rectanglesIdx) = abs(taukl_cc( ax1pts,ax2pts ));
+    metricVec(rectanglesIdx) = abs(taukl_cc( ax1pts,ax2pts,1,0,0 ));
     numPtsVec(rectanglesIdx) = length(ax1pts)-sum(numPtsVec(1:rectanglesIdx));
     rectangles(:,rectanglesIdx) = [0 1 ax2min ax2max];
 end
