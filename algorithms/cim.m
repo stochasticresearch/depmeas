@@ -42,5 +42,5 @@ if(nargin>=4)
 else
     alpha = 0.2;
 end
-[metric,regionRectangle] = cim_cc_mex(x,y,msi);
+[metric,regionRectangle] = cim_cc_mex(x,y,msi,alpha);
 % [metric,regionRectangle] = cim_cc(x,y,msi,alpha);
