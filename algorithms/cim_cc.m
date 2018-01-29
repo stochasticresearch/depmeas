@@ -1,4 +1,4 @@
-function [metric,regionRectangle] = cim_cc(x, y, minScanIncr, alpha)
+function [metric,regionRectangle] = cim_cc(x, y, minScanIncr, alpha, autoDetectHybrid, isHybrid, continuousRvIndicator)
 %CIM - Copula Index for Detecting Dependence and Monotonicity between
 %Stochastic Signals.  See associated paper... to be published and preprint
 %located here: https://arxiv.org/abs/1703.06686
@@ -90,7 +90,8 @@ for axisCfg=axisCfgs
                 end
 
                 [metricVecTmp, numPtsVecTmp, rectangles, numRectanglesCreated] = ...
-                    scanForDep(normInvVal,ax1pts,ax2pts,ax2min,ax2max,scanincr,MAX_NUM_RECT);
+                    scanForDep(normInvVal,ax1pts,ax2pts,ax2min,ax2max,scanincr,MAX_NUM_RECT,...
+                               autoDetectHybrid,isHybrid,continuousRvIndicator);
                 
                 metricCell(zz,:) = metricVecTmp;
                 numPtsCell(zz,:) = numPtsVecTmp;
@@ -182,7 +183,7 @@ metric = sum( metrics(2,:)/sum(metrics(2,:)).*metrics(1,:) );
 
 end
 
-function [metricVec, numPtsVec, rectangles, rectanglesIdx] = scanForDep(normInvVal, ax1pts, ax2pts, ax2min, ax2max, scanincr, maxNumRect)
+function [metricVec, numPtsVec, rectangles, rectanglesIdx] = scanForDep(normInvVal, ax1pts, ax2pts, ax2min, ax2max, scanincr, maxNumRect, autoDetectHybrid,isHybrid,continuousRvIndicator)
 %scanForDep - scans for dependencies across the first axis (if you would
 %like to scan across the second axis, simply swap the input arguments to 
 %this function).
@@ -205,7 +206,7 @@ while ax1max<=1
     numPts = size(matchPts,1);
     if(numPts>=2)   % make sure we have enough points to compute the metric
         % compute the concordance
-        tmp_val = taukl_cc( matchPts(:,1),matchPts(:,2),1,0,0);
+        tmp_val = taukl_cc( matchPts(:,1),matchPts(:,2),autoDetectHybrid,isHybrid,continuousRvIndicator);
         taukl_cc_val = 0;  % see: https://www.mathworks.com/help/simulink/ug/calling-matlab-functions.html#bq1h2z9-47
         taukl_cc_val = tmp_val;
         metricRectangle = min(abs(taukl_cc_val),1);  % because we offload to C, sometimes we get
@@ -243,7 +244,7 @@ end
 
 % means we never matched with any points, so compute tau for the range
 if(metricRectanglePrev<0)
-    tmp_val = taukl_cc( ax1pts,ax2pts,1,0,0 );
+    tmp_val = taukl_cc( ax1pts,ax2pts,autoDetectHybrid,isHybrid,continuousRvIndicator);
     taukl_cc_val = 0;  % see: https://www.mathworks.com/help/simulink/ug/calling-matlab-functions.html#bq1h2z9-47
     taukl_cc_val = tmp_val;
     metricVec(rectanglesIdx) = min(abs(taukl_cc_val),1);

@@ -24,10 +24,9 @@ function [ tau ] = taukl_cc( U, V, autoDetectHybrid, isHybrid, continuousRvIndic
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 len = length(U);
+uncorrected_denominator = len*(len-1)/2;
 
 % compute the numerator the tau_hat
-% K = double(ktau_numer(U,V));  % call the C function
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % some gymanstics for Matlab Coder
 coder.extrinsic('ktau_numer'); 
@@ -43,37 +42,20 @@ end
 
 % compute the denominator ... compute the # of unique values of U and V and
 % how many times each of those unique values occur
-[uniqueU, uniqueUCounts] = uniqueSorted(U);
-[uniqueV, uniqueVCounts] = uniqueSorted(sort(V));
+[~, uniqueUCounts] = uniqueSorted(U);
+[~, uniqueVCounts] = uniqueSorted(sort(V));
 
-if((length(uniqueU) >= len/2) && (length(uniqueV) >= len/2))
+% if the user tells us the data is hybrid, there is no point in running
+% this block of code
+if(~isHybrid && (length(uniqueUCounts) >= len/2) && (length(uniqueVCounts) >= len/2))
     % means we can reasonably assume that we have continuous data
     % for data-sizes >=50
-    tau = K/(len*(len-1)/2);
+    tau = K/uncorrected_denominator;
     return;
 end
 
-u = 0;
-k = 2;
-for ii=1:length(uniqueU)
-    n = uniqueUCounts(ii);
-    if(k<=n)
-        addVal = nchoosek(n,k);
-    else
-        addVal = 0;
-    end
-    u = u + addVal;
-end
-v = 0;
-for ii=1:length(uniqueV)
-    n = uniqueVCounts(ii);
-    if(k<=n)
-        addVal = nchoosek(n,k);
-    else
-        addVal = 0;
-    end
-    v = v + addVal;
-end
+u = sum(uniqueUCounts.*(uniqueUCounts-1)/2);
+v = sum(uniqueVCounts.*(uniqueVCounts-1)/2);
 
 if(autoDetectHybrid)
     uuCloseToZero = closeToZero(u, len);
@@ -87,26 +69,23 @@ if(autoDetectHybrid)
         end
     end
 end
+
 if( isHybrid )
     % special case of hybrid data    
     numOverlapPtsVec = countOverlaps(U, V, continuousRvIndicator);
     correctionFactor = correctionFactor4(numOverlapPtsVec);
     t = max(u,v)-correctionFactor;
-    tau = K/( sqrt(nchoosek(len,2)-t)*sqrt(nchoosek(len,2)-t) );
+    tau = K/( sqrt(uncorrected_denominator-t)*sqrt(uncorrected_denominator-t) );
 else
     % case of either all continuous or all discrete data
-    tau = K/( sqrt(nchoosek(len,2)-u)*sqrt(nchoosek(len,2)-v) );
+    tau = K/( sqrt(uncorrected_denominator-u)*sqrt(uncorrected_denominator-v) );
 end
 
 end
 
 function [cf] = correctionFactor4(numOverlapPtsVec)
     meanVal = floor(mean(numOverlapPtsVec));
-    if(meanVal<2)
-        cf = 0;
-    else
-        cf = nchoosek(meanVal,2)*length(numOverlapPtsVec);
-    end
+    cf = (meanVal*(meanVal-1)/2)*length(numOverlapPtsVec);
 end
 
 function [out] = closeToZero(in, len)
@@ -114,11 +93,7 @@ out = 1;
 thresh = 0.02;      % if we are > 2% of length in terms of combinations;
 lenFloor = floor(len*thresh);
 
-if(lenFloor>=2)
-    cmpVal = nchoosek(lenFloor,2);
-else
-    cmpVal = 0;
-end
+cmpVal = lenFloor*(lenFloor-1)/2;
 
 if(in>cmpVal)
     out = 0;

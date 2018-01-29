@@ -42,5 +42,24 @@ if(nargin>=4)
 else
     alpha = 0.2;
 end
-[metric,regionRectangle] = cim_cc_mex(x,y,msi,alpha);
-% [metric,regionRectangle] = cim_cc(x,y,msi,alpha);
+
+if(nargin>=5)
+    autoDetectHybrid = varargin{3};
+else
+    autoDetectHybrid = 1;
+end
+
+if(nargin>=6)
+    isHybrid = varargin{4};
+else
+    isHybrid = 0;
+end
+
+if(nargin>=7)
+    continuousRvIndicator = varargin{5};
+else
+    continuousRvIndicator = 0;
+end
+
+[metric,regionRectangle] = cim_cc_mex(x,y,msi,alpha,autoDetectHybrid,isHybrid,continuousRvIndicator);
+% [metric,regionRectangle] = cim_cc(x,y,msi,alpha,autoDetectHybrid,isHybrid,continuousRvIndicator);

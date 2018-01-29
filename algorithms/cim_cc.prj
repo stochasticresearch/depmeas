@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.coder" plugin-version="R2016a">
-  <configuration build-checksum="2917121020" file="/home/kiran/stochasticresearch/depmeas/algorithms/cim_cc.prj" location="/home/kiran/stochasticresearch/depmeas/algorithms" name="cim_cc" target="target.unifiedcoder" target-name="MATLAB Coder">
+  <configuration build-checksum="2943208911" file="/home/kiran/stochasticresearch/depmeas/algorithms/cim_cc.prj" location="/home/kiran/stochasticresearch/depmeas/algorithms" name="cim_cc" target="target.unifiedcoder" target-name="MATLAB Coder">
     <profile key="profile.mex">
       <param.BuiltInstrumentedMex>false</param.BuiltInstrumentedMex>
       <param.RanInstrumentedMex>false</param.RanInstrumentedMex>
@@ -8,15 +8,15 @@
       <param.BuildFolder>option.BuildFolder.Project</param.BuildFolder>
       <param.SpecifiedBuildFolder />
       <param.SearchPaths />
-      <param.ResponsivenessChecks>true</param.ResponsivenessChecks>
+      <param.ResponsivenessChecks>false</param.ResponsivenessChecks>
       <param.ExtrinsicCalls>true</param.ExtrinsicCalls>
-      <param.IntegrityChecks>true</param.IntegrityChecks>
-      <param.SaturateOnIntegerOverflow>true</param.SaturateOnIntegerOverflow>
+      <param.IntegrityChecks>false</param.IntegrityChecks>
+      <param.SaturateOnIntegerOverflow>false</param.SaturateOnIntegerOverflow>
       <param.GlobalDataSyncMethod>option.GlobalDataSyncMethod.SyncAlways</param.GlobalDataSyncMethod>
       <param.EnableVariableSizing>true</param.EnableVariableSizing>
       <param.DynamicMemoryAllocation>option.DynamicMemoryAllocation.Threshold</param.DynamicMemoryAllocation>
       <param.DynamicMemoryAllocationThreshold>65536</param.DynamicMemoryAllocationThreshold>
-      <param.StackUsageMax>200000</param.StackUsageMax>
+      <param.StackUsageMax>900000</param.StackUsageMax>
       <param.FilePartitionMethod>option.FilePartitionMethod.MapMFileToCFile</param.FilePartitionMethod>
       <param.GenerateComments>true</param.GenerateComments>
       <param.MATLABSourceComments>false</param.MATLABSourceComments>
@@ -64,15 +64,11 @@
         <param.BuildFolder />
         <param.SpecifiedBuildFolder />
         <param.SearchPaths />
-        <param.ResponsivenessChecks />
         <param.ExtrinsicCalls />
-        <param.IntegrityChecks />
-        <param.SaturateOnIntegerOverflow />
         <param.GlobalDataSyncMethod />
         <param.EnableVariableSizing />
         <param.DynamicMemoryAllocation />
         <param.DynamicMemoryAllocationThreshold />
-        <param.StackUsageMax />
         <param.FilePartitionMethod />
         <param.GenerateComments />
         <param.MATLABSourceComments />
@@ -725,6 +721,7 @@
     <param.objective>option.objective.c</param.objective>
     <param.WorkflowStep>verifyCompatibility</param.WorkflowStep>
     <param.TestSnippets>
+      <item>cim_cc(rand(500,1),rand(500,1),0.015625,0.2,1,0,0)</item>
       <item>cim_cc(rand(500,1),rand(500,1),0.015625,0.2)</item>
     </param.TestSnippets>
     <param.DefaultImportExportVariable>config</param.DefaultImportExportVariable>
@@ -746,7 +743,7 @@
     <param.AutoInferUnboundedSizeThreshold>2048</param.AutoInferUnboundedSizeThreshold>
     <param.EnableFixedPointStep>false</param.EnableFixedPointStep>
     <param.EnableScreener>true</param.EnableScreener>
-    <param.AnnotationChecksum>1638506437</param.AnnotationChecksum>
+    <param.AnnotationChecksum>3656268245</param.AnnotationChecksum>
     <var.LegacyTarget />
     <var.MirrorOnOpen>false</var.MirrorOnOpen>
     <param.FixedPointEnabled>false</param.FixedPointEnabled>
@@ -757,8 +754,8 @@
     <var.gc.lastOutputType />
     <var.gc.preBuildChecksum />
     <var.cfi.lastOutputRoot>codegen/mex/cim_cc</var.cfi.lastOutputRoot>
-    <var.cfi.preBuildChecksum>4115797005</var.cfi.preBuildChecksum>
-    <var.lastCfiTestSnippet>cim_cc(rand(500,1),rand(500,1),0.015625,0.2)</var.lastCfiTestSnippet>
+    <var.cfi.preBuildChecksum>1368617232</var.cfi.preBuildChecksum>
+    <var.lastCfiTestSnippet>cim_cc(rand(500,1),rand(500,1),0.015625,0.2,1,0,0)</var.lastCfiTestSnippet>
     <var.outdatedOnRestore>false</var.outdatedOnRestore>
     <var.lastUserSourceChecksum />
     <var.sourceSetState>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;sourceModel&gt;&lt;primarySourceFiles&gt;&lt;file&gt;/home/kiran/stochasticresearch/copula/algorithms/pobs_sorted_cc.m&lt;/file&gt;&lt;file&gt;/home/kiran/stochasticresearch/depmeas/algorithms/cim_cc.m&lt;/file&gt;&lt;file&gt;/home/kiran/stochasticresearch/depmeas/algorithms/taukl_cc.m&lt;/file&gt;&lt;file&gt;/home/kiran/stochasticresearch/depmeas/algorithms/uniqueSorted.m&lt;/file&gt;&lt;/primarySourceFiles&gt;&lt;fixedPointSourceFiles/&gt;&lt;fixedPointSourceRegistered&gt;false&lt;/fixedPointSourceRegistered&gt;&lt;fixedPointSourceSelected&gt;false&lt;/fixedPointSourceSelected&gt;&lt;/sourceModel&gt;</var.sourceSetState>
@@ -898,7 +895,7 @@
     </unset>
     <fileset.entrypoints>
       <file custom-data-expanded="false" value="${PROJECT_ROOT}/cim_cc.m">
-        <Marker>1517079136020</Marker>
+        <Marker>1517244715611</Marker>
       </file>
     </fileset.entrypoints>
     <fileset.testbench />
@@ -909,6 +906,9 @@
           <Input Name="y" typeId="0" />
           <Input Name="minScanIncr" typeId="1" />
           <Input Name="alpha" typeId="1" />
+          <Input Name="autoDetectHybrid" typeId="1" />
+          <Input Name="isHybrid" typeId="1" />
+          <Input Name="continuousRvIndicator" typeId="1" />
           <idpTable>
             <type typeId="0">
               <Class>double</Class>

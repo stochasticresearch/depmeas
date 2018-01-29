@@ -24,6 +24,7 @@ plotAlgoSensitivity        = 0;
 plotAlgoAlphaSensitivity   = 0;
 runConvergence             = 0;
 plotConvergence            = 0;
+runPower_test_M500_old     = 0;
 runPower_test_M500         = 0;
 
 dispstat('','init'); % One time only initialization
@@ -996,6 +997,48 @@ if(~exist('masterCfgRun'))  % means we are running the cell independently
     dispstat('','init'); % One time only initialization
 end
 
+if(~exist('masterCfgRun') || (masterCfgRun==1 && runPower_test_M500_old) )
+    dispstat(sprintf('Running Power for M=500'),'keepthis','timestamp');
+    
+    rng(1230);
+    
+    M = 500;
+    alpha = 0.2;
+    minScanIncr = 0.015625;
+    nsim_null = 100;
+    nsim_alt = 100;
+    num_noise_test_min = 0;
+    num_noise_test_max = 20;
+    
+    nameIdxCorrelationCell = {'CIM_old'};
+    functionHandlesCell = {@cim_cc_deprecated;};
+    functionArgsCell    = {{minScanIncr};};
+    powerCurve = compute_power_curves(M,functionHandlesCell, functionArgsCell,...
+                                      nsim_null,nsim_alt,...
+                                      num_noise_test_min,num_noise_test_max);
+
+    % save the data
+    if(ispc)
+        save(sprintf('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\cim_comparison_power_M_%d_old.mat',M));
+    elseif(ismac)
+        save(sprintf('/Users/Kiran/ownCloud/PhD/sim_results/independence/cim_comparison_power_M_%d_old.mat',M));
+    else
+        save(sprintf('/home/kiran/ownCloud/PhD/sim_results/independence/cim_comparison_power_M_%d_old.mat',M));
+    end
+end
+
+%% test only the new CIM value and splice in the old CIM metric .. which is faster
+
+if(~exist('masterCfgRun'))  % means we are running the cell independently
+    clear;
+    clc;
+    close all;
+    dbstop if error;
+    dispstat('','init'); % One time only initialization
+end
+
+splice = 0;
+
 if(~exist('masterCfgRun') || (masterCfgRun==1 && runPower_test_M500) )
     dispstat(sprintf('Running Power for M=500'),'keepthis','timestamp');
     
@@ -1010,14 +1053,31 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && runPower_test_M500) )
     num_noise_test_max = 20;
     
     nameIdxCorrelationCell = {'CIM_old', 'CIM'};
-    functionHandlesCell = {@cim_cc_deprecated;
-                           @cim_cc_mex;};
-    functionArgsCell    = {{minScanIncr};
-                           {minScanIncr, alpha};
-                          };
-    powerCurve = compute_power_curves(M,functionHandlesCell, functionArgsCell,...
+    if(splice)
+        functionHandlesCell = {@cim_cc;};
+        functionArgsCell    = {{minScanIncr,alpha,1,0,0};};
+    else
+        functionHandlesCell = {@cim_cc_deprecated;@cim_cc_mex;};
+        functionArgsCell    = {{minScanIncr};{minScanIncr,alpha,1,0,0};};
+    end
+    cim_new_powercurve = compute_power_curves(M,functionHandlesCell, functionArgsCell,...
                                       nsim_null,nsim_alt,...
                                       num_noise_test_min,num_noise_test_max);
+    
+    % splice
+    if(splice)
+        if(ispc)
+            load(sprintf('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\cim_comparison_power_M_%d_old.mat',M),'cim_old_powercurve');
+        elseif(ismac)
+            load(sprintf('/Users/Kiran/ownCloud/PhD/sim_results/independence/cim_comparison_power_M_%d_old.mat',M),'cim_old_powercurve');
+        else
+            load(sprintf('/home/kiran/ownCloud/PhD/sim_results/independence/cim_comparison_power_M_%d_old.mat',M),'cim_old_powercurve');
+        end
+        powerCurve(1,:,:) = cim_old_powercurve;
+        powerCurve(2,:,:) = squeeze(cim_new_powercurve);
+    else
+        powerCurve = cim_new_powercurve;
+    end
 
     % save the data
     if(ispc)
