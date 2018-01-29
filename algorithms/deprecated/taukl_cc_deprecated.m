@@ -1,4 +1,4 @@
-function [ tau ] = taukl_cc( U, V, autoDetectHybrid, isHybrid, continuousRvIndicator )
+function [ tau ] = taukl_cc_deprecated( U, V, autoDetectHybrid, isHybrid, continuousRvIndicator )
 %TAUKL - computes a rescaled version of Kendall's tau that preserves
 %         the definition of Kendall's tau, but assures that in the 
 %         scenario of perfect concordance or discordance for discrete
@@ -26,15 +26,10 @@ function [ tau ] = taukl_cc( U, V, autoDetectHybrid, isHybrid, continuousRvIndic
 len = length(U);
 
 % compute the numerator the tau_hat
-% K = double(ktau_numer(U,V));  % call the C function
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% some gymanstics for Matlab Coder
-coder.extrinsic('ktau_numer'); 
-numer_val = ktau_numer(U,V);
-K = 0;  % see: https://www.mathworks.com/help/simulink/ug/calling-matlab-functions.html#bq1h2z9-47
-K = double(numer_val);
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+K = 0;
+for k = 1:len-1
+    K = K + sum( sign(U(k)-U(k+1:len)) .* sign(V(k)-V(k+1:len)) );
+end
 
 if(K==0)
     tau = 0;
@@ -79,11 +74,11 @@ if(autoDetectHybrid)
     uuCloseToZero = closeToZero(u, len);
     vvCloseToZero = closeToZero(v, len);
     if( (uuCloseToZero && v>0) || (u>0 && vvCloseToZero) )
-        isHybrid = 1;
+        isHybrid = int32(1);
         if(uuCloseToZero)
-            continuousRvIndicator = 0;
+            continuousRvIndicator = int32(0);  % means U is continuous, V is discrete
         else
-            continuousRvIndicator = 1;
+            continuousRvIndicator = int32(1);  % means V is continuous, U is discrete
         end
     end
 end
@@ -147,28 +142,24 @@ else
 end
 uniqueDiscreteOutcomes = sort(uniqueDiscreteOutcomes);  % probably already comes sorted?
 
-if(length(uniqueDiscreteOutcomes)==1)
-    numOverlapPtsVec = M-1;  % why -1?
-else
-    % for each unique outcome .. count the overlapping elements.
-    numOverlapPtsVec = zeros(1,length(uniqueDiscreteOutcomes)-1);
-    for discreteOutcomesIdx=1:length(uniqueDiscreteOutcomes)-1
-        % find the min/max values of the continuous values for this idx and the
-        % next
-        I = discreteOutcomes==uniqueDiscreteOutcomes(discreteOutcomesIdx);
-        relevantContinuousOutcomes_curIdx = continuousOutcomes(I);
-        I = discreteOutcomes==uniqueDiscreteOutcomes(discreteOutcomesIdx+1);
-        relevantContinuousOutcomes_nextIdx = continuousOutcomes(I);
-
-        % compute the number of points which are overlapping
-        minCur = min(relevantContinuousOutcomes_curIdx);
-        maxCur = max(relevantContinuousOutcomes_curIdx);
-
-        numOverlapPoints = length(find(relevantContinuousOutcomes_nextIdx>=minCur & ...
-                                       relevantContinuousOutcomes_nextIdx<=maxCur));
-
-        numOverlapPtsVec(discreteOutcomesIdx) = numOverlapPoints/length(relevantContinuousOutcomes_nextIdx)*(M/length(uniqueDiscreteOutcomes));
-    end
+% for each unique outcome .. count the overlapping elements.
+numOverlapPtsVec = zeros(1,length(uniqueDiscreteOutcomes)-1);
+for discreteOutcomesIdx=1:length(uniqueDiscreteOutcomes)-1
+    % find the min/max values of the continuous values for this idx and the
+    % next
+    I = discreteOutcomes==uniqueDiscreteOutcomes(discreteOutcomesIdx);
+    relevantContinuousOutcomes_curIdx = continuousOutcomes(I);
+    I = discreteOutcomes==uniqueDiscreteOutcomes(discreteOutcomesIdx+1);
+    relevantContinuousOutcomes_nextIdx = continuousOutcomes(I);
+    
+    % compute the number of points which are overlapping
+    minCur = min(relevantContinuousOutcomes_curIdx);
+    maxCur = max(relevantContinuousOutcomes_curIdx);
+    
+    numOverlapPoints = length(find(relevantContinuousOutcomes_nextIdx>=minCur & ...
+                                   relevantContinuousOutcomes_nextIdx<=maxCur));
+                               
+    numOverlapPtsVec(discreteOutcomesIdx) = numOverlapPoints/length(relevantContinuousOutcomes_nextIdx)*(M/length(uniqueDiscreteOutcomes));
 end
 
 end

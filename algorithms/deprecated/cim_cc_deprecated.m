@@ -1,4 +1,4 @@
-function [metric,regionRectangle] = cim_v2_cc(x, y, minScanIncr, alpha)
+function [metric,regionRectangle] = cim_cc_deprecated(x, y, minScanIncr)
 %CIM - Copula Index for Detecting Dependence and Monotonicity between
 %Stochastic Signals.  See associated paper... to be published and preprint
 %located here: https://arxiv.org/abs/1703.06686
@@ -87,7 +87,7 @@ for axisCfg=axisCfgs
                 end
 
                 [metricVecTmp, numPtsVecTmp, rectangles, numRectanglesCreated] = ...
-                    scanForDep(alpha,ax1pts,ax2pts,ax2min,ax2max,scanincr,MAX_NUM_RECT);
+                    scanForDep(ax1pts,ax2pts,ax2min,ax2max,scanincr,MAX_NUM_RECT);
                 
                 metricCell(zz,:) = metricVecTmp;
                 numPtsCell(zz,:) = numPtsVecTmp;
@@ -179,7 +179,7 @@ metric = sum( metrics(2,:)/sum(metrics(2,:)).*metrics(1,:) );
 
 end
 
-function [metricVec, numPtsVec, rectangles, rectanglesIdx] = scanForDep(alpha, ax1pts, ax2pts, ax2min, ax2max, scanincr, maxNumRect)
+function [metricVec, numPtsVec, rectangles, rectanglesIdx] = scanForDep(ax1pts, ax2pts, ax2min, ax2max, scanincr, maxNumRect)
 %scanForDep - scans for dependencies across the first axis (if you would
 %like to scan across the second axis, simply swap the input arguments to 
 %this function).
@@ -195,6 +195,7 @@ rectanglesIdx = 1;
 
 metricRectanglePrev = -999;
 numPtsPrev = 1;  % should get overwritten
+numStdDev = 4;
 while ax1max<=1
     % find all the points which are contained within this cover rectangle
     matchPts = getPointsWithinBounds(ax1pts, ax2pts, ax1min, ax1max, ax2min, ax2max);
@@ -202,8 +203,8 @@ while ax1max<=1
     numPts = size(matchPts,1);
     if(numPts>=2)   % make sure we have enough points to compute the metric
         % compute the concordance
-        metricRectangle = min(abs(taukl_cc( matchPts(:,1),matchPts(:,2),1,0,0)),1);  % investigate why we need max
-        stdTau = sqrt(4*(1-metricRectangle^2))/sqrt(numPts) * norminv(1-alpha/2);
+        metricRectangle = abs(taukl_cc_deprecated( matchPts(:,1),matchPts(:,2),1,0,0));
+        stdTau = ((1-metricRectangle)*sqrt( (2*(2*numPts+5))/(9*numPts*(numPts-1)) ) )*numStdDev;
         if(newRectangle)
             newRectangle = 0;
         else
@@ -236,7 +237,7 @@ end
 
 % means we never matched with any points, so compute tau for the range
 if(metricRectanglePrev<0)
-    metricVec(rectanglesIdx) = abs(taukl_cc( ax1pts,ax2pts,1,0,0 ));
+    metricVec(rectanglesIdx) = abs(taukl_cc_deprecated( ax1pts,ax2pts,1,0,0 ));
     numPtsVec(rectanglesIdx) = length(ax1pts)-sum(numPtsVec(1:rectanglesIdx));
     rectangles(:,rectanglesIdx) = [0 1 ax2min ax2max];
 end

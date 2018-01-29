@@ -36,5 +36,11 @@ if(nargin>=3)
 else
     msi = 0.015625;
 end
+
+if(nargin>=4)
+    alpha = varargin{2};
+else
+    alpha = 0.2;
+end
 [metric,regionRectangle] = cim_cc_mex(x,y,msi);
-% [metric,regionRectangle] = cim_cc(x,y,msi);
+% [metric,regionRectangle] = cim_cc(x,y,msi,alpha);

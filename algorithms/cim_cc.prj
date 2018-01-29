@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.coder" plugin-version="R2016a">
-  <configuration build-checksum="3355907330" file="/home/kiran/stochasticresearch/depmeas/algorithms/cim_cc.prj" location="/home/kiran/stochasticresearch/depmeas/algorithms" name="cim_cc" target="target.unifiedcoder" target-name="MATLAB Coder">
+  <configuration build-checksum="2917121020" file="/home/kiran/stochasticresearch/depmeas/algorithms/cim_cc.prj" location="/home/kiran/stochasticresearch/depmeas/algorithms" name="cim_cc" target="target.unifiedcoder" target-name="MATLAB Coder">
     <profile key="profile.mex">
       <param.BuiltInstrumentedMex>false</param.BuiltInstrumentedMex>
       <param.RanInstrumentedMex>false</param.RanInstrumentedMex>
@@ -725,7 +725,7 @@
     <param.objective>option.objective.c</param.objective>
     <param.WorkflowStep>verifyCompatibility</param.WorkflowStep>
     <param.TestSnippets>
-      <item>x = rand(500,1); y = x; msi = 0.015625; [m,r] = cim_cc(x,y,msi)</item>
+      <item>cim_cc(rand(500,1),rand(500,1),0.015625,0.2)</item>
     </param.TestSnippets>
     <param.DefaultImportExportVariable>config</param.DefaultImportExportVariable>
     <param.RowMajor>false</param.RowMajor>
@@ -746,7 +746,7 @@
     <param.AutoInferUnboundedSizeThreshold>2048</param.AutoInferUnboundedSizeThreshold>
     <param.EnableFixedPointStep>false</param.EnableFixedPointStep>
     <param.EnableScreener>true</param.EnableScreener>
-    <param.AnnotationChecksum>2337098836</param.AnnotationChecksum>
+    <param.AnnotationChecksum>1638506437</param.AnnotationChecksum>
     <var.LegacyTarget />
     <var.MirrorOnOpen>false</var.MirrorOnOpen>
     <param.FixedPointEnabled>false</param.FixedPointEnabled>
@@ -757,11 +757,11 @@
     <var.gc.lastOutputType />
     <var.gc.preBuildChecksum />
     <var.cfi.lastOutputRoot>codegen/mex/cim_cc</var.cfi.lastOutputRoot>
-    <var.cfi.preBuildChecksum>3173484923</var.cfi.preBuildChecksum>
-    <var.lastCfiTestSnippet>x = rand(500,1); y = x; msi = 0.015625; [m,r] = cim_cc(x,y,msi)</var.lastCfiTestSnippet>
+    <var.cfi.preBuildChecksum>4115797005</var.cfi.preBuildChecksum>
+    <var.lastCfiTestSnippet>cim_cc(rand(500,1),rand(500,1),0.015625,0.2)</var.lastCfiTestSnippet>
     <var.outdatedOnRestore>false</var.outdatedOnRestore>
     <var.lastUserSourceChecksum />
-    <var.sourceSetState>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;sourceModel&gt;&lt;primarySourceFiles&gt;&lt;file&gt;/home/kiran/stochasticresearch/copula/algorithms/pobs_sorted_cc.m&lt;/file&gt;&lt;file&gt;/home/kiran/stochasticresearch/depmeas/algorithms/cim_cc.m&lt;/file&gt;&lt;file&gt;/home/kiran/stochasticresearch/depmeas/algorithms/kendallsTauNumer1.m&lt;/file&gt;&lt;file&gt;/home/kiran/stochasticresearch/depmeas/algorithms/taukl_cc.m&lt;/file&gt;&lt;file&gt;/home/kiran/stochasticresearch/depmeas/algorithms/uniqueSorted.m&lt;/file&gt;&lt;/primarySourceFiles&gt;&lt;fixedPointSourceFiles/&gt;&lt;fixedPointSourceRegistered&gt;false&lt;/fixedPointSourceRegistered&gt;&lt;fixedPointSourceSelected&gt;false&lt;/fixedPointSourceSelected&gt;&lt;/sourceModel&gt;</var.sourceSetState>
+    <var.sourceSetState>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;sourceModel&gt;&lt;primarySourceFiles&gt;&lt;file&gt;/home/kiran/stochasticresearch/copula/algorithms/pobs_sorted_cc.m&lt;/file&gt;&lt;file&gt;/home/kiran/stochasticresearch/depmeas/algorithms/cim_cc.m&lt;/file&gt;&lt;file&gt;/home/kiran/stochasticresearch/depmeas/algorithms/taukl_cc.m&lt;/file&gt;&lt;file&gt;/home/kiran/stochasticresearch/depmeas/algorithms/uniqueSorted.m&lt;/file&gt;&lt;/primarySourceFiles&gt;&lt;fixedPointSourceFiles/&gt;&lt;fixedPointSourceRegistered&gt;false&lt;/fixedPointSourceRegistered&gt;&lt;fixedPointSourceSelected&gt;false&lt;/fixedPointSourceSelected&gt;&lt;/sourceModel&gt;</var.sourceSetState>
     <param.forceMexBuild>false</param.forceMexBuild>
     <param.configImportActive>false</param.configImportActive>
     <var.boundToGui>true</var.boundToGui>
@@ -898,7 +898,7 @@
     </unset>
     <fileset.entrypoints>
       <file custom-data-expanded="false" value="${PROJECT_ROOT}/cim_cc.m">
-        <Marker>1501666166147</Marker>
+        <Marker>1517079136020</Marker>
       </file>
     </fileset.entrypoints>
     <fileset.testbench />
@@ -908,6 +908,7 @@
           <Input Name="x" typeId="0" />
           <Input Name="y" typeId="0" />
           <Input Name="minScanIncr" typeId="1" />
+          <Input Name="alpha" typeId="1" />
           <idpTable>
             <type typeId="0">
               <Class>double</Class>
@@ -971,7 +972,7 @@
       <vista>false</vista>
       <linux>true</linux>
       <solaris>false</solaris>
-      <osver>4.10.0-28-generic</osver>
+      <osver>4.13.0-32-generic</osver>
       <os32>false</os32>
       <os64>true</os64>
       <arch>glnxa64</arch>

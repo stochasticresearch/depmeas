@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.coder" plugin-version="R2016a">
-  <configuration build-checksum="2338132723" file="/home/kiran/stochasticresearch/depmeas/algorithms/taukl_cc.prj" location="/home/kiran/stochasticresearch/depmeas/algorithms" name="taukl_cc" target="target.unifiedcoder" target-name="MATLAB Coder">
+  <configuration build-checksum="1384812873" file="/home/kiran/stochasticresearch/depmeas/algorithms/taukl_cc.prj" location="/home/kiran/stochasticresearch/depmeas/algorithms" name="taukl_cc" target="target.unifiedcoder" target-name="MATLAB Coder">
     <profile key="profile.mex">
       <param.BuiltInstrumentedMex>false</param.BuiltInstrumentedMex>
       <param.RanInstrumentedMex>false</param.RanInstrumentedMex>
@@ -725,8 +725,7 @@
     <param.objective>option.objective.c</param.objective>
     <param.WorkflowStep>verifyCompatibility</param.WorkflowStep>
     <param.TestSnippets>
-      <item>x = rand(500,1); y = x; taukl_cc(x,y,int32(0),int32(0),int32(0));</item>
-      <item>x = rand(500,1); y = x; taukl_cc(x,y,0,0,0);</item>
+      <item>taukl_cc(rand(500,1),rand(500,1),1,0,0)</item>
     </param.TestSnippets>
     <param.DefaultImportExportVariable>config</param.DefaultImportExportVariable>
     <param.RowMajor>false</param.RowMajor>
@@ -747,7 +746,7 @@
     <param.AutoInferUnboundedSizeThreshold>2048</param.AutoInferUnboundedSizeThreshold>
     <param.EnableFixedPointStep>false</param.EnableFixedPointStep>
     <param.EnableScreener>true</param.EnableScreener>
-    <param.AnnotationChecksum>426183636</param.AnnotationChecksum>
+    <param.AnnotationChecksum>753507806</param.AnnotationChecksum>
     <var.LegacyTarget />
     <var.MirrorOnOpen>false</var.MirrorOnOpen>
     <param.FixedPointEnabled>false</param.FixedPointEnabled>
@@ -758,8 +757,8 @@
     <var.gc.lastOutputType />
     <var.gc.preBuildChecksum />
     <var.cfi.lastOutputRoot>codegen/mex/taukl_cc</var.cfi.lastOutputRoot>
-    <var.cfi.preBuildChecksum>1800237907</var.cfi.preBuildChecksum>
-    <var.lastCfiTestSnippet>x = rand(500,1); y = x; taukl_cc(x,y,int32(0),int32(0),int32(0));</var.lastCfiTestSnippet>
+    <var.cfi.preBuildChecksum>1817073030</var.cfi.preBuildChecksum>
+    <var.lastCfiTestSnippet>taukl_cc(rand(500,1),rand(500,1),1,0,0)</var.lastCfiTestSnippet>
     <var.outdatedOnRestore>false</var.outdatedOnRestore>
     <var.lastUserSourceChecksum />
     <var.sourceSetState>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;sourceModel&gt;&lt;primarySourceFiles&gt;&lt;file&gt;/home/kiran/stochasticresearch/depmeas/algorithms/taukl_cc.m&lt;/file&gt;&lt;file&gt;/home/kiran/stochasticresearch/depmeas/algorithms/uniqueSorted.m&lt;/file&gt;&lt;/primarySourceFiles&gt;&lt;fixedPointSourceFiles/&gt;&lt;fixedPointSourceRegistered&gt;false&lt;/fixedPointSourceRegistered&gt;&lt;fixedPointSourceSelected&gt;false&lt;/fixedPointSourceSelected&gt;&lt;/sourceModel&gt;</var.sourceSetState>
@@ -899,7 +898,7 @@
     </unset>
     <fileset.entrypoints>
       <file custom-data-expanded="false" value="${PROJECT_ROOT}/taukl_cc.m">
-        <Marker>1514535747942</Marker>
+        <Marker>1517100977754</Marker>
       </file>
     </fileset.entrypoints>
     <fileset.testbench />
@@ -921,7 +920,7 @@
               <Complex>false</Complex>
             </type>
             <type typeId="1">
-              <Class>int32</Class>
+              <Class>double</Class>
               <Size>1 x 1</Size>
               <Value />
               <InitialValue />
@@ -974,7 +973,7 @@
       <vista>false</vista>
       <linux>true</linux>
       <solaris>false</solaris>
-      <osver>4.10.0-42-generic</osver>
+      <osver>4.13.0-32-generic</osver>
       <os32>false</os32>
       <os64>true</os64>
       <arch>glnxa64</arch>

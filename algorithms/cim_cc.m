@@ -1,4 +1,4 @@
-function [metric,regionRectangle] = cim_cc(x, y, minScanIncr)
+function [metric,regionRectangle] = cim_cc(x, y, minScanIncr, alpha)
 %CIM - Copula Index for Detecting Dependence and Monotonicity between
 %Stochastic Signals.  See associated paper... to be published and preprint
 %located here: https://arxiv.org/abs/1703.06686
@@ -33,7 +33,10 @@ function [metric,regionRectangle] = cim_cc(x, y, minScanIncr)
 
 % convert X and Y to pseudo-observations, and scale to be between 0-1
 [u,v] = pobs_sorted_cc(x,y);
+[v_reverse_sorted,u_reverse_sorted] = pobs_sorted_cc(y,x);
+
 MAX_NUM_RECT = ceil(length(x)/2);
+normInvVal = norminv(1-alpha/2);
 
 axisCfgs = [1 2];
 ax2minmaxCfgs = { {[0,1]}, {[0,0.5],[0.5,1]} };
@@ -83,11 +86,11 @@ for axisCfg=axisCfgs
                     case 1
                         ax1pts = u; ax2pts = v;
                     otherwise  % changed from case 2 to otherwise for matlab coder
-                        ax1pts = v; ax2pts = u;
+                        ax1pts = v_reverse_sorted; ax2pts = u_reverse_sorted;
                 end
 
                 [metricVecTmp, numPtsVecTmp, rectangles, numRectanglesCreated] = ...
-                    scanForDep(ax1pts,ax2pts,ax2min,ax2max,scanincr,MAX_NUM_RECT);
+                    scanForDep(normInvVal,ax1pts,ax2pts,ax2min,ax2max,scanincr,MAX_NUM_RECT);
                 
                 metricCell(zz,:) = metricVecTmp;
                 numPtsCell(zz,:) = numPtsVecTmp;
@@ -179,7 +182,7 @@ metric = sum( metrics(2,:)/sum(metrics(2,:)).*metrics(1,:) );
 
 end
 
-function [metricVec, numPtsVec, rectangles, rectanglesIdx] = scanForDep(ax1pts, ax2pts, ax2min, ax2max, scanincr, maxNumRect)
+function [metricVec, numPtsVec, rectangles, rectanglesIdx] = scanForDep(normInvVal, ax1pts, ax2pts, ax2min, ax2max, scanincr, maxNumRect)
 %scanForDep - scans for dependencies across the first axis (if you would
 %like to scan across the second axis, simply swap the input arguments to 
 %this function).
@@ -195,7 +198,6 @@ rectanglesIdx = 1;
 
 metricRectanglePrev = -999;
 numPtsPrev = 1;  % should get overwritten
-numStdDev = 4;
 while ax1max<=1
     % find all the points which are contained within this cover rectangle
     matchPts = getPointsWithinBounds(ax1pts, ax2pts, ax1min, ax1max, ax2min, ax2max);
@@ -203,8 +205,12 @@ while ax1max<=1
     numPts = size(matchPts,1);
     if(numPts>=2)   % make sure we have enough points to compute the metric
         % compute the concordance
-        metricRectangle = abs(taukl_cc( matchPts(:,1),matchPts(:,2),1,0,0));
-        stdTau = ((1-metricRectangle)*sqrt( (2*(2*numPts+5))/(9*numPts*(numPts-1)) ) )*numStdDev;
+        tmp_val = taukl_cc( matchPts(:,1),matchPts(:,2),1,0,0);
+        taukl_cc_val = 0;  % see: https://www.mathworks.com/help/simulink/ug/calling-matlab-functions.html#bq1h2z9-47
+        taukl_cc_val = tmp_val;
+        metricRectangle = min(abs(taukl_cc_val),1);  % because we offload to C, sometimes we get
+                                                     % values within EPS of 1 
+        stdTau = sqrt(4*(1-metricRectangle^2))/sqrt(numPts) * normInvVal;
         if(newRectangle)
             newRectangle = 0;
         else
@@ -237,17 +243,18 @@ end
 
 % means we never matched with any points, so compute tau for the range
 if(metricRectanglePrev<0)
-    metricVec(rectanglesIdx) = abs(taukl_cc( ax1pts,ax2pts,1,0,0 ));
+    tmp_val = taukl_cc( ax1pts,ax2pts,1,0,0 );
+    taukl_cc_val = 0;  % see: https://www.mathworks.com/help/simulink/ug/calling-matlab-functions.html#bq1h2z9-47
+    taukl_cc_val = tmp_val;
+    metricVec(rectanglesIdx) = min(abs(taukl_cc_val),1);
     numPtsVec(rectanglesIdx) = length(ax1pts)-sum(numPtsVec(1:rectanglesIdx));
     rectangles(:,rectanglesIdx) = [0 1 ax2min ax2max];
 end
 
 end
 
-function [matchPts, matchIdxs] = getPointsWithinBounds(ax1pts, ax2pts, ax1min, ax1max, ax2min, ax2max)
+function [matchPts] = getPointsWithinBounds(ax1pts, ax2pts, ax1min, ax1max, ax2min, ax2max)
 coder.inline('always');
-ax1_match = find(ax1pts>ax1min & ax1pts<=ax1max);
-ax2_match = find(ax2pts>ax2min & ax2pts<=ax2max);
-matchIdxs = intersect(ax1_match,ax2_match);
+matchIdxs = find(ax1pts>ax1min & ax1pts<=ax1max & ax2pts>ax2min & ax2pts<=ax2max);
 matchPts = [ax1pts(matchIdxs) ax2pts(matchIdxs)];
 end

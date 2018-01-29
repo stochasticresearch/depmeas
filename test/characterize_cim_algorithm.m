@@ -1004,14 +1004,14 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && runPower_test_M500) )
     M = 500;
     alpha = 0.2;
     minScanIncr = 0.015625;
-    nsim_null = 300;
-    nsim_alt = 300;
+    nsim_null = 100;
+    nsim_alt = 100;
     num_noise_test_min = 0;
     num_noise_test_max = 20;
     
-    nameIdxCorrelationCell = {'CIM', 'CIMv2'};
-    functionHandlesCell = {@cim;
-                           @cim_v2_cc_mex;};
+    nameIdxCorrelationCell = {'CIM_old', 'CIM'};
+    functionHandlesCell = {@cim_cc_deprecated;
+                           @cim_cc_mex;};
     functionArgsCell    = {{minScanIncr};
                            {minScanIncr, alpha};
                           };
@@ -1021,11 +1021,11 @@ if(~exist('masterCfgRun') || (masterCfgRun==1 && runPower_test_M500) )
 
     % save the data
     if(ispc)
-        save(sprintf('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\cim_comparison_power_alpha0.3_M_%d.mat',M));
+        save(sprintf('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\cim_comparison_power_alpha0.2_M_%d.mat',M));
     elseif(ismac)
-        save(sprintf('/Users/Kiran/ownCloud/PhD/sim_results/independence/cim_comparison_power_alpha0.3_M_%d.mat',M));
+        save(sprintf('/Users/Kiran/ownCloud/PhD/sim_results/independence/cim_comparison_power_alpha0.2_M_%d.mat',M));
     else
-        save(sprintf('/home/kiran/ownCloud/PhD/sim_results/independence/cim_comparison_power_alpha0.3_M_%d.mat',M));
+        save(sprintf('/home/kiran/ownCloud/PhD/sim_results/independence/cim_comparison_power_alpha0.2_M_%d.mat',M));
     end
 end
 
@@ -1036,14 +1036,14 @@ clear;
 clc;
 M = 500;
 if(ispc)
-    load(sprintf('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\cim_comparison_power_alpha0.3_M_%d.mat',M));
+    load(sprintf('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\cim_comparison_power_alpha0.2_M_%d.mat',M));
 elseif(ismac)
-    load(sprintf('/Users/Kiran/ownCloud/PhD/sim_results/independence/cim_comparison_power_alpha0.3_M_%d.mat',M));
+    load(sprintf('/Users/Kiran/ownCloud/PhD/sim_results/independence/cim_comparison_power_alpha0.2_M_%d.mat',M));
 else
-    load(sprintf('/home/kiran/ownCloud/PhD/sim_results/independence/cim_comparison_power_alpha0.3_M_%d.mat',M));
+    load(sprintf('/home/kiran/ownCloud/PhD/sim_results/independence/cim_comparison_power_alpha0.2_M_%d.mat',M));
 end
 
-labels = {'CIM', 'CIMv2'};
+labels = {'CIM_old', 'CIM'};
 cellfind = @(string)(@(cell_contents)(strcmp(string,cell_contents)));
 
 num_noise_test_min = 0;
