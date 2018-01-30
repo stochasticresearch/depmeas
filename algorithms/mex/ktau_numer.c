@@ -235,10 +235,11 @@ inline int sgn(float v) {
 // int kendall_naive( double *arr1, double *arr2, int len )
 int kendall_naive( double *arr1, int len )
 {
+    int ii,jj;
     int K = 0;
-    for(int ii=0; ii<len-1; ii++) {
+    for(ii=0; ii<len-1; ii++) {
         // Can we use MKL for the inner for-loop?
-        for(int jj=ii+1; jj<len; jj++) {
+        for(jj=ii+1; jj<len; jj++) {
             K += (sgn(arr1[ii]-arr1[jj])*-1);
         }
     }
