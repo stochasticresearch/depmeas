@@ -19,12 +19,12 @@ for mcSimNum=1:numMCSim
     u = rand(M,1); v = rand(M,1);
     
     tic;
-    cim_cc_vec(mcSimNum) = cim_cc(u,v,msi,alpha);
+    cim_cc_vec(mcSimNum) = cim_cc(u,v,msi,alpha,1,0,0);
     z = toc;
     t1 = t1 + z;
     
     tic;
-    cim_cc_mex_vec(mcSimNum) = cim_cc_mex(u,v,msi,alpha);
+    cim_cc_mex_vec(mcSimNum) = cim_cc_mex(u,v,msi,alpha,1,0,0);
     z = toc;
     t2 = t2 + z;
     
