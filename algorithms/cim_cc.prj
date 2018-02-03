@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.coder" plugin-version="R2016a">
-  <configuration build-checksum="2943208911" file="/home/kiran/stochasticresearch/depmeas/algorithms/cim_cc.prj" location="/home/kiran/stochasticresearch/depmeas/algorithms" name="cim_cc" target="target.unifiedcoder" target-name="MATLAB Coder">
+  <configuration build-checksum="2015996881" file="/home/kiran/stochasticresearch/depmeas/algorithms/cim_cc.prj" location="/home/kiran/stochasticresearch/depmeas/algorithms" name="cim_cc" target="target.unifiedcoder" target-name="MATLAB Coder">
     <profile key="profile.mex">
       <param.BuiltInstrumentedMex>false</param.BuiltInstrumentedMex>
       <param.RanInstrumentedMex>false</param.RanInstrumentedMex>
@@ -743,7 +743,7 @@
     <param.AutoInferUnboundedSizeThreshold>2048</param.AutoInferUnboundedSizeThreshold>
     <param.EnableFixedPointStep>false</param.EnableFixedPointStep>
     <param.EnableScreener>true</param.EnableScreener>
-    <param.AnnotationChecksum>3656268245</param.AnnotationChecksum>
+    <param.AnnotationChecksum>90704514</param.AnnotationChecksum>
     <var.LegacyTarget />
     <var.MirrorOnOpen>false</var.MirrorOnOpen>
     <param.FixedPointEnabled>false</param.FixedPointEnabled>
@@ -754,7 +754,7 @@
     <var.gc.lastOutputType />
     <var.gc.preBuildChecksum />
     <var.cfi.lastOutputRoot>codegen/mex/cim_cc</var.cfi.lastOutputRoot>
-    <var.cfi.preBuildChecksum>1368617232</var.cfi.preBuildChecksum>
+    <var.cfi.preBuildChecksum>2262243086</var.cfi.preBuildChecksum>
     <var.lastCfiTestSnippet>cim_cc(rand(500,1),rand(500,1),0.015625,0.2,1,0,0)</var.lastCfiTestSnippet>
     <var.outdatedOnRestore>false</var.outdatedOnRestore>
     <var.lastUserSourceChecksum />
@@ -895,7 +895,7 @@
     </unset>
     <fileset.entrypoints>
       <file custom-data-expanded="false" value="${PROJECT_ROOT}/cim_cc.m">
-        <Marker>1517244715611</Marker>
+        <Marker>1517635673107</Marker>
       </file>
     </fileset.entrypoints>
     <fileset.testbench />
@@ -908,7 +908,7 @@
           <Input Name="alpha" typeId="1" />
           <Input Name="autoDetectHybrid" typeId="1" />
           <Input Name="isHybrid" typeId="1" />
-          <Input Name="continuousRvIndicator" typeId="1" />
+          <Input Name="continuousRvIndicator_in" typeId="1" />
           <idpTable>
             <type typeId="0">
               <Class>double</Class>

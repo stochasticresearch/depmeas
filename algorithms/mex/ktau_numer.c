@@ -232,15 +232,17 @@ inline int sgn(float v) {
 }
 // #define sgn(v) (v < 0) ? -1 : ((v > 0) ? 1 : 0)
 
-// int kendall_naive( double *arr1, double *arr2, int len )
-int kendall_naive( double *arr1, int len )
+int kendall_naive( double *arr1, double *arr2, int len )
 {
     int ii,jj;
     int K = 0;
     for(ii=0; ii<len-1; ii++) {
         // Can we use MKL for the inner for-loop?
         for(jj=ii+1; jj<len; jj++) {
-            K += (sgn(arr1[ii]-arr1[jj])*-1);
+            // we need to check both X & Y here, because of hybrid RV's 
+            // where we can have a repeating X or Y value (depending on the
+            // orientation of U/V or V/U
+            K += (sgn(arr1[ii]-arr1[jj])*sgn(arr2[ii]-arr2[jj]));
         }
     }
     return K;
@@ -279,7 +281,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
     /* get dimensions of the input matrix */
     len = mxGetNumberOfElements(prhs[0]);
     
-    S = kendall_naive( y, len );
+    S = kendall_naive( x, y, len );
 //     S = kendallNlogN( x, y, len );
 
     /* create the output matrix */

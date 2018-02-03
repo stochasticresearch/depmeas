@@ -1,4 +1,5 @@
-function [metric,regionRectangle] = cim_cc(x, y, minScanIncr, alpha, autoDetectHybrid, isHybrid, continuousRvIndicator)
+function [metric,regionRectangle] = cim_cc(x, y, minScanIncr, alpha, ...
+                                           autoDetectHybrid, isHybrid, continuousRvIndicator_in)
 %CIM - Copula Index for Detecting Dependence and Monotonicity between
 %Stochastic Signals.  See associated paper... to be published and preprint
 %located here: https://arxiv.org/abs/1703.06686
@@ -85,8 +86,11 @@ for axisCfg=axisCfgs
                 switch(axisCfg)
                     case 1
                         ax1pts = u; ax2pts = v;
+                        continuousRvIndicator = continuousRvIndicator_in;
                     otherwise  % changed from case 2 to otherwise for matlab coder
                         ax1pts = v_reverse_sorted; ax2pts = u_reverse_sorted;
+                        % because we flip the axes, we need to flip the indication
+                        continuousRvIndicator = double(~continuousRvIndicator_in);
                 end
 
                 [metricVecTmp, numPtsVecTmp, rectangles, numRectanglesCreated] = ...
@@ -115,6 +119,7 @@ for axisCfg=axisCfgs
         [m,maxIIVec] = computeMetricFromAggregates(metricVecAggr, numPtsVecAggr, numRectanglesVecAggr, ax2minmaxCfgLen);
         maxIICell(rectangleAggrIdx,1:length(maxIIVec)) = maxIIVec;
         metrics(rectangleAggrIdx) = m;
+
         for ii=1:length(maxIIVec)
             numRectanglesCreatedMat(rectangleAggrIdx,ii) = numRectanglesVecAggr(ii,maxIIVec(ii));
         end
@@ -208,8 +213,26 @@ while ax1max<=1
     % find all the points which are contained within this cover rectangle
     matchPts = getPointsWithinBounds(ax1pts, ax2pts, ax1min, ax1max, ax2min, ax2max);
     
+    go = 1;
+    if(isHybrid)
+        % try to detect ill-conditioning during the scanning process ...,
+        % where we grab 1 extra point that falsely makes it look as though
+        % the data has a tau of 1 for the discrete index
+        % idxToExamine is the index of the DISCRETE values
+        if(continuousRvIndicator==0)
+            idxToExamine = 2;
+        else
+            idxToExamine = 1;
+        end
+        [~,tmpCounts] = uniqueSorted(matchPts(:,idxToExamine));
+        if(any(tmpCounts)<=2)  % WARNING: we arbitrarily chose 2 as a heuristic! 
+                               % TODO: can we make this more rigorous?
+            go = 0;
+        end
+    end
+    
     numPts = size(matchPts,1);
-    if(numPts>=2)   % make sure we have enough points to compute the metric
+    if(numPts>=2 && go)   % make sure we have enough points to compute the metric
         % compute the concordance
         tmp_val = taukl_cc( matchPts(:,1),matchPts(:,2),autoDetectHybrid,isHybrid,continuousRvIndicator);
         taukl_cc_val = 0;  % see: https://www.mathworks.com/help/simulink/ug/calling-matlab-functions.html#bq1h2z9-47
