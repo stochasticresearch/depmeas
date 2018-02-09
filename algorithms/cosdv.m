@@ -41,8 +41,8 @@ E_copula = zeros(1,n);
 for ii=1:n
     E_copula(ii) = sum(u(ii)>=u & v(ii)>=v)/(n+1);
 end
-W_copula = min(u,v);
-M_copula = max(u+v-1,0);
+M_copula = min(u,v);
+W_copula = max(u+v-1,0);
 Pi_copula = u.*v;
 
 score = 0; wanc = 1;
@@ -50,7 +50,7 @@ score = 0; wanc = 1;
 if(E_copula(1)==Pi_copula(1))
     wanc = 0;
 end
-if( (E_copula(1)==W_copula(1)) || (E_copula(1)==M_copula(1)) || (E_copula(1)==E_copula(2)) )
+if( (E_copula(1)==M_copula(1)) || (E_copula(1)==W_copula(1)) || (E_copula(1)==E_copula(2)) )
     wanc = 1;
 end
 indep = (mean(abs(diff(E_copula)))>0.12);
@@ -67,17 +67,17 @@ for ii=2:n
         
         % compute the relative distance function
         if (E_copula(jj)>Pi_copula(jj))
-            w = (E_copula(jj)-Pi_copula(jj))/(W_copula(jj)-Pi_copula(jj));
+            w = (E_copula(jj)-Pi_copula(jj))/(M_copula(jj)-Pi_copula(jj));
         else
             if (E_copula(jj)<Pi_copula(jj))
-                w=(Pi_copula(jj)-E_copula(jj))/(Pi_copula(jj)-M_copula(jj));
+                w=(Pi_copula(jj)-E_copula(jj))/(Pi_copula(jj)-W_copula(jj));
             else
                 w=0;
             end
         end
       
-        if (( (round(E_copula(ii-1),2)==round(W_copula(ii-1),2)) || ...
-              (round(E_copula(ii-1),2)==round(M_copula(ii-1),2)) || ...
+        if (( (round(E_copula(ii-1),2)==round(M_copula(ii-1),2)) || ...
+              (round(E_copula(ii-1),2)==round(W_copula(ii-1),2)) || ...
               (E_copula(ii-1)==(1/(n+1)))) && (length(ss)>4) )
             w=1;
         end
@@ -87,8 +87,8 @@ for ii=2:n
             w=1;
         end
       
-        if (( (round(Pi_copula(ii-1),2)==round(W_copula(ii-1),2)) || ...
-              (round(Pi_copula(ii-1),2)==round(M_copula(ii-1),2))) && (length(ss)>4))
+        if (( (round(Pi_copula(ii-1),2)==round(M_copula(ii-1),2)) || ...
+              (round(Pi_copula(ii-1),2)==round(W_copula(ii-1),2))) && (length(ss)>4))
             w=1;
         end
         condd = (round(E_copula(ii-1),2)==round(Pi_copula(ii-1),2));
@@ -102,17 +102,17 @@ for ii=2:n
         if(ii==n)
             % compute the relative distance function
             if (E_copula(ii)>Pi_copula(ii))
-                w=(E_copula(ii)-Pi_copula(ii))/(W_copula(ii)-Pi_copula(ii));
+                w=(E_copula(ii)-Pi_copula(ii))/(M_copula(ii)-Pi_copula(ii));
             else
                 if (E_copula(ii)<Pi_copula(ii))
-                    w=(Pi_copula(ii)-E_copula(ii))/(Pi_copula(ii)-M_copula(ii));
+                    w=(Pi_copula(ii)-E_copula(ii))/(Pi_copula(ii)-W_copula(ii));
                 else
                     w=0;
                 end
             end
             
-            if (( (E_copula(ii-1)==W_copula(ii-1)) || ...
-                  (E_copula(ii-1)==M_copula(ii-1))) && (length(ss)>=4 ))
+            if (( (E_copula(ii-1)==M_copula(ii-1)) || ...
+                  (E_copula(ii-1)==W_copula(ii-1))) && (length(ss)>=4 ))
                 w=1;
             end
             
