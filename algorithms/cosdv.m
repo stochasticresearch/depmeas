@@ -1,4 +1,4 @@
-function [metric] = cosdv(x, y)
+function [metric,numDomains] = cosdv(x, y)
 %COSF - a copula based test of dependence called the copula statistic. See
 %       <TODO: insert paper reference here>
 % Inputs:
@@ -29,6 +29,9 @@ function [metric] = cosdv(x, y)
 %*                                                                        *
 %**************************************************************************
 
+general_debug_print = 0;
+lambda_debug_print = 0;
+
 u = pobs(x);
 v = pobs(y);
 
@@ -55,9 +58,14 @@ if( (E_copula(1)==M_copula(1)) || (E_copula(1)==W_copula(1)) || (E_copula(1)==E_
 end
 indep = (mean(abs(diff(E_copula)))>0.12);
 ss_minIdx = 1;
+numDomains = 0;
 for ii=2:n
     ss = E_copula(ss_minIdx:ii);
     if(~issorted(ss) && ~issorted(fliplr(ss)))      % just a way of testing if they are tied?
+        
+        if(general_debug_print)
+            fprintf('[cosdv] -- Domain -> %d:%d\n',ss_minIdx,ii-1);
+        end
         
         if(E_copula(ii-1)==E_copula(ii-2))
             jj = ii-2;
@@ -68,55 +76,100 @@ for ii=2:n
         % compute the relative distance function
         if (E_copula(jj)>Pi_copula(jj))
             w = (E_copula(jj)-Pi_copula(jj))/(M_copula(jj)-Pi_copula(jj));
+            if(lambda_debug_print)
+                fprintf('[cosdv] -- >> a\n');
+            end
         else
             if (E_copula(jj)<Pi_copula(jj))
                 w=(Pi_copula(jj)-E_copula(jj))/(Pi_copula(jj)-W_copula(jj));
+                if(lambda_debug_print)
+                    fprintf('[cosdv] -- >> b\n');
+                end
             else
                 w=0;
+                if(lambda_debug_print)
+                    fprintf('[cosdv] -- >> c\n');
+                end
             end
         end
       
         if (( (round(E_copula(ii-1),2)==round(M_copula(ii-1),2)) || ...
               (round(E_copula(ii-1),2)==round(W_copula(ii-1),2)) || ...
               (E_copula(ii-1)==(1/(n+1)))) && (length(ss)>4) )
+            if(lambda_debug_print)
+                fprintf('[cosdv] -- >> d\n');
+            end
             w=1;
         end
       
         if (( (E_copula(ii)==E_copula(ii-2)) || ...
               (E_copula(ii-1)==E_copula(ii-2))) && (length(ss)>4) ) 
+            if(lambda_debug_print)
+                fprintf('[cosdv] -- >> e\n');
+            end
             w=1;
         end
       
         if (( (round(Pi_copula(ii-1),2)==round(M_copula(ii-1),2)) || ...
               (round(Pi_copula(ii-1),2)==round(W_copula(ii-1),2))) && (length(ss)>4))
+            if(lambda_debug_print)
+                fprintf('[cosdv] -- >> f\n');
+            end
             w=1;
         end
         condd = (round(E_copula(ii-1),2)==round(Pi_copula(ii-1),2));
         if(condd && indep)
+            if(lambda_debug_print)
+                fprintf('[cosdv] -- >> g\n');
+            end
             w = 0;
         end
+        
+        if(general_debug_print)
+            fprintf('[cosdv] -- lambda_min=%0.02f lambda_max=%0.02f\n',wanc,w);
+        end
+        
         score = score+(length(ss)-1)*(w+wanc)/2;
         wanc = w;
         ss_minIdx = ii;
+        numDomains = numDomains + 1;
     else
         if(ii==n)
+            if(general_debug_print)
+                fprintf('[cosdv] -- Domain -> %d:%d\n',ss_minIdx,ii);
+            end
             % compute the relative distance function
             if (E_copula(ii)>Pi_copula(ii))
+                if(lambda_debug_print)
+                    fprintf('[cosdv] -- >> a\n');
+                end
                 w=(E_copula(ii)-Pi_copula(ii))/(M_copula(ii)-Pi_copula(ii));
             else
                 if (E_copula(ii)<Pi_copula(ii))
+                    if(lambda_debug_print)
+                        fprintf('[cosdv] -- >> b\n');
+                    end
                     w=(Pi_copula(ii)-E_copula(ii))/(Pi_copula(ii)-W_copula(ii));
                 else
+                    if(lambda_debug_print)
+                        fprintf('[cosdv] -- >> c\n');
+                    end
                     w=0;
                 end
             end
             
-            if (( (E_copula(ii-1)==M_copula(ii-1)) || ...
-                  (E_copula(ii-1)==W_copula(ii-1))) && (length(ss)>=4 ))
+            if ( ((E_copula(ii-1)==M_copula(ii-1)) || (E_copula(ii-1)==W_copula(ii-1))) && ...
+                  (length(ss)>=4 ) )
+                if(lambda_debug_print)
+                    fprintf('[cosdv] -- >> d\n');
+                end
                 w=1;
             end
-            
+            if(general_debug_print)
+                fprintf('[cosdv] -- lambda_min=%0.02f lambda_max=%0.02f\n',wanc,w);
+            end
             score=score+(length(ss)-1)*(w+wanc)/2;
+            numDomains = numDomains + 1;
         end
     end
 end
