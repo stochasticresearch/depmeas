@@ -8,10 +8,10 @@ clc;
 dbstop if error;
 
 scenarios = {'left-skew','no-skew','right-skew'};
-tauVec = linspace(0.01,0.99,15);                    
+tauVec = linspace(0.01,0.99,25);                    
 copulas = {'Gaussian','Frank','Gumbel','Clayton'};
 M = 500;
-numMCSims = 10;
+numMCSims = 100;
 
 % manually generate a left-skewed and right-skewed data, from which we
 % construct an empirical cdf
@@ -33,7 +33,8 @@ resVecKNN1  = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),l
 resVecKNN6  = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
 resVecKNN20 = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
 resVecVME   = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
-resVecAP = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
+resVecAP    = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
+resVecEntropyMI= zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
 
 msi = 0.015625; alpha = 0.2;
 
@@ -94,11 +95,14 @@ for continuousDistScenario=scenarios
                     resVecTauKL(mcSimNum,dd,cc,bb,aa) = taukl_cc(X,Y,0,1,0);
                     resVecCIM(mcSimNum,dd,cc,bb,aa) = cim_cc_mex(X,Y,msi,alpha,0,1,0);
                     
-%                     resVecKNN1(mcSimNum,dd,cc,bb,aa) = KraskovMI_cc_mex(X,Y,1);
-%                     resVecKNN6(mcSimNum,dd,cc,bb,aa) = KraskovMI_cc_mex(X,Y,6);
-%                     resVecKNN20(mcSimNum,dd,cc,bb,aa) = KraskovMI_cc_mex(X,Y,20);
-%                     resVecVME(mcSimNum,dd,cc,bb,aa) = vmeMI_interface(X,Y);
-%                     resVecAP(mcSimNum,dd,cc,bb,aa) = apMI_interface(X,Y);
+                    resVecKNN1(mcSimNum,dd,cc,bb,aa) = KraskovMI_cc_mex(X,Y,1);
+                    resVecKNN6(mcSimNum,dd,cc,bb,aa) = KraskovMI_cc_mex(X,Y,6);
+                    resVecKNN20(mcSimNum,dd,cc,bb,aa) = KraskovMI_cc_mex(X,Y,20);
+                    resVecVME(mcSimNum,dd,cc,bb,aa) = vmeMI_interface(X,Y);
+                    resVecAP(mcSimNum,dd,cc,bb,aa) = apMI_interface(X,Y);
+
+                    X_continuous = 1;
+                    resVecEntropyMI(mcSimNum,dd,cc,bb,aa) = discrete_entropy(Y) - conditional_entropy(X,Y,X_continuous);
                 end                
                 
                 %%%%%%%%%%%%%%%%%%%% MESSY CODE !!!!!! %%%%%%%%%%%%%%%%%%%%
@@ -148,11 +152,11 @@ end
 
 % save the results
 if(ispc)
-    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\skewed_data\\binary_output_class.mat');
+    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\skewed_data\\binary_output_class_entropybased.mat');
 elseif(ismac)
-    save('/Users/Kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class.mat');
+    save('/Users/Kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class_entropybased.mat');
 else
-    save('/home/kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class.mat');
+    save('/home/kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class_entropybased.mat');
 end
 
 %% plot the bias for tau-variants
@@ -429,14 +433,18 @@ for dd=1:length(copulas)
         % plot the first sample data
         hh = subplot(1,3,subplotIdx); linkList = [linkList hh];
         tauNVec = mean(squeeze(resVecTauN(:,dd,:,skewIdx,skewIdx)));
-        tauKLVec = mean(squeeze(resVecTauKL(:,dd,:,skewIdx,skewIdx)));
+        cimVec = mean(squeeze(resVecCIM(:,dd,:,skewIdx,skewIdx))); 
         resVecKNN20Vec = mean(squeeze(resVecKNN20(:,dd,:,skewIdx,skewIdx)));
         resVecVMEVec = mean(squeeze(resVecVME(:,dd,:,skewIdx,skewIdx)));
         resVecAPVec = mean(squeeze(resVecAP(:,dd,:,skewIdx,skewIdx)));
+        resEntropyMIVec = mean(squeeze(resVecEntropyMI(:,dd,:,skewIdx,skewIdx)));
         
-        hln(:,1) = plot(tauVec,tauKLVec, tauVec,tauNVec,tauVec,resVecKNN20Vec, ...
-                     tauVec,resVecVMEVec,tauVec,resVecAPVec, tauVec,tauVec,'*k');
+        hln(:,1) = plot(tauVec,cimVec, tauVec,tauNVec,tauVec,resVecKNN20Vec, ...
+                     tauVec,resVecVMEVec,tauVec,resVecAPVec, ...
+                     tauVec,resEntropyMIVec, ...
+                     tauVec,tauVec,'*k');
         hln(1).LineWidth = 2.5;
+        axis([0 1 0 1]);
         
         grid on;
         if(subplotIdx==1)
@@ -456,7 +464,7 @@ for dd=1:length(copulas)
         if(subplotIdx==2)
             xlabel('\tau','FontSize',fontSize);            
             if(dd==1)
-                legendCell = {'\tau_{KL}','\tau_N','KNN_{20}','vME','AP'};
+                legendCell = {'CIM','\tau_N','KNN_{20}','vME','AP','H'};
                 [hl(1).leg, hl(1).obj, hl(1).hout, hl(1).mout] = ...
                     legendflex(hln(:,1), legendCell, 'anchor', {'nw','nw'}, ...
                     'buffer', [5 30], ...
@@ -473,6 +481,9 @@ for dd=1:length(copulas)
 %     h = suptitle(copToVis);
 %     h.FontSize = fontSize+2;
 end
+
+%% Compare the skewed hybrid data versus the entropy & conditional entropy based methods of estimating MI
+
 
 %% compare taukl to CIM
 clear;
