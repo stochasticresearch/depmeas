@@ -8,7 +8,7 @@ clc;
 dbstop if error;
 
 scenarios = {'left-skew','no-skew','right-skew'};
-tauVec = linspace(0.01,0.99,25);                    
+tauVec = linspace(0.01,0.99,20);                    
 copulas = {'Gaussian','Frank','Gumbel','Clayton'};
 M = 500;
 numMCSims = 100;
@@ -152,11 +152,11 @@ end
 
 % save the results
 if(ispc)
-    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\skewed_data\\binary_output_class_entropybased.mat');
+    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\skewed_data\\binary_output_class.mat');
 elseif(ismac)
-    save('/Users/Kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class_entropybased.mat');
+    save('/Users/Kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class.mat');
 else
-    save('/home/kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class_entropybased.mat');
+    save('/home/kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class.mat');
 end
 
 %% plot the bias for tau-variants
