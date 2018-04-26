@@ -8,7 +8,7 @@ clc;
 dbstop if error;
 
 scenarios = {'left-skew','no-skew','right-skew'};
-tauVec = linspace(0.01,0.99,20);
+tauVec = linspace(0.01,0.99,20);                    
 copulas = {'Gaussian','Frank','Gumbel','Clayton'};
 M = 500;
 numMCSims = 500;
@@ -102,7 +102,7 @@ for continuousDistScenario=scenarios
                     resVecAP(mcSimNum,dd,cc,bb,aa) = apMI_interface(X,Y);
 
                     X_continuous = 1;
-                    resVecEntropyMI(mcSimNum,dd,cc,bb,aa) = h_mi_interface(X,Y,X_continuous);
+                    resVecEntropyMI(mcSimNum,dd,cc,bb,aa) = discrete_entropy(Y) - conditional_entropy(X,Y,X_continuous);
                 end                
                 
                 %%%%%%%%%%%%%%%%%%%% MESSY CODE !!!!!! %%%%%%%%%%%%%%%%%%%%
@@ -424,7 +424,7 @@ cmap = downsample(colormap,round(64/6));
 for dd=1:length(copulas)
 % for dd=1:1
     copToVis = copulas{dd};
-    width = 25; height = width/3.5;
+    width = 20; height = width/3.5;
     figure('paperpositionmode', 'auto', 'units', 'centimeters', 'position', [0 0 width height])
     subplotIdx=1;
     linkList = [];
@@ -465,8 +465,7 @@ for dd=1:length(copulas)
         if(subplotIdx==1)
             title('Left-Skew','FontSize',fontSize);
         elseif(subplotIdx==2)
-%             title({copToVis,'No-Skew'},'FontSize',fontSize);
-            title('No-Skew','FontSize',fontSize);
+            title({copToVis,'No-Skew'},'FontSize',fontSize);
         elseif(subplotIdx==3)
             title('Right-Skew','FontSize',fontSize);
         end
