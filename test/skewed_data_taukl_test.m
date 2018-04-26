@@ -11,7 +11,7 @@ scenarios = {'left-skew','no-skew','right-skew'};
 tauVec = linspace(0.01,0.99,20);
 copulas = {'Gaussian','Frank','Gumbel','Clayton'};
 M = 500;
-numMCSims = 100;
+numMCSims = 500;
 
 % manually generate a left-skewed and right-skewed data, from which we
 % construct an empirical cdf
@@ -152,11 +152,11 @@ end
 
 % save the results
 if(ispc)
-    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\skewed_data\\binary_output_class_entropybased.mat');
+    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\skewed_data\\binary_output_class.mat');
 elseif(ismac)
-    save('/Users/Kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class_entropybased.mat');
+    save('/Users/Kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class.mat');
 else
-    save('/home/kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class_entropybased.mat');
+    save('/home/kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class.mat');
 end
 
 %% plot the bias for tau-variants
@@ -419,6 +419,7 @@ else
 end
 
 fontSize = 16;
+cmap = downsample(colormap,round(64/6));
 
 for dd=1:length(copulas)
 % for dd=1:1
@@ -432,18 +433,25 @@ for dd=1:length(copulas)
 
         % plot the first sample data
         hh = subplot(1,3,subplotIdx); linkList = [linkList hh];
-        tauNVec = mean(squeeze(resVecTauN(:,dd,:,skewIdx,skewIdx)));
-        cimVec = mean(squeeze(resVecCIM(:,dd,:,skewIdx,skewIdx))); 
-        resVecKNN20Vec = mean(squeeze(resVecKNN20(:,dd,:,skewIdx,skewIdx)));
-        resVecVMEVec = mean(squeeze(resVecVME(:,dd,:,skewIdx,skewIdx)));
-        resVecAPVec = mean(squeeze(resVecAP(:,dd,:,skewIdx,skewIdx)));
-        resEntropyMIVec = mean(squeeze(resVecEntropyMI(:,dd,:,skewIdx,skewIdx)));
+        tauNVec = squeeze(resVecTauN(:,dd,:,skewIdx,skewIdx));
+        cimVec = squeeze(resVecCIM(:,dd,:,skewIdx,skewIdx)); 
+        resVecKNN20Vec = squeeze(resVecKNN20(:,dd,:,skewIdx,skewIdx));
+        resVecVMEVec = squeeze(resVecVME(:,dd,:,skewIdx,skewIdx));
+        resVecAPVec = squeeze(resVecAP(:,dd,:,skewIdx,skewIdx));
+        resEntropyMIVec = squeeze(resVecEntropyMI(:,dd,:,skewIdx,skewIdx));
         
-        hln(:,1) = plot(tauVec,cimVec, tauVec,tauNVec,tauVec,resVecKNN20Vec, ...
-                     tauVec,resVecVMEVec,tauVec,resVecAPVec, ...
-                     tauVec,resEntropyMIVec, ...
-                     tauVec,tauVec,'*k');
-        hln(1).LineWidth = 2.5;
+%         hln(:,1) = plot(tauVec,cimVec, tauVec,tauNVec,tauVec,resVecKNN20Vec, ...
+%                      tauVec,resVecVMEVec,tauVec,resVecAPVec, ...
+%                      tauVec,resEntropyMIVec, ...
+%                      tauVec,tauVec,'*k');
+%         hln(1).LineWidth = 2.5;
+        hln(:,1) = boundedline(tauVec,mean(cimVec),std(cimVec),'cmap', cmap(1,:), 'transparency', 0.6);
+        hold on;
+        boundedline(tauVec,mean(tauNVec),std(tauNVec),'cmap', cmap(2,:), 'transparency', 0.6);
+        boundedline(tauVec,mean(resVecKNN20Vec),std(resVecKNN20Vec),'cmap', cmap(3,:), 'transparency', 0.6);
+        boundedline(tauVec,mean(resVecVMEVec),std(resVecVMEVec),'cmap', cmap(4,:), 'transparency', 0.6);
+        boundedline(tauVec,mean(resVecAPVec),std(resVecAPVec),'cmap', cmap(5,:), 'transparency', 0.6);
+        boundedline(tauVec,mean(resEntropyMIVec),std(resEntropyMIVec),'cmap', cmap(6,:), 'transparency', 0.6);
         axis([0 1 0 1]);
         
         grid on;
@@ -465,14 +473,15 @@ for dd=1:length(copulas)
         if(subplotIdx==2)
             xlabel('\tau','FontSize',fontSize);            
             if(dd==1)
-                legendCell = {'CIM','\tau_N','KNN_{20}','vME','AP','H'};
-                [hl(1).leg, hl(1).obj, hl(1).hout, hl(1).mout] = ...
-                    legendflex(hln(:,1), legendCell, 'anchor', {'nw','nw'}, ...
-                    'buffer', [10 30], ...
-                    'ncol', 2, ...
-                    'fontsize', fontSize-3, ...
-                    'xscale', 0.4, ...
-                    'box', 'off');
+                legendCell = {'CIM','\tau_N','KNN_{20}','vME','AP','H_{MI}'};
+%                 [hl(1).leg, hl(1).obj, hl(1).hout, hl(1).mout] = ...
+%                     legendflex(hln(:,1), legendCell, 'anchor', {'nw','nw'}, ...
+%                     'buffer', [10 30], ...
+%                     'ncol', 2, ...
+%                     'fontsize', fontSize-3, ...
+%                     'xscale', 0.4, ...
+%                     'box', 'off');
+                legend(legendCell)
             end
         end
         

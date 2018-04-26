@@ -1,0 +1,10 @@
+x = 1:1000';
+x = x';
+y = [ones(1,500), 2*ones(1,500)]';
+b = x\y;
+scatter(x,y);
+hold on;
+yCalc = b*x;
+plot(x,yCalc);
+xlabel('x','FontSize',20); ylabel('y','FontSize',20); title('Linear Regression of Binary Discrete Dependent Data');
+grid on;
