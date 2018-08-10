@@ -25,16 +25,16 @@ leftSkewContinuousDistInfo = rvEmpiricalInfo(xiLeftSkew,fLeftSkew,FLeftSkew,0);
 FRightSkew = empcdf(xiRightSkew,0);
 rightSkewContinuousDistInfo = rvEmpiricalInfo(xiRightSkew,fRightSkew,FRightSkew,0);
 
-% resVecTauB  = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
-% resVecTauN  = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
-% resVecTauKL = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
-% resVecCIM   = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
-% resVecKNN1  = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
-% resVecKNN6  = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
-% resVecKNN20 = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
-% resVecVME   = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
-% resVecAP    = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
-% resVecEntropyMI= zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
+resVecTauB  = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
+resVecTauN  = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
+resVecTauKL = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
+resVecCIM   = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
+resVecKNN1  = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
+resVecKNN6  = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
+resVecKNN20 = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
+resVecVME   = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
+resVecAP    = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
+resVecEntropyMI= zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
 resVecDcorr = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
 resVecMIC   = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
 resVecCorr  = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
@@ -99,19 +99,19 @@ for continuousDistScenario=scenarios
                     [X,Y] = pobs_sorted_cc(X,Y);
 
                     % compute tau, tau_kl, tau_N and record
-                    % resVecTauN(mcSimNum,dd,cc,bb,aa) = corr(X,Y,'type','kendall');
-                    % resVecTauB(mcSimNum,dd,cc,bb,aa) = ktaub([X Y], 0.05, 0);
-                    % resVecTauKL(mcSimNum,dd,cc,bb,aa) = taukl_cc(X,Y,0,1,0);
-                    % resVecCIM(mcSimNum,dd,cc,bb,aa) = cim_cc_mex(X,Y,msi,alpha,0,1,0);
+                    resVecTauN(mcSimNum,dd,cc,bb,aa) = corr(X,Y,'type','kendall');
+                    resVecTauB(mcSimNum,dd,cc,bb,aa) = ktaub([X Y], 0.05, 0);
+                    resVecTauKL(mcSimNum,dd,cc,bb,aa) = taukl_cc(X,Y,0,1,0);
+                    resVecCIM(mcSimNum,dd,cc,bb,aa) = cim_cc_mex(X,Y,msi,alpha,0,1,0);
                     
-                    % resVecKNN1(mcSimNum,dd,cc,bb,aa) = KraskovMI_cc_mex(X,Y,1);
-                    % resVecKNN6(mcSimNum,dd,cc,bb,aa) = KraskovMI_cc_mex(X,Y,6);
-                    % resVecKNN20(mcSimNum,dd,cc,bb,aa) = KraskovMI_cc_mex(X,Y,20);
-                    % resVecVME(mcSimNum,dd,cc,bb,aa) = vmeMI_interface(X,Y);
-                    % resVecAP(mcSimNum,dd,cc,bb,aa) = apMI_interface(X,Y);
+                    resVecKNN1(mcSimNum,dd,cc,bb,aa) = KraskovMI_cc_mex(X,Y,1);
+                    resVecKNN6(mcSimNum,dd,cc,bb,aa) = KraskovMI_cc_mex(X,Y,6);
+                    resVecKNN20(mcSimNum,dd,cc,bb,aa) = KraskovMI_cc_mex(X,Y,20);
+                    resVecVME(mcSimNum,dd,cc,bb,aa) = vmeMI_interface(X,Y);
+                    resVecAP(mcSimNum,dd,cc,bb,aa) = apMI_interface(X,Y);
 
-                    % X_continuous = 1;
-                    % resVecEntropyMI(mcSimNum,dd,cc,bb,aa) = discrete_entropy(Y) - conditional_entropy(X,Y,X_continuous);
+                    X_continuous = 1;
+                    resVecEntropyMI(mcSimNum,dd,cc,bb,aa) = discrete_entropy(Y) - conditional_entropy(X,Y,X_continuous);
                     resVecDcorr(mcSimNum,dd,cc,bb,aa) = dcor(X,Y);
                     resVecMIC(mcSimNum,dd,cc,bb,aa) = mine_interface_mic(X,Y, mine_alpha, mine_c,'mic_e');
                     resVecCorr(mcSimNum,dd,cc,bb,aa) = corr(X,Y);
@@ -166,11 +166,11 @@ end
 
 % save the results
 if(ispc)
-    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\skewed_data\\binary_output_class_depmeas.mat');
+    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\skewed_data\\binary_output_class.mat');
 elseif(ismac)
-    save('/Users/Kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class_depmeas.mat');
+    save('/Users/Kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class.mat');
 else
-    save('/home/kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class_depmeas.mat');
+    save('/home/kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class.mat');
 end
 
 %% plot the bias for tau-variants
@@ -426,14 +426,20 @@ close all;
 
 if(ispc)
     load('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\skewed_data\\binary_output_class.mat');
+    load('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\skewed_data\\binary_output_class_depmeas.mat');
 elseif(ismac)
     load('/Users/Kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class.mat');
+    load('/Users/Kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class_depmeas.mat');
 else
     load('/home/kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class.mat');
+    load('/home/kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class_depmeas.mat');
 end
 
 fontSize = 16;
-cmap = downsample(colormap,round(64/6));
+cmap = downsample(colormap,round(64/5));
+
+plot_mi = 0;
+plot_dep = 1;
 
 for dd=1:length(copulas)
 % for dd=1:1
@@ -453,6 +459,9 @@ for dd=1:length(copulas)
         resVecVMEVec = squeeze(resVecVME(:,dd,:,skewIdx,skewIdx));
         resVecAPVec = squeeze(resVecAP(:,dd,:,skewIdx,skewIdx));
         resEntropyMIVec = squeeze(resVecEntropyMI(:,dd,:,skewIdx,skewIdx));
+        resVecDcorrVec = squeeze(resVecDcorr(:,dd,:,skewIdx,skewIdx));
+        resVecMICVec   = squeeze(resVecMIC(:,dd,:,skewIdx,skewIdx));
+        resVecRDCVec   = squeeze(resVecRDC(:,dd,:,skewIdx,skewIdx));
         
 %         hln(:,1) = plot(tauVec,cimVec, tauVec,tauNVec,tauVec,resVecKNN20Vec, ...
 %                      tauVec,resVecVMEVec,tauVec,resVecAPVec, ...
@@ -461,11 +470,17 @@ for dd=1:length(copulas)
 %         hln(1).LineWidth = 2.5;
         hln(:,1) = boundedline(tauVec,mean(cimVec),std(cimVec),'cmap', cmap(1,:), 'transparency', 0.6);
         hold on;
-        boundedline(tauVec,mean(tauNVec),std(tauNVec),'cmap', cmap(2,:), 'transparency', 0.6);
-        boundedline(tauVec,mean(resVecKNN20Vec),std(resVecKNN20Vec),'cmap', cmap(3,:), 'transparency', 0.6);
-        boundedline(tauVec,mean(resVecVMEVec),std(resVecVMEVec),'cmap', cmap(4,:), 'transparency', 0.6);
-        boundedline(tauVec,mean(resVecAPVec),std(resVecAPVec),'cmap', cmap(5,:), 'transparency', 0.6);
-        boundedline(tauVec,mean(resEntropyMIVec),std(resEntropyMIVec),'cmap', cmap(6,:), 'transparency', 0.6);
+        if(plot_mi)
+            boundedline(tauVec,mean(resVecKNN20Vec),std(resVecKNN20Vec),'cmap', cmap(2,:), 'transparency', 0.6);
+            boundedline(tauVec,mean(resVecVMEVec),std(resVecVMEVec),'cmap', cmap(3,:), 'transparency', 0.6);
+            boundedline(tauVec,mean(resVecAPVec),std(resVecAPVec),'cmap', cmap(4,:), 'transparency', 0.6);
+            boundedline(tauVec,mean(resEntropyMIVec),std(resEntropyMIVec),'cmap', cmap(5,:), 'transparency', 0.6);
+        elseif(plot_dep)
+%             boundedline(tauVec,mean(tauNVec),std(tauNVec),'cmap', cmap(2,:), 'transparency', 0.6);
+            boundedline(tauVec,mean(resVecDcorrVec),std(resVecDcorrVec),'cmap', cmap(2,:), 'transparency', 0.6);
+            boundedline(tauVec,mean(resVecMICVec),std(resVecMICVec),'cmap', cmap(3,:), 'transparency', 0.6);
+            boundedline(tauVec,mean(resVecRDCVec),std(resVecRDCVec),'cmap', cmap(4,:), 'transparency', 0.6);
+        end
         axis([0 1 0 1]);
         
         grid on;
@@ -486,7 +501,13 @@ for dd=1:length(copulas)
         if(subplotIdx==2)
             xlabel('\tau','FontSize',fontSize);            
             if(dd==1)
-                legendCell = {'CIM','\tau_N','KNN_{20}','vME','AP','H_{MI}'};
+                if(plot_mi)
+                    legendCell = {'CIM','KNN_{20}','vME','AP','H_{MI}'};
+                elseif(plot_dep)
+%                     legendCell = {'CIM','\tau_N','dCor','MIC','RDC'};
+                    legendCell = {'CIM','dCor','MIC','RDC'};
+                end
+                
 %                 [hl(1).leg, hl(1).obj, hl(1).hout, hl(1).mout] = ...
 %                     legendflex(hln(:,1), legendCell, 'anchor', {'nw','nw'}, ...
 %                     'buffer', [10 30], ...
@@ -554,7 +575,6 @@ for jj=1:length(probVecCell)
     dispstat(sprintf('err{[%0.02f,%0.02f]}=%0.02f',probVec(1),probVec(2),total_err),'keepthis','timestamp');
 end
 
-%%
 %% compare taukl_cc to taukl
 clear;
 clc;
