@@ -491,7 +491,7 @@ for dd=1:length(copulas)
         
         grid on;
         if(subplotIdx==1)
-            ylabel('Measure','FontSize',fontSize);
+            ylabel('$\hat{\kappa}$','FontSize',fontSize,'Interpreter','Latex');
         end
         % remove y ticks when plotting subplot 2 & 3
         if(subplotIdx==2 || subplotIdx==3)
@@ -521,7 +521,8 @@ for dd=1:length(copulas)
 %                     'fontsize', fontSize-3, ...
 %                     'xscale', 0.4, ...
 %                     'box', 'off');
-                legend(legendCell)
+                lgnd = legend(legendCell);
+                set(lgnd,'color','none');
             end
         end
         
