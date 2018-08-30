@@ -438,8 +438,8 @@ end
 fontSize = 16;
 cmap = downsample(colormap,round(64/5));
 
-plot_mi = 0;
-plot_dep = 1;
+plot_mi = 1;
+plot_dep = 0;
 
 for dd=1:length(copulas)
 % for dd=1:1
@@ -468,20 +468,26 @@ for dd=1:length(copulas)
 %                      tauVec,resEntropyMIVec, ...
 %                      tauVec,tauVec,'*k');
 %         hln(1).LineWidth = 2.5;
-        hln(:,1) = boundedline(tauVec,mean(cimVec),std(cimVec),'cmap', cmap(1,:), 'transparency', 0.6);
+        transparency_val = 0.6;
+        hln(:,1) = boundedline(tauVec,mean(cimVec),std(cimVec),'+','cmap', cmap(1,:), 'transparency', transparency_val);
         hold on;
         if(plot_mi)
-            boundedline(tauVec,mean(resVecKNN20Vec),std(resVecKNN20Vec),'cmap', cmap(2,:), 'transparency', 0.6);
-            boundedline(tauVec,mean(resVecVMEVec),std(resVecVMEVec),'cmap', cmap(3,:), 'transparency', 0.6);
-            boundedline(tauVec,mean(resVecAPVec),std(resVecAPVec),'cmap', cmap(4,:), 'transparency', 0.6);
-            boundedline(tauVec,mean(resEntropyMIVec),std(resEntropyMIVec),'cmap', cmap(5,:), 'transparency', 0.6);
+            hln(:,2) = boundedline(tauVec,mean(resVecKNN20Vec),std(resVecKNN20Vec),'h','cmap', cmap(2,:), 'transparency', transparency_val);
+            hln(:,3) = boundedline(tauVec,mean(resVecVMEVec),std(resVecVMEVec),'^','cmap', cmap(3,:), 'transparency', transparency_val);
+            hln(:,4) = boundedline(tauVec,mean(resVecAPVec),std(resVecAPVec),'.','cmap', cmap(4,:), 'transparency', transparency_val);
+            hln(:,5) = boundedline(tauVec,mean(resEntropyMIVec),std(resEntropyMIVec),'o','cmap', cmap(5,:), 'transparency', transparency_val);
         elseif(plot_dep)
 %             boundedline(tauVec,mean(tauNVec),std(tauNVec),'cmap', cmap(2,:), 'transparency', 0.6);
-            boundedline(tauVec,mean(resVecDcorrVec),std(resVecDcorrVec),'cmap', cmap(2,:), 'transparency', 0.6);
-            boundedline(tauVec,mean(resVecMICVec),std(resVecMICVec),'cmap', cmap(3,:), 'transparency', 0.6);
-            boundedline(tauVec,mean(resVecRDCVec),std(resVecRDCVec),'cmap', cmap(4,:), 'transparency', 0.6);
+            hln(:,2) = boundedline(tauVec,mean(resVecDcorrVec),std(resVecDcorrVec),'o','cmap', cmap(2,:), 'transparency', transparency_val);
+            hln(:,3) = boundedline(tauVec,mean(resVecMICVec),std(resVecMICVec),'*','cmap', cmap(3,:), 'transparency', transparency_val);
+            hln(:,4) = boundedline(tauVec,mean(resVecRDCVec),std(resVecRDCVec),'.','cmap', cmap(4,:), 'transparency', transparency_val);
         end
         axis([0 1 0 1]);
+        hln(:,1).LineWidth=2.5;
+        hln(:,2).LineWidth=2.5;
+        hln(:,3).LineWidth=2.5;
+        hln(:,4).LineWidth=2.5;
+        hln(:,5).LineWidth=2.5;
         
         grid on;
         if(subplotIdx==1)
@@ -499,7 +505,7 @@ for dd=1:length(copulas)
             title('Right-Skew','FontSize',fontSize);
         end
         if(subplotIdx==2)
-            xlabel('\tau','FontSize',fontSize);            
+            xlabel('\kappa','FontSize',fontSize);            
             if(dd==1)
                 if(plot_mi)
                     legendCell = {'CIM','KNN_{20}','vME','AP','H_{MI}'};
