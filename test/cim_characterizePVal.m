@@ -546,3 +546,57 @@ p4(3).LineWidth = lineWidth; p4(3).Marker = '*'; p4(3).MarkerSize = markerSize;
 p4(4).LineWidth = lineWidth; p4(4).Marker = 'x'; p4(4).MarkerSize = markerSize;
 
 legend({'Continuous', 'Hybrid-1', 'Hybrid-2', 'Discrete'}, 'location', 'SouthEast');
+
+%% Characterize the error between the approximate fit distribution and the theoretical null distribution
+
+clear;
+clc;
+
+if(ispc)
+    load('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\cim_nullDistribution.mat');
+elseif(ismac)
+    load('/Users/Kiran/ownCloud/PhD/sim_results/independence/cim_nullDistribution.mat');
+else
+    load('/home/kiran/ownCloud/PhD/sim_results/independence/cim_nullDistribution.mat');
+end
+
+% From the above analysis, the Beta distribution seems 
+% to fit best ... Q-Q Plots
+
+% QQ Plot w/ best fit for M=100 and M=1000
+pdObjsContinuous = cell(1,length(M_vec));
+alphaVecContinuous = zeros(1,length(M_vec));
+betaVecContinuous = zeros(1,length(M_vec));
+for ii=1:length(M_vec)
+    M = M_vec(ii);
+    % look for the Inverse Gaussian Distribution in the correct cell array
+    PD_continuous = PD_continuous_cell(ii); PD_continuous = PD_continuous{1};
+    for jj=1:length(PD_continuous)
+        if(strcmpi('Beta', PD_continuous{jj}.DistributionName))
+            pdContinuous = PD_continuous{jj};
+            break;
+        end
+    end
+    pdObjsContinuous{ii} = pdContinuous;
+    alphaVecContinuous(ii) = pdContinuous.a; 
+    betaVecContinuous(ii) = pdContinuous.b;
+end
+
+sample_points = linspace(0.01,0.99,15);
+for ii=1:length(M_vec)
+    % sample the Beta-Distribution at n points 0-1
+    beta_pts = betapdf(sample_points, alphaVecContinuous(ii), betaVecContinuous(ii));
+    % sample the "true" distribution at n points 0-1
+    var_val = 2*(2*M_vec(ii)+5)/(9*M_vec(ii)*(M_vec(ii)-1));
+    true_pdf = makedist('HalfNormal','mu',0,'sigma',sqrt(var_val));
+    true_pts = pdf(true_pdf,sample_points);
+    
+    % compute K-L Divergence
+    I = beta_pts>0 & true_pts>0;
+    beta_pts_ii = beta_pts(I);
+    true_pts_ii = true_pts(I);
+    kl_div = sum(true_pts_ii.*log10(true_pts_ii./beta_pts_ii));
+%     beta_pts_ii
+%     true_pts_ii
+    kl_div
+end
