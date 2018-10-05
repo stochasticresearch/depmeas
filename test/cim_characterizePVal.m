@@ -547,6 +547,51 @@ p4(4).LineWidth = lineWidth; p4(4).Marker = 'x'; p4(4).MarkerSize = markerSize;
 
 legend({'Continuous', 'Hybrid-1', 'Hybrid-2', 'Discrete'}, 'location', 'SouthEast');
 
+%% Save off only the beta distribution values
+clear;
+clc;
+
+if(ispc)
+    load('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\cim_nullDistribution.mat');
+elseif(ismac)
+    load('/Users/Kiran/ownCloud/PhD/sim_results/independence/cim_nullDistribution.mat');
+else
+    load('/home/kiran/ownCloud/PhD/sim_results/independence/cim_nullDistribution.mat');
+end
+
+% From the above analysis, the Beta distribution seems 
+% to fit best ... Q-Q Plots
+
+% QQ Plot w/ best fit for M=100 and M=1000
+pdObjsContinuous = cell(1,length(M_vec));
+alphaVecContinuous = zeros(1,length(M_vec));
+betaVecContinuous = zeros(1,length(M_vec));
+for ii=1:length(M_vec)
+    M = M_vec(ii);
+    % look for the Inverse Gaussian Distribution in the correct cell array
+    PD_continuous = PD_continuous_cell(ii); PD_continuous = PD_continuous{1};
+    for jj=1:length(PD_continuous)
+        if(strcmpi('Beta', PD_continuous{jj}.DistributionName))
+            pdContinuous = PD_continuous{jj};
+            break;
+        end
+    end
+    pdObjsContinuous{ii} = pdContinuous;
+    alphaVecContinuous(ii) = pdContinuous.a; 
+    betaVecContinuous(ii) = pdContinuous.b;
+end
+
+if(ispc)
+    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\cim_nullDistribution_beta.mat',...
+        'alphaVecContinuous','betaVecContinuous','M_vec');
+elseif(ismac)
+    save('/Users/Kiran/ownCloud/PhD/sim_results/independence/cim_nullDistribution_beta.mat',...
+        'alphaVecContinuous','betaVecContinuous','M_vec');
+else
+    save('/home/kiran/ownCloud/PhD/sim_results/independence/cim_nullDistribution_beta.mat',...
+        'alphaVecContinuous','betaVecContinuous','M_vec');
+end
+
 %% Characterize the error between the approximate fit distribution and the theoretical null distribution
 
 clear;
@@ -600,3 +645,69 @@ for ii=1:length(M_vec)
 %     true_pts_ii
     kl_div
 end
+
+%% Compute a distribution of the # of regions the CIM algorithm produces under independence of RV's as a function of sample size
+
+clear;
+clc;
+
+num_mc_sims = 100;
+M_vec = 100:100:2500;
+M_vec = [M_vec 5000 10000];
+
+xMin = 0; xMax = 1;
+
+meanNumRegionsDetected = zeros(1,length(M_vec));
+stdNumRegionsDetected = zeros(1,length(M_vec));
+
+dispstat('','init'); % One time only initialization
+dispstat(sprintf('Begining the simulation...\n'),'keepthis','timestamp');
+
+for m_idx=1:length(M_vec)
+    M = M_vec(m_idx);
+    dispstat(sprintf('Simulating for M=%d', M), 'keepthis', 'timestamp');
+    
+    tmpNumRegionsMCVec = zeros(1,num_mc_sims);
+    parfor mcSimNum=1:num_mc_sims
+        % generate independent data
+        x = rand(M,1)*(xMax-xMin)+xMin;
+        y = rand(M,1)*(xMax-xMin)+xMin;
+        
+        % compute # of regions CIM produces
+        [~,regionRectangle] = cim(x,y);
+        numRegionsDetected = size(regionRectangle,2);
+        
+        % store
+        tmpNumRegionsMCVec(mcSimNum) = numRegionsDetected;
+    end
+    
+    meanNumRegionsDetected(m_idx) = mean(tmpNumRegionsMCVec);
+    stdNumRegionsDetected(m_idx)  = std(tmpNumRegionsMCVec);
+end
+
+boundedline(M_vec,meanNumRegionsDetected,stdNumRegionsDetected)
+
+if(ispc)
+    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\indep_num_regions_cim.mat');
+elseif(ismac)
+    save('/Users/Kiran/ownCloud/PhD/sim_results/independence/indep_num_regions_cim.mat');
+else
+    save('/home/kiran/ownCloud/PhD/sim_results/independence/indep_num_regions_cim.mat');
+end
+
+%% Load up the # of regions, and compute error between beta approx & real null distribution
+clear;
+clc;
+
+if(ispc)
+    load('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\cim_nullDistribution_hd.mat');
+elseif(ismac)
+    load('/Users/Kiran/ownCloud/PhD/sim_results/independence/cim_nullDistribution_hd.mat');
+else
+    load('/home/kiran/ownCloud/PhD/sim_results/independence/cim_nullDistribution_hd.mat');
+end
+
+semilogx(M_vec,hd_vec);
+xlabel('M (Sample Size)', 'FontSize', 20);
+ylabel('d_H(P,Q)', 'FontSize', 20);
+grid on;
