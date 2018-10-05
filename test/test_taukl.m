@@ -283,12 +283,10 @@ clc;
 
 rng(123);
 
-nsim = 300;
-% M = 500;
+nsim = 10;
 M_vec = 100:100:1000;
 numDiscreteIntervals = 4;
 
-% correctionFactors = [1 2 3 4 5];
 correctionFactors = [4];
 numTotalConfigurations = 3; % 8 entries, 1-5 are the different correction factors, 
                                          % 6 is matlab's built in tau, 
@@ -297,11 +295,17 @@ numTotalConfigurations = 3; % 8 entries, 1-5 are the different correction factor
                                         
 % TODO: put monotonoic and comonotonic dependencies in here!
 dependenciesVec = {'Gaussian', 'Frank', 'Gumbel', 'Clayton'};
-subDependenciesVec = [linspace(-0.99,0.99,10); ...
-                       1:10; ...
-                       1:10; ...
-                       1:10];
-xyOrientationVec = [1 2];       % use [1,2] so this can double as an index into a vector also
+numSubDependencies = 10;
+subDependenciesVec = zeros(4,numSubDependencies);
+tauVec = linspace(0.1,0.9,numSubDependencies);
+for ii=1:numSubDependencies
+    subDependenciesVec(1,ii) = copulaparam('Gaussian',tauVec(ii),'type','Kendall');
+    subDependenciesVec(2,ii) = copulaparam('Frank',tauVec(ii),'type','Kendall');
+    subDependenciesVec(3,ii) = copulaparam('Gumbel',tauVec(ii),'type','Kendall');
+    subDependenciesVec(4,ii) = copulaparam('Clayton',tauVec(ii),'type','Kendall');
+end
+% xyOrientationVec = [1 2];       % use [1,2] so this can double as an index into a vector also
+xyOrientationVec = [1];
 pdConfigurations = {'', '', ...
     {'Gaussian', 'Uniform', 'ThickTailed'}, ...
     {[0.25 0.25 0.25 0.25], [0.5 0.3 0.1 0.1], [0.1 0.1 0.3 0.5]} };
@@ -321,9 +325,9 @@ for mIdx=1:length(M_vec)
     for dependencyIdx=1:length(dependenciesVec)
         dependency = dependenciesVec{dependencyIdx};
         subDependencies = subDependenciesVec(dependencyIdx,:);
-        for subDependencyIdx=1:length(subDependencies)
+        for subDependencyIdx=1:numSubDependencies
             subDependency = subDependencies(subDependencyIdx);
-            tauTrue = copulastat(dependency, subDependency);
+            tauTrue = tauVec(subDependencyIdx);
             % TODO: add more kinds of distributions for pd1 and pd2...
             pd1 = makedist('Normal');
             pd2 = makedist('Multinomial','Probabilities',[0.25 0.25 0.25 0.25]);
@@ -334,7 +338,6 @@ for mIdx=1:length(M_vec)
                 for simnum=1:nsim
 
                     % generate the data according to the configuration
-                    rho = subDependency;
                     U = copularnd(dependency, subDependency, M);
 
                     X = zeros(size(U));
@@ -355,17 +358,10 @@ for mIdx=1:length(M_vec)
 
                     % compute the tau
                     for correctionFactor=correctionFactors
-%                         tau_hat = taukl(x,y,correctionFactor);
                         [u,v] = pobs_sorted_cc(x,y);
                         tau_hat = taukl_cc( u,v,0,1,continuousRvIndicator);
-                        
-%                         tau_hat_vec(correctionFactor, simnum) = tau_hat;
                         tau_hat_vec(1, simnum) = tau_hat;
                     end
-%                     tau_hat_vec(6,simnum) = corr(x,y,'type','kendall');
-%                     tau_hat_vec(7,simnum) =  ktaub([x y], 0.05, 0);
-%                     kso = taukl_s(x, y);
-%                     tau_hat_vec(8,simnum) = kso.consumeAll();
                     tau_hat_vec(2,simnum) = corr(x,y,'type','kendall');
                     tau_hat_vec(3,simnum) =  ktaub([x y], 0.05, 0);
 
@@ -378,12 +374,6 @@ for mIdx=1:length(M_vec)
                 % print the result
                 dispstat(sprintf('\t %s -- %0.02f -- %d\n', ...
                         dependency, subDependency, xyOrientation));
-%                 fprintf('\t Bias >> [%0.02f %0.02f %0.02f %0.02f %0.02f %0.02f %0.02f %0.02f]\n', ...
-%                     tau_hat_bias(1), tau_hat_bias(2), tau_hat_bias(3), tau_hat_bias(4), ...
-%                     tau_hat_bias(5), tau_hat_bias(6), tau_hat_bias(7), tau_hat_bias(8));
-%                 fprintf('\t Var  >> [%0.02f %0.02f %0.02f %0.02f %0.02f %0.02f %0.02f %0.02f]\n', ...
-%                     tau_hat_var(1), tau_hat_var(2), tau_hat_var(3), tau_hat_var(4), ...
-%                     tau_hat_var(5), tau_hat_var(6), tau_hat_var(7), tau_hat_var(8));
 
                 if(xyOrientation)
                     resultsXYCopula_bias(mIdx, dependencyIdx, subDependencyIdx, 1:numTotalConfigurations) = tau_hat_bias;
@@ -435,19 +425,20 @@ for mIdx=1:length(M_vec)
 
                     if(xyOrientation==1)
                         x = discretizeRv(x, numDiscreteIntervals)';
+                        continuousRvIndicator = 0;
                     else
                         y = discretizeRv(y, numDiscreteIntervals)';
+                        continuousRvIndicator = 1;
                     end
 
                     % compute the metrics
                     for correctionFactor=correctionFactors
-                        tau_hat = taukl(x,y,correctionFactor);
-                        tau_hat_vec(correctionFactor, simnum) = tau_hat;
+                        [u,v] = pobs_sorted_cc(x,y);
+                        tau_hat = taukl_cc( u,v,0,1,continuousRvIndicator);
+                        tau_hat_vec(1, simnum) = tau_hat;
                     end
-                    tau_hat_vec(6,simnum) = corr(x,y,'type','kendall');
-                    tau_hat_vec(7,simnum) =  ktaub([x y], 0.05, 0);
-                    kso = taukl_s(x, y);
-                    tau_hat_vec(8,simnum) = kso.consumeAll();
+                    tau_hat_vec(2,simnum) = corr(x,y,'type','kendall');
+                    tau_hat_vec(3,simnum) =  ktaub([x y], 0.05, 0);
                 end
 
                 tau_hat_bias = mean(tau_hat_vec,2)-tauTrue;
@@ -469,23 +460,126 @@ end
 
 % save the results
 if(ispc)
-    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\ktauhat_biasData2.mat');
+    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\ktauhat_biasData.mat');
 elseif(ismac)
-    save('/Users/kiran/ownCloud/PhD/sim_results/independence/ktauhat_biasData2.mat');
+    save('/Users/kiran/ownCloud/PhD/sim_results/independence/ktauhat_biasData.mat');
 else
-    save('/home/kiran/ownCloud/PhD/sim_results/independence/ktauhat_biasData2.mat');
+    save('/home/kiran/ownCloud/PhD/sim_results/independence/ktauhat_biasData.mat');
+end
+
+%% Characterize the Bias and Variance of ktauhat for hybrid functional and copula dependencies asymptotically for copula dependencies
+clear;
+clc;
+
+rng(123);
+
+nsim = 10;
+M_vec = [10000, 50000];
+
+% correctionFactors = [1 2 3 4 5];
+correctionFactors = [4];
+numTotalConfigurations = 2; % 8 entries, 1-5 are the different correction factors, 
+                                         % 6 is matlab's built in tau, 
+                                         % 7 is tau-b
+                                         % 8 taukl_s, which should closely mimic correctionFactor=4
+                                        
+% TODO: put monotonoic and comonotonic dependencies in here!
+dependenciesVec = {'Gaussian', 'Frank', 'Gumbel', 'Clayton'};
+numSubDependencies = 10;
+subDependenciesVec = zeros(4,numSubDependencies);
+tauVec = linspace(0.1,0.9,numSubDependencies);
+for ii=1:numSubDependencies
+    subDependenciesVec(1,ii) = copulaparam('Gaussian',tauVec(ii),'type','Kendall');
+    subDependenciesVec(2,ii) = copulaparam('Frank',tauVec(ii),'type','Kendall');
+    subDependenciesVec(3,ii) = copulaparam('Gumbel',tauVec(ii),'type','Kendall');
+    subDependenciesVec(4,ii) = copulaparam('Clayton',tauVec(ii),'type','Kendall');
+end
+pdConfigurations = {'', '', ...
+    {'Gaussian', 'Uniform', 'ThickTailed'}, ...
+    {[0.25 0.25 0.25 0.25], [0.5 0.3 0.1 0.1], [0.1 0.1 0.3 0.5]} };
+
+resultsXYCopula_bias = zeros( [length(M_vec) size(dependenciesVec) size(subDependenciesVec) numTotalConfigurations ]);
+resultsXYCopula_var = zeros(  [length(M_vec) size(dependenciesVec) size(subDependenciesVec) numTotalConfigurations ]);
+
+dispstat('','init'); % One time only initialization
+dispstat(sprintf('Begining the simulation...\n'),'keepthis','timestamp');
+
+for mIdx=1:length(M_vec)
+    M = M_vec(mIdx);
+    dispstat(sprintf('Simulating for M=%d\n',M),'keepthis', 'timestamp');
+        
+    for dependencyIdx=1:length(dependenciesVec)
+        dependency = dependenciesVec{dependencyIdx};
+        subDependencies = subDependenciesVec(dependencyIdx,:);
+        for subDependencyIdx=1:numSubDependencies
+            subDependency = subDependencies(subDependencyIdx);
+            tauTrue = tauVec(subDependencyIdx);
+            % TODO: add more kinds of distributions for pd1 and pd2...
+            pd1 = makedist('Normal');
+            pd2 = makedist('Multinomial','Probabilities',[0.25 0.25 0.25 0.25]);
+
+            tau_hat_vec = zeros(numTotalConfigurations, nsim);
+            parfor simnum=1:nsim
+
+                % generate the data according to the configuration
+                U = copularnd(dependency, subDependency, M);
+
+                X = zeros(size(U));
+                X(:,1) = pd1.icdf(U(:,1));
+                X(:,2) = pd2.icdf(U(:,2));
+                x = X(:,1); y = X(:,2);
+
+                % compute the tau
+                [u,v] = pobs_sorted_cc(x,y); continuousRvIndicator = 0; 
+                tau_kl = taukl_cc( u,v,0,1,continuousRvIndicator);
+                tau_n = corr(x,y,'type','kendall');
+%                 tau_b = ktaub([x y], 0.05, 0);
+%                 resVec = [tau_kl; tau_n; tau_b];
+                resVec = [tau_kl; tau_n];
+                tau_hat_vec(:,simnum) = resVec;
+            end
+
+            % compute standardized bias and variance
+            tau_hat_bias = mean(tau_hat_vec,2)-tauTrue;
+            tau_hat_var  = var(tau_hat_vec-tauTrue,0,2);    % w = 0
+
+            % print the result
+            dispstat(sprintf('\t %s -- %0.02f\n', ...
+                    dependency, subDependency));
+
+            resultsXYCopula_bias(mIdx, dependencyIdx, subDependencyIdx, 1:numTotalConfigurations) = tau_hat_bias;
+            resultsXYCopula_var(mIdx, dependencyIdx, subDependencyIdx, 1:numTotalConfigurations) = tau_hat_var;
+        end
+    end
+end
+
+% save the results
+if(ispc)
+    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\ktauhat_biasData_asymptoticbehavior.mat');
+elseif(ismac)
+    save('/Users/kiran/ownCloud/PhD/sim_results/independence/ktauhat_biasData_asymptoticbehavior.mat');
+else
+    save('/home/kiran/ownCloud/PhD/sim_results/independence/ktauhat_biasData_asymptoticbehavior.mat');
 end
 
 %% Plot over all M the average bias for different dependency types
 clear;
 clc;
+close all;
 
 if(ispc)
-    load('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\ktauhat_biasData2.mat');
+    load('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\ktauhat_biasData_copula.mat');
 elseif(ismac)
-    load('/Users/kiran/ownCloud/PhD/sim_results/independence/ktauhat_biasData2.mat');
+    load('/Users/kiran/ownCloud/PhD/sim_results/independence/ktauhat_biasData_copula.mat');
 else
-    load('/home/kiran/ownCloud/PhD/sim_results/independence/ktauhat_biasData2.mat');
+    load('/home/kiran/ownCloud/PhD/sim_results/independence/ktauhat_biasData_copula.mat');
+end
+if(ispc)
+    load('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\ktauhat_biasData_functional.mat');
+elseif(ismac)
+    load('/Users/kiran/ownCloud/PhD/sim_results/independence/ktauhat_biasData_functional.mat');
+else
+    load('/home/kiran/ownCloud/PhD/sim_results/independence/ktauhat_biasData_functional.mat');
 end
 
 metricsToPlot = [1 2 3];    % Experimentally, 2,5 are bad (last config)
@@ -540,30 +634,30 @@ end
 
 % plot it
 figure;
-boundedline(M_vec,yBiasGauss(1,:),(yVarGauss(1,:).^(0.5))/2,'b'); hold on;
-boundedline(M_vec,yBiasGauss(2,:),(yVarGauss(2,:).^(0.5))/2,'r'); hold on;
-boundedline(M_vec,yBiasGauss(3,:),(yVarGauss(3,:).^(0.5))/2,'k');
+boundedline(M_vec,yBiasGauss(1,:),(yVarGauss(1,:).^(0.5))/2,'b', 'alpha'); hold on;
+boundedline(M_vec,yBiasGauss(2,:),(yVarGauss(2,:).^(0.5))/2,'r', 'alpha'); hold on;
+boundedline(M_vec,yBiasGauss(3,:),(yVarGauss(3,:).^(0.5))/2,'k', 'alpha');
 xlabel('M', 'FontSize', 20); ylabel('Bias', 'FontSize', 20); 
 title('Gaussian Copula', 'FontSize', 20); grid on;
 
 figure;
-boundedline(M_vec,yBiasFrank(1,:),(yVarFrank(1,:).^(0.5))/2,'b'); hold on;
-boundedline(M_vec,yBiasFrank(2,:),(yVarFrank(2,:).^(0.5))/2,'r'); hold on;
-boundedline(M_vec,yBiasFrank(3,:),(yVarFrank(3,:).^(0.5))/2,'k');
+boundedline(M_vec,yBiasFrank(1,:),(yVarFrank(1,:).^(0.5))/2,'b', 'alpha'); hold on;
+boundedline(M_vec,yBiasFrank(2,:),(yVarFrank(2,:).^(0.5))/2,'r', 'alpha'); hold on;
+boundedline(M_vec,yBiasFrank(3,:),(yVarFrank(3,:).^(0.5))/2,'k', 'alpha');
 xlabel('M', 'FontSize', 20); ylabel('Bias', 'FontSize', 20); 
 title('Frank Copula', 'FontSize', 20); grid on;
 
 figure;
-boundedline(M_vec,yBiasGumbel(1,:),(yVarGumbel(1,:).^(0.5))/2,'b'); hold on;
-boundedline(M_vec,yBiasGumbel(2,:),(yVarGumbel(2,:).^(0.5))/2,'r'); hold on;
-boundedline(M_vec,yBiasGumbel(3,:),(yVarGumbel(3,:).^(0.5))/2,'k');
+boundedline(M_vec,yBiasGumbel(1,:),(yVarGumbel(1,:).^(0.5))/2,'b', 'alpha'); hold on;
+boundedline(M_vec,yBiasGumbel(2,:),(yVarGumbel(2,:).^(0.5))/2,'r', 'alpha'); hold on;
+boundedline(M_vec,yBiasGumbel(3,:),(yVarGumbel(3,:).^(0.5))/2,'k', 'alpha');
 xlabel('M', 'FontSize', 20); ylabel('Bias', 'FontSize', 20); 
 title('Gumbel Copula', 'FontSize', 20); grid on;
 
 figure;
-boundedline(M_vec,yBiasClayton(1,:),(yVarClayton(1,:).^(0.5))/2,'b'); hold on;
-boundedline(M_vec,yBiasClayton(2,:),(yVarClayton(2,:).^(0.5))/2,'r'); hold on;
-boundedline(M_vec,yBiasClayton(3,:),(yVarClayton(3,:).^(0.5))/2,'k');
+boundedline(M_vec,yBiasClayton(1,:),(yVarClayton(1,:).^(0.5))/2,'b', 'alpha'); hold on;
+boundedline(M_vec,yBiasClayton(2,:),(yVarClayton(2,:).^(0.5))/2,'r', 'alpha'); hold on;
+boundedline(M_vec,yBiasClayton(3,:),(yVarClayton(3,:).^(0.5))/2,'k', 'alpha');
 xlabel('M', 'FontSize', 20); ylabel('Bias', 'FontSize', 20); 
 title('Clayton Copula', 'FontSize', 20); grid on;
 
@@ -581,9 +675,198 @@ boundedline(M_vec,yBiasCountermonotonic(3,:),(yVarCountermonotonic(3,:).^(0.5))/
 xlabel('M', 'FontSize', 20); ylabel('Bias', 'FontSize', 20);  
 title('Countermonotonic Dependency', 'FontSize', 20); grid on;
 
-h_legend = legend({'$\hat{\tau}_b$', '$\hat{\tau}_{N}$', '$\hat{\tau}_{KL}$'},...
+h_legend = legend({'$\hat{\tau}_{KL}$', '$\hat{\tau}_{N}$','$\hat{\tau}_b$'},...
                   'Interpreter','Latex');
 set(h_legend,'FontSize',20);
+
+%% Plot over all Theta for M=chosen value
+clear;
+clc;
+close all;
+
+if(ispc)
+    load('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\ktauhat_biasData_copula.mat');
+elseif(ismac)
+    load('/Users/kiran/ownCloud/PhD/sim_results/independence/ktauhat_biasData_copula.mat');
+else
+    load('/home/kiran/ownCloud/PhD/sim_results/independence/ktauhat_biasData_copula.mat');
+end
+
+metricsToPlot = [1 2 3];    % Experimentally, 2,5 are bad (last config)
+                            % 4 Gumbel/Frank OK, Clayton Bias (-0.02)
+                            % 3 Gumbel/Frank OK, Clayton Bias (-0.02)
+                            % 1 Clayton/Frank OK, Gumbel Bias (0.04)
+
+M = 1000;
+% find the index associated w/ the chosen M value
+MIdx = find(M_vec==M);
+
+% resultsXYCopula_bias(mIdx, dependencyIdx, subDependencyIdx, 1:numTotalConfigurations)
+
+% get the Gaussian copula data
+depTypeIdx = 1;
+yBiasGauss = squeeze(resultsXYCopula_bias(MIdx, depTypeIdx, :, metricsToPlot))'; 
+yVarGauss = squeeze(resultsXYCopula_var(MIdx, depTypeIdx, :, metricsToPlot))';
+
+% get the Frank copula data
+depTypeIdx = 2;
+yBiasFrank = squeeze(resultsXYCopula_bias(MIdx, depTypeIdx, :, metricsToPlot))';
+yVarFrank = squeeze(resultsXYCopula_var(MIdx, depTypeIdx, :, metricsToPlot))';
+
+% get the Gumbel copula data
+depTypeIdx = 3;
+yBiasGumbel = squeeze(resultsXYCopula_bias(MIdx, depTypeIdx, :, metricsToPlot))';
+yVarGumbel = squeeze(resultsXYCopula_var(MIdx, depTypeIdx, :, metricsToPlot))';
+
+% get the Clayton copula data
+depTypeIdx = 4;
+yBiasClayton = squeeze(resultsXYCopula_bias(MIdx, depTypeIdx, :, metricsToPlot))';
+yVarClayton = squeeze(resultsXYCopula_var(MIdx, depTypeIdx, :, metricsToPlot))';
+
+% plot it
+subplot(2,2,1);
+boundedline(tauVec,yBiasGauss(1,:),(yVarGauss(1,:).^(0.5))/2,'b', 'alpha'); hold on;
+boundedline(tauVec,yBiasGauss(2,:),(yVarGauss(2,:).^(0.5))/2,'r', 'alpha'); hold on;
+boundedline(tauVec,yBiasGauss(3,:),(yVarGauss(3,:).^(0.5))/2,'k', 'alpha');
+% xlabel('\tau', 'FontSize', 20); ylabel('Bias', 'FontSize', 20); 
+xlabel('(a)','FontSize',20);
+title('Gaussian Copula', 'FontSize', 20); grid on;
+axis([0.1 0.9 -0.1 0.1]);
+% saveas(gcf,'/home/kiran/Desktop/ktauhat_bias1.png')
+
+% figure;
+subplot(2,2,2);
+boundedline(tauVec,yBiasFrank(1,:),(yVarFrank(1,:).^(0.5))/2,'b', 'alpha'); hold on;
+boundedline(tauVec,yBiasFrank(2,:),(yVarFrank(2,:).^(0.5))/2,'r', 'alpha'); hold on;
+boundedline(tauVec,yBiasFrank(3,:),(yVarFrank(3,:).^(0.5))/2,'k', 'alpha');
+% xlabel('\tau', 'FontSize', 20); ylabel('Bias', 'FontSize', 20); 
+xlabel('(b)','FontSize',20);
+title('Frank Copula', 'FontSize', 20); grid on;
+axis([0.1 0.9 -0.1 0.1]);
+% saveas(gcf,'/home/kiran/Desktop/ktauhat_bias2.png')
+
+% figure;
+subplot(2,2,3);
+boundedline(tauVec,yBiasGumbel(1,:),(yVarGumbel(1,:).^(0.5))/2,'b', 'alpha'); hold on;
+boundedline(tauVec,yBiasGumbel(2,:),(yVarGumbel(2,:).^(0.5))/2,'r', 'alpha'); hold on;
+boundedline(tauVec,yBiasGumbel(3,:),(yVarGumbel(3,:).^(0.5))/2,'k', 'alpha');
+% xlabel('\tau', 'FontSize', 20); ylabel('Bias', 'FontSize', 20); 
+xlabel('(c)','FontSize',20);
+title('Gumbel Copula', 'FontSize', 20); grid on;
+axis([0.1 0.9 -0.1 0.1]);
+% saveas(gcf,'/home/kiran/Desktop/ktauhat_bias3.png')
+
+% figure;
+subplot(2,2,4);
+boundedline(tauVec,yBiasClayton(1,:),(yVarClayton(1,:).^(0.5))/2,'b', 'alpha'); hold on;
+boundedline(tauVec,yBiasClayton(2,:),(yVarClayton(2,:).^(0.5))/2,'r', 'alpha'); hold on;
+boundedline(tauVec,yBiasClayton(3,:),(yVarClayton(3,:).^(0.5))/2,'k', 'alpha');
+% xlabel('\tau', 'FontSize', 20); ylabel('Bias', 'FontSize', 20); 
+xlabel('(d)','FontSize',20);
+title('Clayton Copula', 'FontSize', 20); grid on;
+axis([0.1 0.9 -0.1 0.1]);
+
+h_legend = legend({'$\hat{\tau}_{KL}$', '$\hat{\tau}_{N}$','$\hat{\tau}_b$'},...
+                  'Interpreter','Latex');
+set(h_legend,'FontSize',20);
+% saveas(gcf,'/home/kiran/Desktop/ktauhat_bias4.png')
+[~,h_xlab] = suplabel('\tau','x');
+set(h_xlab,'FontSize',20)
+[~,h_ylab] = suplabel('\tau-\hat{\tau}','y');
+set(h_ylab,'FontSize',20)
+
+%% Plot over all Theta for M=chosen value only for tau_kl and tau_n (meant for test for Asymptotic Behavior)
+clear;
+clc;
+close all;
+
+if(ispc)
+    load('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\independence\\ktauhat_biasData_asymptoticbehavior.mat');
+elseif(ismac)
+    load('/Users/kiran/ownCloud/PhD/sim_results/independence/ktauhat_biasData_asymptoticbehavior.mat');
+else
+    load('/home/kiran/ownCloud/PhD/sim_results/independence/ktauhat_biasData_asymptoticbehavior.mat');
+end
+
+metricsToPlot = [1 2];    % Experimentally, 2,5 are bad (last config)
+                            % 4 Gumbel/Frank OK, Clayton Bias (-0.02)
+                            % 3 Gumbel/Frank OK, Clayton Bias (-0.02)
+                            % 1 Clayton/Frank OK, Gumbel Bias (0.04)
+
+M = 50000;
+% find the index associated w/ the chosen M value
+MIdx = find(M_vec==M);
+
+% resultsXYCopula_bias(mIdx, dependencyIdx, subDependencyIdx, 1:numTotalConfigurations)
+
+% get the Gaussian copula data
+depTypeIdx = 1;
+yBiasGauss = squeeze(resultsXYCopula_bias(MIdx, depTypeIdx, :, metricsToPlot))'; 
+yVarGauss = squeeze(resultsXYCopula_var(MIdx, depTypeIdx, :, metricsToPlot))';
+
+% get the Frank copula data
+depTypeIdx = 2;
+yBiasFrank = squeeze(resultsXYCopula_bias(MIdx, depTypeIdx, :, metricsToPlot))';
+yVarFrank = squeeze(resultsXYCopula_var(MIdx, depTypeIdx, :, metricsToPlot))';
+
+% get the Gumbel copula data
+depTypeIdx = 3;
+yBiasGumbel = squeeze(resultsXYCopula_bias(MIdx, depTypeIdx, :, metricsToPlot))';
+yVarGumbel = squeeze(resultsXYCopula_var(MIdx, depTypeIdx, :, metricsToPlot))';
+
+% get the Clayton copula data
+depTypeIdx = 4;
+yBiasClayton = squeeze(resultsXYCopula_bias(MIdx, depTypeIdx, :, metricsToPlot))';
+yVarClayton = squeeze(resultsXYCopula_var(MIdx, depTypeIdx, :, metricsToPlot))';
+
+% plot it
+figure;
+% subplot(2,2,1);
+boundedline(tauVec,abs(yBiasGauss(1,:)),(yVarGauss(1,:).^(0.5))/2,'b', 'alpha'); hold on;
+boundedline(tauVec,abs(yBiasGauss(2,:)),(yVarGauss(2,:).^(0.5))/2,'r', 'alpha'); hold on;
+% boundedline(tauVec,yBiasGauss(3,:),(yVarGauss(3,:).^(0.5))/2,'k', 'alpha');
+xlabel('\tau', 'FontSize', 20); ylabel('Bias', 'FontSize', 20); 
+% xlabel('(a)','FontSize',20);
+title('Gaussian Copula', 'FontSize', 20); grid on;
+axis([0.1 0.9 -0.1 0.1]);
+% saveas(gcf,'/home/kiran/Desktop/ktauhat_bias1.png')
+
+figure;
+% subplot(2,2,2);
+boundedline(tauVec,abs(yBiasFrank(1,:)),(yVarFrank(1,:).^(0.5))/2,'b', 'alpha'); hold on;
+boundedline(tauVec,abs(yBiasFrank(2,:)),(yVarFrank(2,:).^(0.5))/2,'r', 'alpha'); hold on;
+% boundedline(tauVec,yBiasFrank(3,:),(yVarFrank(3,:).^(0.5))/2,'k', 'alpha');
+xlabel('\tau', 'FontSize', 20); ylabel('Bias', 'FontSize', 20); 
+% xlabel('(b)','FontSize',20);
+title('Frank Copula', 'FontSize', 20); grid on;
+axis([0.1 0.9 -0.1 0.1]);
+% saveas(gcf,'/home/kiran/Desktop/ktauhat_bias2.png')
+
+figure;
+% subplot(2,2,3);
+boundedline(tauVec,abs(yBiasGumbel(1,:)),(yVarGumbel(1,:).^(0.5))/2,'b', 'alpha'); hold on;
+boundedline(tauVec,abs(yBiasGumbel(2,:)),(yVarGumbel(2,:).^(0.5))/2,'r', 'alpha'); hold on;
+% boundedline(tauVec,yBiasGumbel(3,:),(yVarGumbel(3,:).^(0.5))/2,'k', 'alpha');
+xlabel('\tau', 'FontSize', 20); ylabel('Bias', 'FontSize', 20); 
+% xlabel('(c)','FontSize',20);
+title('Gumbel Copula', 'FontSize', 20); grid on;
+axis([0.1 0.9 -0.1 0.1]);
+% saveas(gcf,'/home/kiran/Desktop/ktauhat_bias3.png')
+
+figure;
+% subplot(2,2,4);
+boundedline(tauVec,abs(yBiasClayton(1,:)),(yVarClayton(1,:).^(0.5))/2,'b', 'alpha'); hold on;
+boundedline(tauVec,abs(yBiasClayton(2,:)),(yVarClayton(2,:).^(0.5))/2,'r', 'alpha'); hold on;
+% boundedline(tauVec,yBiasClayton(3,:),(yVarClayton(3,:).^(0.5))/2,'k', 'alpha');
+% xlabel('\tau', 'FontSize', 20); ylabel('Bias', 'FontSize', 20); 
+% xlabel('(d)','FontSize',20);
+title('Clayton Copula', 'FontSize', 20); grid on;
+axis([0.1 0.9 -0.1 0.1]);
+
+h_legend = legend({'$\hat{\tau}_{KL}$', '$\hat{\tau}_{N}$'},...
+                  'Interpreter','Latex');
+set(h_legend,'FontSize',20);
+% saveas(gcf,'/home/kiran/Desktop/ktauhat_bias4.png')
 
 %% A continuiation of the above section (plot for M=500) (old Fig. 2)
 clear;
