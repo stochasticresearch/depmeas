@@ -14,7 +14,7 @@ function [ tau ] = taukl_cc( U, V, autoDetectHybrid, isHybrid, continuousRvIndic
 %                   and/or continuous
 %             if autoDetectHybrid=1, then this input doesn't matter
 %  continuousRvIndicator - if 1, and autoDetectHybrid=0, then this indicates that U is continuous & V is discrete
-%                        - if 0, and autoDetectHybrid=0, then this indicates that U is continuous & V is discrete
+%                        - if 0, and autoDetectHybrid=0, then this indicates that U is discrete & V is continuous
 %             if autoDetectHybrid=1, then this input doesn't matter
 % Outputs:
 %  tau - the rescaled version of Kendall's tau
