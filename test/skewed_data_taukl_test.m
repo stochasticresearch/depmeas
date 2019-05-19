@@ -11,19 +11,7 @@ scenarios = {'left-skew','no-skew','right-skew'};
 tauVec = linspace(0.01,0.99,20);                    
 copulas = {'Gaussian','Frank','Gumbel','Clayton'};
 M = 500;
-numMCSims = 500;
-
-% manually generate a left-skewed and right-skewed data, from which we
-% construct an empirical cdf
-leftSkewData = pearsrnd(0,1,-1,3,5000,1);
-rightSkewData = pearsrnd(0,1,1,3,5000,1);
-
-[fLeftSkew,xiLeftSkew] = emppdf(leftSkewData,0);
-FLeftSkew = empcdf(xiLeftSkew,0);
-leftSkewContinuousDistInfo = rvEmpiricalInfo(xiLeftSkew,fLeftSkew,FLeftSkew,0);
-[fRightSkew,xiRightSkew] = emppdf(rightSkewData,0);
-FRightSkew = empcdf(xiRightSkew,0);
-rightSkewContinuousDistInfo = rvEmpiricalInfo(xiRightSkew,fRightSkew,FRightSkew,0);
+numMCSims = 100;
 
 resVecTauB  = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
 resVecTauN  = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
@@ -35,10 +23,10 @@ resVecKNN20 = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),l
 resVecVME   = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
 resVecAP    = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
 resVecEntropyMI= zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
-resVecDcorr = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
-resVecMIC   = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
-resVecCorr  = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
-resVecRDC   = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
+% resVecDcorr = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
+% resVecMIC   = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
+% resVecCorr  = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
+% resVecRDC   = zeros(numMCSims,length(copulas),length(tauVec),length(scenarios),length(scenarios));
 
 msi = 0.015625; alpha = 0.2;
 minScanIncr = 0.015625;
@@ -71,21 +59,13 @@ for continuousDistScenario=scenarios
                     
                     % generate F_X
                     if(strcmpi('left-skew',continuousDistScenario))
-                        X = zeros(length(U),1);
-                        % TODO: vectorize
-                        for ii=1:length(U)
-                            X(ii) = leftSkewContinuousDistInfo.icdf(U(ii,1));
-                        end
+                        distObj = makedist('Beta', 'a', 20, 'b', 4);
                     elseif(strcmpi('no-skew',continuousDistScenario))
-                        distObj = makedist('Normal');
-                        X = icdf(distObj,U(:,1));
+                        distObj = makedist('Beta', 'a', 10, 'b', 10);
                     elseif(strcmpi('right-skew',continuousDistScenario))
-                        X = zeros(length(U),1);
-                        % TODO: vectorize
-                        for ii=1:length(U)
-                            X(ii) = rightSkewContinuousDistInfo.icdf(U(ii,1));
-                        end
+                        distObj = makedist('Beta', 'a', 4, 'b', 20);
                     end
+                    X = icdf(distObj,U(:,1));
                     
                     % generate F_Y
                     if(strcmpi('left-skew',discreteDistScenario))
@@ -112,10 +92,10 @@ for continuousDistScenario=scenarios
 
                     X_continuous = 1;
                     resVecEntropyMI(mcSimNum,dd,cc,bb,aa) = discrete_entropy(Y) - conditional_entropy(X,Y,X_continuous);
-                    resVecDcorr(mcSimNum,dd,cc,bb,aa) = dcor(X,Y);
-                    resVecMIC(mcSimNum,dd,cc,bb,aa) = mine_interface_mic(X,Y, mine_alpha, mine_c,'mic_e');
-                    resVecCorr(mcSimNum,dd,cc,bb,aa) = corr(X,Y);
-                    resVecRDC(mcSimNum,dd,cc,bb,aa) = rdc(X,Y,rdc_k,rdc_s);
+%                     resVecDcorr(mcSimNum,dd,cc,bb,aa) = dcor(X,Y);
+%                     resVecMIC(mcSimNum,dd,cc,bb,aa) = mine_interface_mic(X,Y, mine_alpha, mine_c,'mic_e');
+%                     resVecCorr(mcSimNum,dd,cc,bb,aa) = corr(X,Y);
+%                     resVecRDC(mcSimNum,dd,cc,bb,aa) = rdc(X,Y,rdc_k,rdc_s);
                     
                 end                
                 
@@ -126,21 +106,13 @@ for continuousDistScenario=scenarios
 
                 % generate F_X
                 if(strcmpi('left-skew',continuousDistScenario))
-                    X = zeros(length(U),1);
-                    % TODO: vectorize
-                    for ii=1:length(U)
-                        X(ii) = leftSkewContinuousDistInfo.icdf(U(ii,1));
-                    end
+                    distObj = makedist('Beta', 'a', 20, 'b', 4);
                 elseif(strcmpi('no-skew',continuousDistScenario))
-                    distObj = makedist('Normal');
-                    X = icdf(distObj,U(:,1));
+                    distObj = makedist('Beta', 'a', 10, 'b', 10);
                 elseif(strcmpi('right-skew',continuousDistScenario))
-                    X = zeros(length(U),1);
-                    % TODO: vectorize
-                    for ii=1:length(U)
-                        X(ii) = rightSkewContinuousDistInfo.icdf(U(ii,1));
-                    end
+                    distObj = makedist('Beta', 'a', 4, 'b', 20);
                 end
+                X = icdf(distObj,U(:,1));
 
                 % generate F_Y
                 numIndepTrials = 1;
@@ -166,25 +138,26 @@ end
 
 % save the results
 if(ispc)
-    save('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\skewed_data\\binary_output_class.mat');
+    error('unsupported OS!');
 elseif(ismac)
-    save('/Users/Kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class.mat');
+    fname = '/Users/karrak1/Documents/erc_paper/binary_output_class.mat';
 else
-    save('/home/kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class.mat');
+    fname = '/home/apluser/stochasticresearch/data/erc_paper/binary_output_class.mat';
 end
+save(fname);
 
 %% plot the bias for tau-variants
 clear;
 clc;
 
 if(ispc)
-    load('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\skewed_data\\binary_output_class.mat');
+    error('unsupported OS!');
 elseif(ismac)
-    load('/Users/Kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class.mat');
+    folder = '/Users/karrak1/Documents/erc_paper/binary_output_class.mat';
 else
-    load('/home/kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class.mat');
+    folder = '/home/apluser/stochasticresearch/data/erc_paper/binary_output_class.mat';
 end
-
+load(folder);
 
 sampleData1_subplotIdxVec = [1,3,5,   13,15,17, 25,27,29];
 sampleData2_subplotIdxVec = [2,4,6,   14,16,18, 26,28,30];
@@ -425,27 +398,25 @@ clc;
 close all;
 
 if(ispc)
-    load('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\skewed_data\\binary_output_class.mat');
-    load('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\skewed_data\\binary_output_class_depmeas.mat');
+    error('unsupported OS!');
 elseif(ismac)
-    load('/Users/Kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class.mat');
-    load('/Users/Kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class_depmeas.mat');
+    folder = '/Users/karrak1/Documents/erc_paper/binary_output_class.mat';
 else
-    load('/home/kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class.mat');
-    load('/home/kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class_depmeas.mat');
+    folder = '/home/karrak1/stochasticresearch/data/erc_paper/binary_output_class.mat';
 end
+load(folder);
 
-fontSize = 16;
-cmap = downsample(colormap,round(64/5));
+fontSize = 20;
+cmap = downsample(colormap,round(64/7));
 
 plot_mi = 1;
 plot_dep = 0;
 
-for dd=1:length(copulas)
-% for dd=1:1
+% for dd=1:length(copulas)
+for dd=1:1
     copToVis = copulas{dd};
-    width = 20; height = width/3.5;
-    figure('paperpositionmode', 'auto', 'units', 'centimeters', 'position', [0 0 width height])
+%     width = 20; height = width/3.5;
+%     figure('paperpositionmode', 'auto', 'units', 'centimeters', 'position', [0 0 width height])
     subplotIdx=1;
     linkList = [];
     for scenarioIdx=1:length(scenarios)
@@ -455,13 +426,15 @@ for dd=1:length(copulas)
         hh = subplot(1,3,subplotIdx); linkList = [linkList hh];
         tauNVec = squeeze(resVecTauN(:,dd,:,skewIdx,skewIdx));
         cimVec = squeeze(resVecCIM(:,dd,:,skewIdx,skewIdx)); 
+        resVecKNN1Vec = squeeze(resVecKNN1(:,dd,:,skewIdx,skewIdx));
+        resVecKNN6Vec = squeeze(resVecKNN6(:,dd,:,skewIdx,skewIdx));
         resVecKNN20Vec = squeeze(resVecKNN20(:,dd,:,skewIdx,skewIdx));
         resVecVMEVec = squeeze(resVecVME(:,dd,:,skewIdx,skewIdx));
         resVecAPVec = squeeze(resVecAP(:,dd,:,skewIdx,skewIdx));
         resEntropyMIVec = squeeze(resVecEntropyMI(:,dd,:,skewIdx,skewIdx));
-        resVecDcorrVec = squeeze(resVecDcorr(:,dd,:,skewIdx,skewIdx));
-        resVecMICVec   = squeeze(resVecMIC(:,dd,:,skewIdx,skewIdx));
-        resVecRDCVec   = squeeze(resVecRDC(:,dd,:,skewIdx,skewIdx));
+%         resVecDcorrVec = squeeze(resVecDcorr(:,dd,:,skewIdx,skewIdx));
+%         resVecMICVec   = squeeze(resVecMIC(:,dd,:,skewIdx,skewIdx));
+%         resVecRDCVec   = squeeze(resVecRDC(:,dd,:,skewIdx,skewIdx));
         
 %         hln(:,1) = plot(tauVec,cimVec, tauVec,tauNVec,tauVec,resVecKNN20Vec, ...
 %                      tauVec,resVecVMEVec,tauVec,resVecAPVec, ...
@@ -472,10 +445,12 @@ for dd=1:length(copulas)
         hln(:,1) = boundedline(tauVec,mean(cimVec),std(cimVec),'+','cmap', cmap(1,:), 'transparency', transparency_val);
         hold on;
         if(plot_mi)
-            hln(:,2) = boundedline(tauVec,mean(resVecKNN20Vec),std(resVecKNN20Vec),'h','cmap', cmap(2,:), 'transparency', transparency_val);
-            hln(:,3) = boundedline(tauVec,mean(resVecVMEVec),std(resVecVMEVec),'^','cmap', cmap(3,:), 'transparency', transparency_val);
-            hln(:,4) = boundedline(tauVec,mean(resVecAPVec),std(resVecAPVec),'.','cmap', cmap(4,:), 'transparency', transparency_val);
-            hln(:,5) = boundedline(tauVec,mean(resEntropyMIVec),std(resEntropyMIVec),'o','cmap', cmap(5,:), 'transparency', transparency_val);
+            hln(:,2) = boundedline(tauVec,mean(resVecKNN1Vec),std(resVecKNN1Vec),'h','cmap', cmap(2,:), 'transparency', transparency_val);
+            hln(:,3) = boundedline(tauVec,mean(resVecKNN6Vec),std(resVecKNN6Vec),'h','cmap', cmap(3,:), 'transparency', transparency_val);
+            hln(:,4) = boundedline(tauVec,mean(resVecKNN20Vec),std(resVecKNN20Vec),'h','cmap', cmap(4,:), 'transparency', transparency_val);
+            hln(:,5) = boundedline(tauVec,mean(resVecVMEVec),std(resVecVMEVec),'^','cmap', cmap(5,:), 'transparency', transparency_val);
+            hln(:,6) = boundedline(tauVec,mean(resVecAPVec),std(resVecAPVec),'.','cmap', cmap(6,:), 'transparency', transparency_val);
+            hln(:,7) = boundedline(tauVec,mean(resEntropyMIVec),std(resEntropyMIVec),'o','cmap', cmap(7,:), 'transparency', transparency_val);
         elseif(plot_dep)
 %             boundedline(tauVec,mean(tauNVec),std(tauNVec),'cmap', cmap(2,:), 'transparency', 0.6);
             hln(:,2) = boundedline(tauVec,mean(resVecDcorrVec),std(resVecDcorrVec),'o','cmap', cmap(2,:), 'transparency', transparency_val);
@@ -508,7 +483,7 @@ for dd=1:length(copulas)
             xlabel('\kappa','FontSize',fontSize);            
             if(dd==1)
                 if(plot_mi)
-                    legendCell = {'CIM','KNN_{20}','vME','AP','H_{MI}'};
+                    legendCell = {'CIM','KNN_{1}', 'KNN_{6}', 'KNN_{20}','vME','AP','H_{MI}'};
                 elseif(plot_dep)
 %                     legendCell = {'CIM','\tau_N','dCor','MIC','RDC'};
                     legendCell = {'CIM','dCor','MIC','RDC'};
@@ -521,7 +496,7 @@ for dd=1:length(copulas)
 %                     'fontsize', fontSize-3, ...
 %                     'xscale', 0.4, ...
 %                     'box', 'off');
-                lgnd = legend(legendCell);
+                lgnd = legend(legendCell, 'FontSize', 20);
                 set(lgnd,'color','none');
             end
         end
