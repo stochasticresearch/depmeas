@@ -9,7 +9,8 @@ dbstop if error;
 
 scenarios = {'left-skew','no-skew','right-skew'};
 tauVec = linspace(0.01,0.99,20);                    
-copulas = {'Gaussian','Frank','Gumbel','Clayton'};
+copulas = {'Gaussian','t','Frank','Gumbel','Clayton'};
+DoF = 2;
 M = 500;
 numMCSims = 100;
 
@@ -55,7 +56,12 @@ for continuousDistScenario=scenarios
                 parfor mcSimNum=1:numMCSims
 %                 for mcSimNum=1:numMCSims
                     % generate U
-                    U = copularnd(cop,iTau,M);
+                    if(strcmpi(cop,'t'))
+                        U = copularnd(cop,iTau,DoF,M);
+                    else
+                        U = copularnd(cop,iTau,M);
+                    end
+                    
                     
                     % generate F_X
                     if(strcmpi('left-skew',continuousDistScenario))
