@@ -62,7 +62,6 @@ for continuousDistScenario=scenarios
                         U = copularnd(cop,iTau,M);
                     end
                     
-                    
                     % generate F_X
                     if(strcmpi('left-skew',continuousDistScenario))
                         distObj = makedist('Beta', 'a', 20, 'b', 4);
@@ -108,7 +107,11 @@ for continuousDistScenario=scenarios
                 %%%%%%%%%%%%%%%%%%%% MESSY CODE !!!!!! %%%%%%%%%%%%%%%%%%%%
                 % COPIED FROM ABOVE, b/c parfor suks sometimes :/
                 % generate U
-                U = copularnd(cop,iTau,M);
+                if(strcmpi(cop,'t'))
+                    U = copularnd(cop,iTau,DoF,M);
+                else
+                    U = copularnd(cop,iTau,M);
+                end
 
                 % generate F_X
                 if(strcmpi('left-skew',continuousDistScenario))
