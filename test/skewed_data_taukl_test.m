@@ -36,7 +36,7 @@ mine_alpha = 0.6;
 rdc_k = 20;
 rdc_s = 1/6;
 
-sampleDataMat = zeros(M,2,length(copulas),length(tauVec),length(scenarios),length(scenarios));
+% % % % % sampleDataMat = zeros(M,2,length(copulas),length(tauVec),length(scenarios),length(scenarios));
 
 dispstat('','init'); % One time only initialization
 dispstat(sprintf('Begining the simulation...\n'),'keepthis','timestamp');
@@ -94,6 +94,7 @@ for continuousDistScenario=scenarios
                         distObj = makedist('Multinomial','probabilities',[rightSkew_p,1-rightSkew_p]);
                     end
                     Y = icdf(distObj,U(:,2));
+                    Y(Y==1) = -1; Y(Y==2) = 1;
                     [X,Y] = pobs_sorted_cc(X,Y);
 
                     % compute tau, tau_kl, tau_N and record
@@ -116,39 +117,40 @@ for continuousDistScenario=scenarios
 %                     resVecRDC(mcSimNum,dd,cc,bb,aa) = rdc(X,Y,rdc_k,rdc_s);
                     
                 end                
-                
-                %%%%%%%%%%%%%%%%%%%% MESSY CODE !!!!!! %%%%%%%%%%%%%%%%%%%%
-                % COPIED FROM ABOVE, b/c parfor suks sometimes :/
-                % generate U
-                if(strcmpi(cop,'t'))
-                    U = copularnd(cop,iTau,DoF,M);
-                else
-                    U = copularnd(cop,iTau,M);
-                end
-
-                % generate F_X
-                if(strcmpi('left-skew',continuousDistScenario))
-                    distObj = makedist('Beta', 'a', leftSkew_alpha, 'b', leftSkew_beta);
-                elseif(strcmpi('no-skew',continuousDistScenario))
-                    distObj = makedist('Beta', 'a', noSkew_alpha, 'b', noSkew_beta);
-                elseif(strcmpi('right-skew',continuousDistScenario))
-                    distObj = makedist('Beta', 'a', rightSkew_alpha, 'b', rightSkew_beta);
-                end
-                X = icdf(distObj,U(:,1));
-
-                % generate F_Y
-                numIndepTrials = 1;
-                if(strcmpi('left-skew',discreteDistScenario))
-                    distObj = makedist('Multinomial','probabilities',[leftSkew_p,1-leftSkew_p]);
-                elseif(strcmpi('no-skew',discreteDistScenario))
-                    distObj = makedist('Multinomial','probabilities',[noSkew_p,1-noSkew_p]);
-                elseif(strcmpi('right-skew',discreteDistScenario))
-                    distObj = makedist('Multinomial','probabilities',[rightSkew_p,1-rightSkew_p]);
-                end
-                Y = icdf(distObj,U(:,2));
-                sampleDataMat(:,1,dd,cc,bb,aa) = X;
-                sampleDataMat(:,2,dd,cc,bb,aa) = Y;
-                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % % % %                 
+% % % % %                 %%%%%%%%%%%%%%%%%%%% MESSY CODE !!!!!! %%%%%%%%%%%%%%%%%%%%
+% % % % %                 % COPIED FROM ABOVE, b/c parfor suks sometimes :/
+% % % % %                 % generate U
+% % % % %                 if(strcmpi(cop,'t'))
+% % % % %                     U = copularnd(cop,iTau,DoF,M);
+% % % % %                 else
+% % % % %                     U = copularnd(cop,iTau,M);
+% % % % %                 end
+% % % % % 
+% % % % %                 % generate F_X
+% % % % %                 if(strcmpi('left-skew',continuousDistScenario))
+% % % % %                     distObj = makedist('Beta', 'a', leftSkew_alpha, 'b', leftSkew_beta);
+% % % % %                 elseif(strcmpi('no-skew',continuousDistScenario))
+% % % % %                     distObj = makedist('Beta', 'a', noSkew_alpha, 'b', noSkew_beta);
+% % % % %                 elseif(strcmpi('right-skew',continuousDistScenario))
+% % % % %                     distObj = makedist('Beta', 'a', rightSkew_alpha, 'b', rightSkew_beta);
+% % % % %                 end
+% % % % %                 X = icdf(distObj,U(:,1));
+% % % % % 
+% % % % %                 % generate F_Y
+% % % % %                 numIndepTrials = 1;
+% % % % %                 if(strcmpi('left-skew',discreteDistScenario))
+% % % % %                     distObj = makedist('Multinomial','probabilities',[leftSkew_p,1-leftSkew_p]);
+% % % % %                 elseif(strcmpi('no-skew',discreteDistScenario))
+% % % % %                     distObj = makedist('Multinomial','probabilities',[noSkew_p,1-noSkew_p]);
+% % % % %                 elseif(strcmpi('right-skew',discreteDistScenario))
+% % % % %                     distObj = makedist('Multinomial','probabilities',[rightSkew_p,1-rightSkew_p]);
+% % % % %                 end
+% % % % %                 Y = icdf(distObj,U(:,2));
+% % % % %                 Y(Y==1) = -1; Y(Y==2) = 1;
+% % % % %                 sampleDataMat(:,1,dd,cc,bb,aa) = X;
+% % % % %                 sampleDataMat(:,2,dd,cc,bb,aa) = Y;
+% % % % %                 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 dd = dd + 1;
             end
             cc = cc + 1;
@@ -162,9 +164,9 @@ end
 if(ispc)
     error('unsupported OS!');
 elseif(ismac)
-    fname = '/Users/karrak1/Documents/erc_paper/binary_output_class.mat';
+    fname = '/Users/karrak1/Documents/erc_paper/binary_output_class_t2_p1n1.mat';
 else
-    fname = '/home/apluser/stochasticresearch/data/erc_paper/binary_output_class.mat';
+    fname = '/home/apluser/stochasticresearch/data/erc_paper/binary_output_class_t2_p1n1.mat';
 end
 save(fname);
 
