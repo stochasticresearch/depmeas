@@ -41,6 +41,19 @@ sampleDataMat = zeros(M,2,length(copulas),length(tauVec),length(scenarios),lengt
 dispstat('','init'); % One time only initialization
 dispstat(sprintf('Begining the simulation...\n'),'keepthis','timestamp');
 
+% choose your skew value here - which configures the distributions accordingly!
+desired_skew = 1;
+
+if(desired_skew==1)
+    leftSkew_alpha = 12; leftSkew_beta = 2;
+    noSkew_alpha = 10; noSkew_beta = 10;
+    rightSkew_alpha = 2; rightSkew_beta = 12;
+    leftSkew_p = .28; noSkew_p = 0.5; 
+    rightSkew_p = 1-leftSkew_p;
+else
+    error('Skew value not supported!'); 
+end
+
 aa = 1; 
 for continuousDistScenario=scenarios
     bb = 1; 
@@ -64,21 +77,21 @@ for continuousDistScenario=scenarios
                     
                     % generate F_X
                     if(strcmpi('left-skew',continuousDistScenario))
-                        distObj = makedist('Beta', 'a', 20, 'b', 4);
+                        distObj = makedist('Beta', 'a', leftSkew_alpha, 'b', leftSkew_beta);
                     elseif(strcmpi('no-skew',continuousDistScenario))
-                        distObj = makedist('Beta', 'a', 10, 'b', 10);
+                        distObj = makedist('Beta', 'a', noSkew_alpha, 'b', noSkew_beta);
                     elseif(strcmpi('right-skew',continuousDistScenario))
-                        distObj = makedist('Beta', 'a', 4, 'b', 20);
+                        distObj = makedist('Beta', 'a', rightSkew_alpha, 'b', rightSkew_beta);
                     end
                     X = icdf(distObj,U(:,1));
                     
                     % generate F_Y
                     if(strcmpi('left-skew',discreteDistScenario))
-                        distObj = makedist('Multinomial','probabilities',[0.1,0.9]);
+                        distObj = makedist('Multinomial','probabilities',[leftSkew_p,1-leftSkew_p]);
                     elseif(strcmpi('no-skew',discreteDistScenario))
-                        distObj = makedist('Multinomial','probabilities',[0.5,0.5]);
+                        distObj = makedist('Multinomial','probabilities',[noSkew_p,1-noSkew_p]);
                     elseif(strcmpi('right-skew',discreteDistScenario))
-                        distObj = makedist('Multinomial','probabilities',[0.9,0.1]);
+                        distObj = makedist('Multinomial','probabilities',[rightSkew_p,1-rightSkew_p]);
                     end
                     Y = icdf(distObj,U(:,2));
                     [X,Y] = pobs_sorted_cc(X,Y);
@@ -115,22 +128,22 @@ for continuousDistScenario=scenarios
 
                 % generate F_X
                 if(strcmpi('left-skew',continuousDistScenario))
-                    distObj = makedist('Beta', 'a', 20, 'b', 4);
+                    distObj = makedist('Beta', 'a', leftSkew_alpha, 'b', leftSkew_beta);
                 elseif(strcmpi('no-skew',continuousDistScenario))
-                    distObj = makedist('Beta', 'a', 10, 'b', 10);
+                    distObj = makedist('Beta', 'a', noSkew_alpha, 'b', noSkew_beta);
                 elseif(strcmpi('right-skew',continuousDistScenario))
-                    distObj = makedist('Beta', 'a', 4, 'b', 20);
+                    distObj = makedist('Beta', 'a', rightSkew_alpha, 'b', rightSkew_beta);
                 end
                 X = icdf(distObj,U(:,1));
 
                 % generate F_Y
                 numIndepTrials = 1;
                 if(strcmpi('left-skew',discreteDistScenario))
-                    distObj = makedist('Multinomial','probabilities',[0.1,0.9]);
+                    distObj = makedist('Multinomial','probabilities',[leftSkew_p,1-leftSkew_p]);
                 elseif(strcmpi('no-skew',discreteDistScenario))
-                    distObj = makedist('Multinomial','probabilities',[0.5,0.5]);
+                    distObj = makedist('Multinomial','probabilities',[noSkew_p,1-noSkew_p]);
                 elseif(strcmpi('right-skew',discreteDistScenario))
-                    distObj = makedist('Multinomial','probabilities',[0.9,0.1]);
+                    distObj = makedist('Multinomial','probabilities',[rightSkew_p,1-rightSkew_p]);
                 end
                 Y = icdf(distObj,U(:,2));
                 sampleDataMat(:,1,dd,cc,bb,aa) = X;
@@ -339,12 +352,13 @@ clc;
 close all;
 
 if(ispc)
-    load('C:\\Users\\Kiran\\ownCloud\\PhD\\sim_results\\skewed_data\\binary_output_class.mat');
+    error('unsupported OS!');
 elseif(ismac)
-    load('/Users/Kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class.mat');
+    folder = '/Users/karrak1/Documents/erc_paper/binary_output_class.mat';
 else
-    load('/home/kiran/ownCloud/PhD/sim_results/skewed_data/binary_output_class.mat');
+    folder = '/home/karrak1/stochasticresearch/data/erc_paper/binary_output_class.mat';
 end
+load(folder);
 
 copToVis = 'Gaussian';
 % find the appropriate indices
@@ -402,6 +416,7 @@ tightfig;
 % suptitle(copToVis);
 
 %% make the plots for the paper - Figure 2 - synth data results
+% and compute the probability of error
 clear;
 clc;
 close all;
@@ -409,29 +424,40 @@ close all;
 if(ispc)
     error('unsupported OS!');
 elseif(ismac)
-    folder = '/Users/karrak1/Documents/erc_paper/binary_output_class.mat';
+    folder = '/Users/karrak1/Documents/erc_paper/binary_output_class_t_2.mat';
 else
-    folder = '/home/karrak1/stochasticresearch/data/erc_paper/binary_output_class.mat';
+    folder = '/home/karrak1/stochasticresearch/data/erc_paper/binary_output_class_t_3.mat';
 end
 load(folder);
 
 fontSize = 20;
-cmap = downsample(colormap,round(64/7));
+cmap = downsample(colormap,round(64/2));
 
 plot_mi = 1;
 plot_dep = 0;
 
 % for dd=1:length(copulas)
-for dd=1:1
+for dd=1:2
     copToVis = copulas{dd};
+    figure;
 %     width = 20; height = width/3.5;
 %     figure('paperpositionmode', 'auto', 'units', 'centimeters', 'position', [0 0 width height])
     subplotIdx=1;
     linkList = [];
     for scenarioIdx=1:length(scenarios)
+        if(subplotIdx==1)
+            skewStr = 'Left';
+        elseif(subplotIdx==2)
+            skewStr = 'None';
+        elseif(subplotIdx==3)
+            skewStr = 'Right';
+        end
+        fprintf('***********************************\n');
+        fprintf('%s --> %s\n', copToVis, skewStr);
         skewIdx = find(contains(scenarios,scenarios{scenarioIdx}));
 
         % plot the first sample data
+        
         hh = subplot(1,3,subplotIdx); linkList = [linkList hh];
         tauNVec = squeeze(resVecTauN(:,dd,:,skewIdx,skewIdx));
         cimVec = squeeze(resVecCIM(:,dd,:,skewIdx,skewIdx)); 
@@ -451,15 +477,47 @@ for dd=1:1
 %                      tauVec,tauVec,'*k');
 %         hln(1).LineWidth = 2.5;
         transparency_val = 0.6;
-        hln(:,1) = boundedline(tauVec,mean(cimVec),std(cimVec),'+','cmap', cmap(1,:), 'transparency', transparency_val);
+        hln(:,1) = boundedline(tauVec,median(cimVec),mad(cimVec,1),'+','cmap', cmap(1,:), 'transparency', transparency_val);
         hold on;
         if(plot_mi)
-            hln(:,2) = boundedline(tauVec,mean(resVecKNN1Vec),std(resVecKNN1Vec),'h','cmap', cmap(2,:), 'transparency', transparency_val);
-            hln(:,3) = boundedline(tauVec,mean(resVecKNN6Vec),std(resVecKNN6Vec),'h','cmap', cmap(3,:), 'transparency', transparency_val);
-            hln(:,4) = boundedline(tauVec,mean(resVecKNN20Vec),std(resVecKNN20Vec),'h','cmap', cmap(4,:), 'transparency', transparency_val);
-            hln(:,5) = boundedline(tauVec,mean(resVecVMEVec),std(resVecVMEVec),'^','cmap', cmap(5,:), 'transparency', transparency_val);
-            hln(:,6) = boundedline(tauVec,mean(resVecAPVec),std(resVecAPVec),'.','cmap', cmap(6,:), 'transparency', transparency_val);
-            hln(:,7) = boundedline(tauVec,mean(resEntropyMIVec),std(resEntropyMIVec),'o','cmap', cmap(7,:), 'transparency', transparency_val);
+%             hln(:,2) = boundedline(tauVec,mean(resVecKNN1Vec),std(resVecKNN1Vec),'h','cmap', cmap(2,:), 'transparency', transparency_val);
+%             hln(:,3) = boundedline(tauVec,mean(resVecKNN6Vec),std(resVecKNN6Vec),'h','cmap', cmap(3,:), 'transparency', transparency_val);
+%             hln(:,4) = boundedline(tauVec,mean(resVecKNN20Vec),std(resVecKNN20Vec),'h','cmap', cmap(4,:), 'transparency', transparency_val);
+%             hln(:,5) = boundedline(tauVec,mean(resVecVMEVec),std(resVecVMEVec),'^','cmap', cmap(5,:), 'transparency', transparency_val);
+%             hln(:,6) = boundedline(tauVec,mean(resVecAPVec),std(resVecAPVec),'.','cmap', cmap(6,:), 'transparency', transparency_val);
+%             hln(:,7) = boundedline(tauVec,mean(resEntropyMIVec),std(resEntropyMIVec),'o','cmap', cmap(7,:), 'transparency', transparency_val);
+            hln(:,2) = boundedline(tauVec,median(resEntropyMIVec),mad(resEntropyMIVec,1),'o','cmap', cmap(2,:), 'transparency', transparency_val);
+            
+            % compute probability of error between between successive
+            % points for H_MI and CIM
+            cim_mean = median(cimVec); cim_std = mad(cimVec,1);
+            hmi_mean = median(resEntropyMIVec); hmi_std = mad(resEntropyMIVec,1);
+            for ii=2:length(tauVec)
+                top_left_cim = cim_mean(ii-1)+cim_std(ii-1);
+                top_right_cim = cim_mean(ii)+cim_std(ii);
+                bottom_right_cim = cim_mean(ii)-cim_std(ii);
+                bottom_left_cim = cim_mean(ii-1)-cim_std(ii-1);
+                
+                top_left_hmi = hmi_mean(ii-1)+hmi_std(ii-1);
+                top_right_hmi = hmi_mean(ii)+hmi_std(ii);
+                bottom_right_hmi = hmi_mean(ii)-hmi_std(ii);
+                bottom_left_hmi = hmi_mean(ii-1)-hmi_std(ii-1);
+%                 if(top_left_cim > bottom_right_cim)
+%                     p_e_cim = 1;
+%                 else
+%                     p_e_cim = 0;
+%                 end
+%                 if(top_left_hmi > bottom_right_hmi)
+%                     p_e_hmi = 1;
+%                 else
+%                     p_e_hmi = 0;
+%                 end
+                p_e_cim = max(top_left_cim - bottom_right_cim,0)/(top_right_cim-bottom_left_cim);
+                p_e_hmi = max(top_left_hmi - bottom_right_hmi,0)/(top_right_hmi-bottom_left_hmi);
+                fprintf('tau[%0.02f,%0.02f], CIM[Pe]=%0.02f H_MI[Pe]=%0.02f\n', ...
+                    tauVec(ii-1), tauVec(ii), p_e_cim, p_e_hmi);
+            end
+            
         elseif(plot_dep)
 %             boundedline(tauVec,mean(tauNVec),std(tauNVec),'cmap', cmap(2,:), 'transparency', 0.6);
             hln(:,2) = boundedline(tauVec,mean(resVecDcorrVec),std(resVecDcorrVec),'o','cmap', cmap(2,:), 'transparency', transparency_val);
@@ -469,9 +527,9 @@ for dd=1:1
         axis([0 1 0 1]);
         hln(:,1).LineWidth=2.5;
         hln(:,2).LineWidth=2.5;
-        hln(:,3).LineWidth=2.5;
-        hln(:,4).LineWidth=2.5;
-        hln(:,5).LineWidth=2.5;
+%         hln(:,3).LineWidth=2.5;
+%         hln(:,4).LineWidth=2.5;
+%         hln(:,5).LineWidth=2.5;
         
         grid on;
         if(subplotIdx==1)
@@ -492,7 +550,8 @@ for dd=1:1
             xlabel('\kappa','FontSize',fontSize);            
             if(dd==1)
                 if(plot_mi)
-                    legendCell = {'CIM','KNN_{1}', 'KNN_{6}', 'KNN_{20}','vME','AP','H_{MI}'};
+%                     legendCell = {'CIM','KNN_{1}', 'KNN_{6}', 'KNN_{20}','vME','AP','H_{MI}'};
+                    legendCell = {'CIM','H_{MI}'};
                 elseif(plot_dep)
 %                     legendCell = {'CIM','\tau_N','dCor','MIC','RDC'};
                     legendCell = {'CIM','dCor','MIC','RDC'};
