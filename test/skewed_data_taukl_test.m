@@ -10,7 +10,7 @@ dbstop if error;
 scenarios = {'left-skew','no-skew','right-skew'};
 tauVec = linspace(0.01,0.99,20);                    
 copulas = {'Gaussian','t','Frank','Gumbel','Clayton'};
-DoF = 2;
+t_copula_DoF = 2;
 M = 500;
 numMCSims = 100;
 
@@ -41,7 +41,10 @@ rdc_s = 1/6;
 dispstat('','init'); % One time only initialization
 dispstat(sprintf('Begining the simulation...\n'),'keepthis','timestamp');
 
-% choose your skew value here - which configures the distributions accordingly!
+% some additional test configurations
+y_data_cfg = 'p1n1';  % can be p1n1, meaning Y \in {-1,1} or
+                      % Y \in {1,2}.  We don't know if this matters to the
+                      % estimators or not, but we want to find out
 desired_skew = 1;
 
 if(desired_skew==1)
@@ -70,7 +73,7 @@ for continuousDistScenario=scenarios
 %                 for mcSimNum=1:numMCSims
                     % generate U
                     if(strcmpi(cop,'t'))
-                        U = copularnd(cop,iTau,DoF,M);
+                        U = copularnd(cop,iTau,t_copula_DoF,M);
                     else
                         U = copularnd(cop,iTau,M);
                     end
@@ -94,7 +97,13 @@ for continuousDistScenario=scenarios
                         distObj = makedist('Multinomial','probabilities',[rightSkew_p,1-rightSkew_p]);
                     end
                     Y = icdf(distObj,U(:,2));
-                    Y(Y==1) = -1; Y(Y==2) = 1;
+                    if strcmpi(y_data_cfg, 'p1n1')
+                        Y(Y==1) = -1; Y(Y==2) = 1;
+                    elseif strcmpi(y_data_cfg, 'p2n1')
+                        % do nothing, data is originally in this way
+                    else
+                        error('unknown y_data_cfg specified!');
+                    end
                     [X,Y] = pobs_sorted_cc(X,Y);
 
                     % compute tau, tau_kl, tau_N and record
@@ -161,27 +170,293 @@ for continuousDistScenario=scenarios
 end
 
 % save the results
+output_fname = sprintf('binary_output_class_M%d_t%d_skew%0.02f_%s.mat', ...
+    M, t_copula_DoF, desired_skew, y_data_cfg);
+
 if(ispc)
     error('unsupported OS!');
 elseif(ismac)
-    fname = '/Users/karrak1/Documents/erc_paper/binary_output_class_t2_p1n1.mat';
+    fname = fullfile('/Users/karrak1/Documents/erc_paper', output_fname);
 else
-    fname = '/home/apluser/stochasticresearch/data/erc_paper/binary_output_class_t2_p1n1.mat';
+    fname = fullfile('/home/apluser/stochasticresearch/data/erc_paper/', output_fname);
 end
 save(fname);
+
+%% make the plots for the paper - Figure 2 - synth data results
+% and compute the probability of error
+clear;
+clc;
+close all;
+
+M = 250;
+t_copula_DoF = 3;
+desired_skew = 1.0;
+y_data_cfg = 'p2n1';
+data_fname = sprintf('binary_output_class_M%d_t%d_skew%0.02f_%s.mat', ...
+    M, t_copula_DoF, desired_skew, y_data_cfg);
+if(ispc)
+    error('unsupported OS!');
+elseif(ismac)
+    folder = '/Users/karrak1/Documents/erc_paper/';
+else
+    folder = '/home/apluser/stochasticresearch/data/erc_paper/';
+end
+load(fullfile(folder, data_fname));
+
+fontSize = 20;
+% cmap = downsample(colormap,round(64/7));
+cmap = downsample(colormap,round(64/3));
+
+plot_mi = 1;
+plot_dep = 0;
+
+measure_center = @mean;
+measure_spread = @std;
+% measure_center = @median;
+% measure_spread = @mad;
+
+% for dd=1:length(copulas)
+for dd=1:2
+    copToVis = copulas{dd};
+    figure;
+%     width = 20; height = width/3.5;
+%     figure('paperpositionmode', 'auto', 'units', 'centimeters', 'position', [0 0 width height])
+    subplotIdx=1;
+    linkList = [];
+    for scenarioIdx=1:length(scenarios)
+        if(subplotIdx==1)
+            skewStr = 'Left';
+        elseif(subplotIdx==2)
+            skewStr = 'None';
+        elseif(subplotIdx==3)
+            skewStr = 'Right';
+        end
+        fprintf('***********************************\n');
+        fprintf('%s --> %s\n', copToVis, skewStr);
+        skewIdx = find(contains(scenarios,scenarios{scenarioIdx}));
+
+        % plot the first sample data
+        
+        hh = subplot(1,3,subplotIdx); linkList = [linkList hh];
+        tauNVec = squeeze(resVecTauN(:,dd,:,skewIdx,skewIdx));
+        cimVec = squeeze(resVecCIM(:,dd,:,skewIdx,skewIdx)); 
+        resVecKNN1Vec = squeeze(resVecKNN1(:,dd,:,skewIdx,skewIdx));
+        resVecKNN6Vec = squeeze(resVecKNN6(:,dd,:,skewIdx,skewIdx));
+        resVecKNN20Vec = squeeze(resVecKNN20(:,dd,:,skewIdx,skewIdx));
+        resVecVMEVec = squeeze(resVecVME(:,dd,:,skewIdx,skewIdx));
+        resVecAPVec = squeeze(resVecAP(:,dd,:,skewIdx,skewIdx));
+        resEntropyMIVec = squeeze(resVecEntropyMI(:,dd,:,skewIdx,skewIdx));
+%         resVecDcorrVec = squeeze(resVecDcorr(:,dd,:,skewIdx,skewIdx));
+%         resVecMICVec   = squeeze(resVecMIC(:,dd,:,skewIdx,skewIdx));
+%         resVecRDCVec   = squeeze(resVecRDC(:,dd,:,skewIdx,skewIdx));
+        
+%         hln(:,1) = plot(tauVec,cimVec, tauVec,tauNVec,tauVec,resVecKNN20Vec, ...
+%                      tauVec,resVecVMEVec,tauVec,resVecAPVec, ...
+%                      tauVec,resEntropyMIVec, ...
+%                      tauVec,tauVec,'*k');
+%         hln(1).LineWidth = 2.5;
+        transparency_val = 0.4;
+        hln(:,1) = boundedline(tauVec,measure_center(cimVec),measure_spread(cimVec,1),'+','cmap', cmap(1,:), 'transparency', transparency_val);
+        hold on;
+        if(plot_mi)
+%             hln(:,2) = boundedline(tauVec,mean(resVecKNN1Vec),std(resVecKNN1Vec),'h','cmap', cmap(2,:), 'transparency', transparency_val);
+%             hln(:,3) = boundedline(tauVec,mean(resVecKNN6Vec),std(resVecKNN6Vec),'h','cmap', cmap(3,:), 'transparency', transparency_val);
+%             hln(:,4) = boundedline(tauVec,mean(resVecKNN20Vec),std(resVecKNN20Vec),'h','cmap', cmap(4,:), 'transparency', transparency_val);
+%             hln(:,5) = boundedline(tauVec,mean(resVecVMEVec),std(resVecVMEVec),'^','cmap', cmap(5,:), 'transparency', transparency_val);
+%             hln(:,6) = boundedline(tauVec,mean(resVecAPVec),std(resVecAPVec),'.','cmap', cmap(6,:), 'transparency', transparency_val);
+%             hln(:,7) = boundedline(tauVec,mean(resEntropyMIVec),std(resEntropyMIVec),'o','cmap', cmap(7,:), 'transparency', transparency_val);
+            hln(:,2) = boundedline(tauVec,measure_center(resEntropyMIVec),measure_spread(resEntropyMIVec,1),'o','cmap', cmap(2,:), 'transparency', transparency_val);
+            hln(:,3) = boundedline(tauVec,measure_center(resVecKNN20Vec),measure_spread(resVecKNN20Vec,1),'h','cmap', cmap(3,:), 'transparency', transparency_val);
+%             hln(:,4) = boundedline(tauVec,measure_center(resVecKNN6Vec),measure_spread(resVecKNN6Vec,1),'.','cmap', cmap(4,:), 'transparency', transparency_val);
+%             hln(:,5) = boundedline(tauVec,mean(resVecKNN1Vec),std(resVecKNN1Vec),'h','cmap', cmap(5,:), 'transparency', transparency_val);
+            
+            % compute probability of error between between successive
+            % points for H_MI and CIM
+            cim_center = measure_center(cimVec); cim_spread = measure_spread(cimVec,1);
+            hmi_center = measure_center(resEntropyMIVec); hmi_spread = measure_spread(resEntropyMIVec,1);
+            for ii=2:length(tauVec)
+                top_left_cim = cim_center(ii-1)+cim_spread(ii-1);
+                top_right_cim = cim_center(ii)+cim_spread(ii);
+                bottom_right_cim = cim_center(ii)-cim_spread(ii);
+                bottom_left_cim = cim_center(ii-1)-cim_spread(ii-1);
+                
+                top_left_hmi = hmi_center(ii-1)+hmi_spread(ii-1);
+                top_right_hmi = hmi_center(ii)+hmi_spread(ii);
+                bottom_right_hmi = hmi_center(ii)-hmi_spread(ii);
+                bottom_left_hmi = hmi_center(ii-1)-hmi_spread(ii-1);
+%                 if(top_left_cim > bottom_right_cim)
+%                     p_e_cim = 1;
+%                 else
+%                     p_e_cim = 0;
+%                 end
+%                 if(top_left_hmi > bottom_right_hmi)
+%                     p_e_hmi = 1;
+%                 else
+%                     p_e_hmi = 0;
+%                 end
+                p_e_cim = max(top_left_cim - bottom_right_cim,0)/(top_right_cim-bottom_left_cim);
+                p_e_hmi = max(top_left_hmi - bottom_right_hmi,0)/(top_right_hmi-bottom_left_hmi);
+                fprintf('tau[%0.02f,%0.02f], CIM[Pe]=%0.02f H_MI[Pe]=%0.02f\n', ...
+                    tauVec(ii-1), tauVec(ii), p_e_cim, p_e_hmi);
+            end
+            
+        elseif(plot_dep)
+%             boundedline(tauVec,mean(tauNVec),std(tauNVec),'cmap', cmap(2,:), 'transparency', 0.6);
+            hln(:,2) = boundedline(tauVec,mean(resVecDcorrVec),std(resVecDcorrVec),'o','cmap', cmap(2,:), 'transparency', transparency_val);
+            hln(:,3) = boundedline(tauVec,mean(resVecMICVec),std(resVecMICVec),'*','cmap', cmap(3,:), 'transparency', transparency_val);
+            hln(:,4) = boundedline(tauVec,mean(resVecRDCVec),std(resVecRDCVec),'.','cmap', cmap(4,:), 'transparency', transparency_val);
+        end
+        axis([0 1 0 1]);
+        hln(:,1).LineWidth=2.5;
+        hln(:,2).LineWidth=2.5;
+        hln(:,3).LineWidth=2.5;
+%         hln(:,4).LineWidth=2.5;
+%         hln(:,5).LineWidth=2.5;
+        
+        grid on;
+        if(subplotIdx==1)
+            ylabel('$\hat{\kappa}$','FontSize',fontSize,'Interpreter','Latex');
+        end
+        % remove y ticks when plotting subplot 2 & 3
+        if(subplotIdx==2 || subplotIdx==3)
+            hh.YTickLabel = [];
+        end
+        if(subplotIdx==1)
+            title('Left-Skew','FontSize',fontSize);
+        elseif(subplotIdx==2)
+            title({copToVis,'No-Skew'},'FontSize',fontSize);
+        elseif(subplotIdx==3)
+            title('Right-Skew','FontSize',fontSize);
+        end
+        if(subplotIdx==2)
+            xlabel('\kappa','FontSize',fontSize);            
+            if(dd==1)
+                if(plot_mi)
+%                     legendCell = {'CIM','KNN_{1}', 'KNN_{6}', 'KNN_{20}','vME','AP','H_{MI}'};
+                    legendCell = {'CIM','H_{MI}', 'KNN_{20}'};
+                elseif(plot_dep)
+%                     legendCell = {'CIM','\tau_N','dCor','MIC','RDC'};
+                    legendCell = {'CIM','dCor','MIC','RDC'};
+                end
+                
+%                 [hl(1).leg, hl(1).obj, hl(1).hout, hl(1).mout] = ...
+%                     legendflex(hln(:,1), legendCell, 'anchor', {'nw','nw'}, ...
+%                     'buffer', [10 30], ...
+%                     'ncol', 2, ...
+%                     'fontsize', fontSize-3, ...
+%                     'xscale', 0.4, ...
+%                     'box', 'off');
+                lgnd = legend(legendCell, 'FontSize', 20);
+                set(lgnd,'color','none');
+            end
+        end
+        
+        subplotIdx = subplotIdx + 1;
+    end
+    linkaxes(linkList,'xy');
+%     h = suptitle(copToVis);
+%     h.FontSize = fontSize+2;
+end
+
+%% Compare the skewed hybrid data versus the entropy & conditional entropy based methods of estimating MI
+
+
+%% compare taukl to CIM
+clear;
+clc;
+close all;
+
+tau = 0.6;
+cop = 'Gaussian';
+iTau = copulaparam(cop,tau);
+M = 500;
+
+dispstat('','init'); % One time only initialization
+dispstat(sprintf('Begining the simulation...\n'),'keepthis','timestamp');
+
+numMCSim = 1000;
+tau_vec = zeros(1,numMCSim);
+cim_vec = zeros(1,numMCSim);
+probVecCell = {[0.05,0.95],[0.2,0.8],[0.5,0.5],[0.8,0.2],[0.95,0.05]};
+for jj=1:length(probVecCell)
+    probVec = probVecCell{jj};
+    for ii=1:numMCSim
+        dispstat(sprintf('%d/%d',ii,numMCSim),'timestamp');
+        U = copularnd(cop,iTau,M);
+        distObj = makedist('Normal');
+        X = icdf(distObj,U(:,1));                  
+        distObj = makedist('Multinomial','probabilities',probVec);
+        Y = icdf(distObj,U(:,2));
+        [u,v] = pobs_sorted_cc(X,Y);
+        [v_reverse_sorted,u_reverse_sorted] = pobs_sorted_cc(Y,X);
+
+        msi = 0.015625;
+        alpha = 0.2;
+
+        tau_val = taukl_cc(u,v,0,1,0);
+        cim_val = cim_cc_mex(u,v,msi,alpha,0,1,0);
+        correct = abs(tau_val - cim_val)<=0.01;
+        if (~correct)
+            dispstat(sprintf('!!! tau=%0.02f cim=%0.02f\n',tau_val,cim_val),'keepthis','timestamp');
+            pause;
+        end
+        tau_vec(ii) = tau_val;
+        cim_vec(ii) = cim_val;
+    end
+    total_err = sum(tau_vec-cim_vec);
+    dispstat(sprintf('err{[%0.02f,%0.02f]}=%0.02f',probVec(1),probVec(2),total_err),'keepthis','timestamp');
+end
+
+%% compare taukl_cc to taukl
+clear;
+clc;
+
+tau = 0.6;
+cop = 'Gaussian';
+iTau = copulaparam(cop,tau);
+M = 500;
+
+numMCSim = 5000;
+
+sumCorrect = 0;
+for simNum=1:numMCSim
+    U = copularnd(cop,iTau,M);
+    distObj = makedist('Normal');
+    X = icdf(distObj,U(:,1));                  
+    distObj = makedist('Multinomial','probabilities',[0.05,0.95]);
+    Y = icdf(distObj,U(:,2));
+
+    % intentionally swap u and v
+    [u,v] = pobs_sorted_cc(Y,X);
+
+    % we have to tell it Y is the continuous variable, b/c we swapped X and Y in the pobs computation
+    % (this is the last argument of 1 instead of 0)
+    ccval = taukl_cc(u,v,0,1,1);
+    regval = taukl(X,Y);
+
+    correct = abs(ccval - regval)<=eps;
+    sumCorrect = sumCorrect + correct;
+end
+sumCorrect
 
 %% plot the bias for tau-variants
 clear;
 clc;
 
+M = 250;
+t_copula_DoF = 3;
+desired_skew = 1.0;
+y_data_cfg = 'p2n1';
+data_fname = sprintf('binary_output_class_M%d_t%d_skew%0.02f_%s.mat', ...
+    M, t_copula_DoF, desired_skew, y_data_cfg);
 if(ispc)
     error('unsupported OS!');
 elseif(ismac)
-    folder = '/Users/karrak1/Documents/erc_paper/binary_output_class.mat';
+    folder = '/Users/karrak1/Documents/erc_paper/';
 else
-    folder = '/home/apluser/stochasticresearch/data/erc_paper/binary_output_class.mat';
+    folder = '/home/apluser/stochasticresearch/data/erc_paper/';
 end
-load(folder);
+load(fullfile(folder, data_fname));
 
 sampleData1_subplotIdxVec = [1,3,5,   13,15,17, 25,27,29];
 sampleData2_subplotIdxVec = [2,4,6,   14,16,18, 26,28,30];
@@ -416,245 +691,3 @@ for scenarioIdx=1:length(scenarios)
 end
 tightfig;
 % suptitle(copToVis);
-
-%% make the plots for the paper - Figure 2 - synth data results
-% and compute the probability of error
-clear;
-clc;
-close all;
-
-if(ispc)
-    error('unsupported OS!');
-elseif(ismac)
-    folder = '/Users/karrak1/Documents/erc_paper/binary_output_class_t_2.mat';
-else
-    folder = '/home/karrak1/stochasticresearch/data/erc_paper/binary_output_class_t_3.mat';
-end
-load(folder);
-
-fontSize = 20;
-cmap = downsample(colormap,round(64/2));
-
-plot_mi = 1;
-plot_dep = 0;
-
-% for dd=1:length(copulas)
-for dd=1:2
-    copToVis = copulas{dd};
-    figure;
-%     width = 20; height = width/3.5;
-%     figure('paperpositionmode', 'auto', 'units', 'centimeters', 'position', [0 0 width height])
-    subplotIdx=1;
-    linkList = [];
-    for scenarioIdx=1:length(scenarios)
-        if(subplotIdx==1)
-            skewStr = 'Left';
-        elseif(subplotIdx==2)
-            skewStr = 'None';
-        elseif(subplotIdx==3)
-            skewStr = 'Right';
-        end
-        fprintf('***********************************\n');
-        fprintf('%s --> %s\n', copToVis, skewStr);
-        skewIdx = find(contains(scenarios,scenarios{scenarioIdx}));
-
-        % plot the first sample data
-        
-        hh = subplot(1,3,subplotIdx); linkList = [linkList hh];
-        tauNVec = squeeze(resVecTauN(:,dd,:,skewIdx,skewIdx));
-        cimVec = squeeze(resVecCIM(:,dd,:,skewIdx,skewIdx)); 
-        resVecKNN1Vec = squeeze(resVecKNN1(:,dd,:,skewIdx,skewIdx));
-        resVecKNN6Vec = squeeze(resVecKNN6(:,dd,:,skewIdx,skewIdx));
-        resVecKNN20Vec = squeeze(resVecKNN20(:,dd,:,skewIdx,skewIdx));
-        resVecVMEVec = squeeze(resVecVME(:,dd,:,skewIdx,skewIdx));
-        resVecAPVec = squeeze(resVecAP(:,dd,:,skewIdx,skewIdx));
-        resEntropyMIVec = squeeze(resVecEntropyMI(:,dd,:,skewIdx,skewIdx));
-%         resVecDcorrVec = squeeze(resVecDcorr(:,dd,:,skewIdx,skewIdx));
-%         resVecMICVec   = squeeze(resVecMIC(:,dd,:,skewIdx,skewIdx));
-%         resVecRDCVec   = squeeze(resVecRDC(:,dd,:,skewIdx,skewIdx));
-        
-%         hln(:,1) = plot(tauVec,cimVec, tauVec,tauNVec,tauVec,resVecKNN20Vec, ...
-%                      tauVec,resVecVMEVec,tauVec,resVecAPVec, ...
-%                      tauVec,resEntropyMIVec, ...
-%                      tauVec,tauVec,'*k');
-%         hln(1).LineWidth = 2.5;
-        transparency_val = 0.6;
-        hln(:,1) = boundedline(tauVec,median(cimVec),mad(cimVec,1),'+','cmap', cmap(1,:), 'transparency', transparency_val);
-        hold on;
-        if(plot_mi)
-%             hln(:,2) = boundedline(tauVec,mean(resVecKNN1Vec),std(resVecKNN1Vec),'h','cmap', cmap(2,:), 'transparency', transparency_val);
-%             hln(:,3) = boundedline(tauVec,mean(resVecKNN6Vec),std(resVecKNN6Vec),'h','cmap', cmap(3,:), 'transparency', transparency_val);
-%             hln(:,4) = boundedline(tauVec,mean(resVecKNN20Vec),std(resVecKNN20Vec),'h','cmap', cmap(4,:), 'transparency', transparency_val);
-%             hln(:,5) = boundedline(tauVec,mean(resVecVMEVec),std(resVecVMEVec),'^','cmap', cmap(5,:), 'transparency', transparency_val);
-%             hln(:,6) = boundedline(tauVec,mean(resVecAPVec),std(resVecAPVec),'.','cmap', cmap(6,:), 'transparency', transparency_val);
-%             hln(:,7) = boundedline(tauVec,mean(resEntropyMIVec),std(resEntropyMIVec),'o','cmap', cmap(7,:), 'transparency', transparency_val);
-            hln(:,2) = boundedline(tauVec,median(resEntropyMIVec),mad(resEntropyMIVec,1),'o','cmap', cmap(2,:), 'transparency', transparency_val);
-            
-            % compute probability of error between between successive
-            % points for H_MI and CIM
-            cim_mean = median(cimVec); cim_std = mad(cimVec,1);
-            hmi_mean = median(resEntropyMIVec); hmi_std = mad(resEntropyMIVec,1);
-            for ii=2:length(tauVec)
-                top_left_cim = cim_mean(ii-1)+cim_std(ii-1);
-                top_right_cim = cim_mean(ii)+cim_std(ii);
-                bottom_right_cim = cim_mean(ii)-cim_std(ii);
-                bottom_left_cim = cim_mean(ii-1)-cim_std(ii-1);
-                
-                top_left_hmi = hmi_mean(ii-1)+hmi_std(ii-1);
-                top_right_hmi = hmi_mean(ii)+hmi_std(ii);
-                bottom_right_hmi = hmi_mean(ii)-hmi_std(ii);
-                bottom_left_hmi = hmi_mean(ii-1)-hmi_std(ii-1);
-%                 if(top_left_cim > bottom_right_cim)
-%                     p_e_cim = 1;
-%                 else
-%                     p_e_cim = 0;
-%                 end
-%                 if(top_left_hmi > bottom_right_hmi)
-%                     p_e_hmi = 1;
-%                 else
-%                     p_e_hmi = 0;
-%                 end
-                p_e_cim = max(top_left_cim - bottom_right_cim,0)/(top_right_cim-bottom_left_cim);
-                p_e_hmi = max(top_left_hmi - bottom_right_hmi,0)/(top_right_hmi-bottom_left_hmi);
-                fprintf('tau[%0.02f,%0.02f], CIM[Pe]=%0.02f H_MI[Pe]=%0.02f\n', ...
-                    tauVec(ii-1), tauVec(ii), p_e_cim, p_e_hmi);
-            end
-            
-        elseif(plot_dep)
-%             boundedline(tauVec,mean(tauNVec),std(tauNVec),'cmap', cmap(2,:), 'transparency', 0.6);
-            hln(:,2) = boundedline(tauVec,mean(resVecDcorrVec),std(resVecDcorrVec),'o','cmap', cmap(2,:), 'transparency', transparency_val);
-            hln(:,3) = boundedline(tauVec,mean(resVecMICVec),std(resVecMICVec),'*','cmap', cmap(3,:), 'transparency', transparency_val);
-            hln(:,4) = boundedline(tauVec,mean(resVecRDCVec),std(resVecRDCVec),'.','cmap', cmap(4,:), 'transparency', transparency_val);
-        end
-        axis([0 1 0 1]);
-        hln(:,1).LineWidth=2.5;
-        hln(:,2).LineWidth=2.5;
-%         hln(:,3).LineWidth=2.5;
-%         hln(:,4).LineWidth=2.5;
-%         hln(:,5).LineWidth=2.5;
-        
-        grid on;
-        if(subplotIdx==1)
-            ylabel('$\hat{\kappa}$','FontSize',fontSize,'Interpreter','Latex');
-        end
-        % remove y ticks when plotting subplot 2 & 3
-        if(subplotIdx==2 || subplotIdx==3)
-            hh.YTickLabel = [];
-        end
-        if(subplotIdx==1)
-            title('Left-Skew','FontSize',fontSize);
-        elseif(subplotIdx==2)
-            title({copToVis,'No-Skew'},'FontSize',fontSize);
-        elseif(subplotIdx==3)
-            title('Right-Skew','FontSize',fontSize);
-        end
-        if(subplotIdx==2)
-            xlabel('\kappa','FontSize',fontSize);            
-            if(dd==1)
-                if(plot_mi)
-%                     legendCell = {'CIM','KNN_{1}', 'KNN_{6}', 'KNN_{20}','vME','AP','H_{MI}'};
-                    legendCell = {'CIM','H_{MI}'};
-                elseif(plot_dep)
-%                     legendCell = {'CIM','\tau_N','dCor','MIC','RDC'};
-                    legendCell = {'CIM','dCor','MIC','RDC'};
-                end
-                
-%                 [hl(1).leg, hl(1).obj, hl(1).hout, hl(1).mout] = ...
-%                     legendflex(hln(:,1), legendCell, 'anchor', {'nw','nw'}, ...
-%                     'buffer', [10 30], ...
-%                     'ncol', 2, ...
-%                     'fontsize', fontSize-3, ...
-%                     'xscale', 0.4, ...
-%                     'box', 'off');
-                lgnd = legend(legendCell, 'FontSize', 20);
-                set(lgnd,'color','none');
-            end
-        end
-        
-        subplotIdx = subplotIdx + 1;
-    end
-    linkaxes(linkList,'xy');
-%     h = suptitle(copToVis);
-%     h.FontSize = fontSize+2;
-end
-
-%% Compare the skewed hybrid data versus the entropy & conditional entropy based methods of estimating MI
-
-
-%% compare taukl to CIM
-clear;
-clc;
-close all;
-
-tau = 0.6;
-cop = 'Gaussian';
-iTau = copulaparam(cop,tau);
-M = 500;
-
-dispstat('','init'); % One time only initialization
-dispstat(sprintf('Begining the simulation...\n'),'keepthis','timestamp');
-
-numMCSim = 1000;
-tau_vec = zeros(1,numMCSim);
-cim_vec = zeros(1,numMCSim);
-probVecCell = {[0.05,0.95],[0.2,0.8],[0.5,0.5],[0.8,0.2],[0.95,0.05]};
-for jj=1:length(probVecCell)
-    probVec = probVecCell{jj};
-    for ii=1:numMCSim
-        dispstat(sprintf('%d/%d',ii,numMCSim),'timestamp');
-        U = copularnd(cop,iTau,M);
-        distObj = makedist('Normal');
-        X = icdf(distObj,U(:,1));                  
-        distObj = makedist('Multinomial','probabilities',probVec);
-        Y = icdf(distObj,U(:,2));
-        [u,v] = pobs_sorted_cc(X,Y);
-        [v_reverse_sorted,u_reverse_sorted] = pobs_sorted_cc(Y,X);
-
-        msi = 0.015625;
-        alpha = 0.2;
-
-        tau_val = taukl_cc(u,v,0,1,0);
-        cim_val = cim_cc_mex(u,v,msi,alpha,0,1,0);
-        correct = abs(tau_val - cim_val)<=0.01;
-        if (~correct)
-            dispstat(sprintf('!!! tau=%0.02f cim=%0.02f\n',tau_val,cim_val),'keepthis','timestamp');
-            pause;
-        end
-        tau_vec(ii) = tau_val;
-        cim_vec(ii) = cim_val;
-    end
-    total_err = sum(tau_vec-cim_vec);
-    dispstat(sprintf('err{[%0.02f,%0.02f]}=%0.02f',probVec(1),probVec(2),total_err),'keepthis','timestamp');
-end
-
-%% compare taukl_cc to taukl
-clear;
-clc;
-
-tau = 0.6;
-cop = 'Gaussian';
-iTau = copulaparam(cop,tau);
-M = 500;
-
-numMCSim = 5000;
-
-sumCorrect = 0;
-for simNum=1:numMCSim
-    U = copularnd(cop,iTau,M);
-    distObj = makedist('Normal');
-    X = icdf(distObj,U(:,1));                  
-    distObj = makedist('Multinomial','probabilities',[0.05,0.95]);
-    Y = icdf(distObj,U(:,2));
-
-    % intentionally swap u and v
-    [u,v] = pobs_sorted_cc(Y,X);
-
-    % we have to tell it Y is the continuous variable, b/c we swapped X and Y in the pobs computation
-    % (this is the last argument of 1 instead of 0)
-    ccval = taukl_cc(u,v,0,1,1);
-    regval = taukl(X,Y);
-
-    correct = abs(ccval - regval)<=eps;
-    sumCorrect = sumCorrect + correct;
-end
-sumCorrect
